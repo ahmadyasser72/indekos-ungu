@@ -27,6 +27,7 @@ const accounts = await db.query.users.findMany({
 	},
 
 	where: {
+		role: { ne: "cron" },
 		...(params.query && {
 			OR: [
 				{ username: { like: `%${params.query}%` } },

@@ -16,7 +16,8 @@
 		"docs:build-css": "tailwindcss --minify --input ./docs/wireframes/tailwind.css --output ./docs/wireframes/style.css",
 		"docs:dump-diagrams": "bun ./docs/scripts/dump.ts",
 		"docs:export-diagrams": "bun ./docs/scripts/export.ts",
-		"db:push": "bun-workspaces run db:push @e-kos/database"
+		"db:push": "bun-workspaces run db:push @e-kos/database",
+		"db:seed": "bun-workspaces run db:seed @e-kos/database"
 	},
 	"devDependencies": {
 		"@ianvs/prettier-plugin-sort-imports": "^4.7.1",

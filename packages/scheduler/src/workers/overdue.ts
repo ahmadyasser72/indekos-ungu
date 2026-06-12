@@ -1,11 +1,34 @@
 import { and, db, eq, sql } from "@e-kos/database";
-import { invoices } from "@e-kos/database/schema";
+import { auditLogs, invoices } from "@e-kos/database/schema";
+
+const cronUser = (await db.query.users.findFirst({
+	where: { username: "cron" },
+}))!;
 
 const now = Math.floor(Date.now() / 1000);
 
-await db
-	.update(invoices)
-	.set({ status: "overdue" })
-	.where(and(eq(invoices.status, "unpaid"), sql`${invoices.dueDate} < ${now}`));
+const overdue = await db.query.invoices.findMany({
+	where: { status: "unpaid" },
+});
 
-console.log("[Cron] Overdue invoices updated", new Date().toISOString());
+const filtered = overdue.filter((inv) => inv.dueDate.getTime() / 1000 < now);
+
+if (filtered.length > 0) {
+	const ids = filtered.map((inv) => inv.id);
+
+	await db
+		.update(invoices)
+		.set({ status: "overdue" })
+		.where(
+			and(eq(invoices.status, "unpaid"), sql`${invoices.dueDate} < ${now}`),
+		);
+
+	await db.insert(auditLogs).values({
+		userId: cronUser.id,
+		action: "UPDATE",
+		tableName: "invoices",
+		details: `Cron marked ${filtered.length} invoice(s) as overdue (IDs: ${ids.join(", ")})`,
+	});
+}
+
+console.log("[Cron] Overdue invoices updated: %d", filtered.length);

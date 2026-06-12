@@ -1,5 +1,9 @@
 import { db } from "@e-kos/database";
-import { notifications } from "@e-kos/database/schema";
+import { auditLogs, notifications } from "@e-kos/database/schema";
+
+const cronUser = (await db.query.users.findFirst({
+	where: { username: "cron" },
+}))!;
 
 const now = new Date();
 const threeDaysLater = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
@@ -33,4 +37,13 @@ for (const inv of dueInvoices) {
 	count++;
 }
 
-console.log(`[Cron] ${count} reminders created`);
+if (count > 0) {
+	await db.insert(auditLogs).values({
+		userId: cronUser.id,
+		action: "INSERT",
+		tableName: "notifications",
+		details: `Cron created ${count} payment reminder notification(s)`,
+	});
+}
+
+console.log("[Cron] %d reminders created", count);
