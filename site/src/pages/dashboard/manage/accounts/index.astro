@@ -27,7 +27,7 @@ const accounts = await db.query.users.findMany({
 	},
 
 	where: {
-		role: { ne: "cron" },
+		role: { ne: "system" },
 		...(params.query && {
 			OR: [
 				{ username: { like: `%${params.query}%` } },
@@ -42,7 +42,6 @@ export const ROLE_BADGES = {
 	admin: "badge-primary",
 	staff: "badge-secondary",
 	owner: "badge-accent",
-	cron: "badge-error",
 };
 
 const formResult = (():
@@ -194,7 +193,8 @@ const formResult = (():
 												<span
 													class:list={[
 														"badge badge-sm font-bold uppercase",
-														ROLE_BADGES[role],
+														ROLE_BADGES[role as keyof typeof ROLE_BADGES] ??
+															"badge-ghost",
 													]}
 												>
 													{role}

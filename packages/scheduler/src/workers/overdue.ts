@@ -1,8 +1,8 @@
 import { and, db, eq, sql } from "@e-kos/database";
 import { auditLogs, invoices } from "@e-kos/database/schema";
 
-const cronUser = (await db.query.users.findFirst({
-	where: { username: "cron" },
+const systemUser = (await db.query.users.findFirst({
+	where: { username: "system" },
 }))!;
 
 const now = Math.floor(Date.now() / 1000);
@@ -24,7 +24,7 @@ if (filtered.length > 0) {
 		);
 
 	await db.insert(auditLogs).values({
-		userId: cronUser.id,
+		userId: systemUser.id,
 		action: "UPDATE",
 		tableName: "invoices",
 		details: `Cron marked ${filtered.length} invoice(s) as overdue (IDs: ${ids.join(", ")})`,

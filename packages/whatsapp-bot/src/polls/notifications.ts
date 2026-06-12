@@ -1,8 +1,9 @@
 import { db, eq } from "@e-kos/database";
-import { notifications, tenants } from "@e-kos/database/schema";
+import { auditLogs, notifications, tenants } from "@e-kos/database/schema";
+
 import type { WASocket } from "baileys";
 
-export async function pollNotifications(sock: WASocket) {
+export async function pollNotifications(sock: WASocket, botUserId: number) {
 	const pending = await db.query.notifications.findMany({
 		where: { status: "pending" },
 	});
@@ -44,6 +45,13 @@ export async function pollNotifications(sock: WASocket) {
 				.update(notifications)
 				.set({ status: "sent" })
 				.where(eq(notifications.id, n.id));
+
+			await db.insert(auditLogs).values({
+				userId: botUserId,
+				action: "INSERT",
+				tableName: "notifications",
+				details: `Bot mengirim pengingat pembayaran ke tenant #${tenant.id} (${tenant.phoneNumber})`,
+			});
 		} catch (err) {
 			console.error("[Bot] Send notification failed:", err);
 			await db

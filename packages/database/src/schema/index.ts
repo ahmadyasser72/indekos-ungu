@@ -6,7 +6,7 @@ import {
 	uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 
-export const USER_ROLES = ["admin", "staff", "owner", "cron"] as const;
+export const USER_ROLES = ["admin", "staff", "owner", "system"] as const;
 export const INVOICE_STATUS = ["unpaid", "paid", "overdue"] as const;
 export const CHATBOT_DIRECTIONS = ["incoming", "outgoing"] as const;
 export const NOTIFICATION_TYPES = [

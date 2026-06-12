@@ -1,39 +1,46 @@
 import { createHash, randomUUID } from "node:crypto";
 
 import { db } from "./index";
-import { users } from "./schema";
+import { USER_ROLES, users } from "./schema";
 
-const CRON_USERNAME = "cron";
-const CRON_PASSWORD = randomUUID();
-
-async function main() {
+async function ensureUser(
+	username: string,
+	displayName: string,
+	role: (typeof USER_ROLES)[number],
+) {
 	const existing = await db.query.users.findFirst({
-		where: { username: CRON_USERNAME },
+		where: { username },
 	});
 
 	if (existing) {
-		console.log("[Seed] Cron user already exists (id=%d)", existing.id);
-		return;
+		console.log(
+			"[Seed] User '%s' already exists (id=%d)",
+			username,
+			existing.id,
+		);
+		return existing;
 	}
 
-	const passwordHash = createHash("sha512").update(CRON_PASSWORD).digest("hex");
+	const password = randomUUID();
+	const passwordHash = createHash("sha512").update(password).digest("hex");
 
-	const [cronUser] = await db
+	const [user] = await db
 		.insert(users)
-		.values({
-			username: CRON_USERNAME,
-			passwordHash,
-			displayName: "Cron Scheduler",
-			role: "cron",
-		})
+		.values({ username, passwordHash, displayName, role })
 		.returning({ id: users.id });
 
 	console.log(
-		"[Seed] Cron user created (id=%d, password=%s)",
-		cronUser.id,
-		CRON_PASSWORD,
+		"[Seed] User '%s' created (id=%d, password=%s)",
+		username,
+		user.id,
+		password,
 	);
-	console.log("[Seed] Save this password for reference: %s", CRON_PASSWORD);
+	return user;
+}
+
+async function main() {
+	await ensureUser("system", "System Scheduler", "system");
+	await ensureUser("bot-wa", "WhatsApp Bot", "system");
 }
 
 main();

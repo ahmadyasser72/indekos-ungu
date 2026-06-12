@@ -14,8 +14,11 @@ const params = Astro.locals.parseQuery(
 	z.object({
 		query: z.string().catch(""),
 		action: z.enum(["CREATE", "UPDATE", "DELETE"]).optional().catch(undefined),
+		show_system: z.string().optional().catch(undefined),
 	}),
 );
+
+const showSystem = params.show_system !== undefined;
 
 const logsFromDb = await db.query.auditLogs.findMany({
 	where: {
@@ -32,6 +35,11 @@ const logsFromDb = await db.query.auditLogs.findMany({
 			],
 		}),
 		...(params.action && { action: params.action }),
+		...(!showSystem && {
+			user: {
+				role: { ne: "system" },
+			},
+		}),
 	},
 	with: { user: true },
 	orderBy: { createdAt: "desc" },
@@ -121,7 +129,7 @@ const formResult = (():
 							placeholder="Cari aksi, tabel, atau pengguna..."
 						/>
 					</label>
-					<div class="flex gap-2">
+					<div class="flex items-center gap-2">
 						<select
 							hx-get
 							class="select select-sm filter-audit w-32"
@@ -140,6 +148,17 @@ const formResult = (():
 								DELETE
 							</option>
 						</select>
+
+						<label class="flex cursor-pointer items-center gap-2">
+							<span class="label-text text-xs">System</span>
+							<input
+								hx-get
+								class="toggle toggle-sm filter-audit"
+								name="show_system"
+								type="checkbox"
+								checked={showSystem}
+							/>
+						</label>
 					</div>
 				</div>
 
@@ -193,7 +212,10 @@ const formResult = (():
 											</td>
 											<td>
 												{details ? (
-													<div class="tooltip tooltip-right cursor-help" data-tip={details}>
+													<div
+														class="tooltip tooltip-right cursor-help"
+														data-tip={details}
+													>
 														<span
 															class:list={[
 																"badge badge-xs font-bold underline decoration-dotted underline-offset-2",

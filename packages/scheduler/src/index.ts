@@ -1,12 +1,12 @@
 import { db } from "@e-kos/database";
 
-const cronUser = await db.query.users.findFirst({
-	where: { username: "cron" },
+const systemUser = await db.query.users.findFirst({
+	where: { username: "system" },
 });
 
-if (!cronUser) {
+if (!systemUser) {
 	console.error(
-		"[Scheduler] Cron user not found. Run `bun run db:seed` first.",
+		"[Scheduler] System user not found. Run `bun run db:seed` first.",
 	);
 	process.exit(1);
 }

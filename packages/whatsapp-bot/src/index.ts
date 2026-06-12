@@ -1,5 +1,5 @@
 import { db } from "@e-kos/database";
-import { chatbotMessages, tenants } from "@e-kos/database/schema";
+import { auditLogs, chatbotMessages, tenants } from "@e-kos/database/schema";
 
 import { DisconnectReason, makeWASocket, useMultiFileAuthState } from "baileys";
 
@@ -21,6 +21,7 @@ interface PendingMessage {
 const debounceTimers = new Map<string, ReturnType<typeof setTimeout>>();
 const pendingMessages = new Map<string, PendingMessage>();
 let lastSendTime = 0;
+let botUserId: number;
 
 async function sendWithRateLimit(
 	sock: ReturnType<typeof makeWASocket>,
@@ -39,6 +40,19 @@ async function sendWithRateLimit(
 }
 
 async function main() {
+	const botUser = await db.query.users.findFirst({
+		where: { username: "bot-wa" },
+	});
+
+	if (!botUser) {
+		console.error(
+			"[Bot] User 'bot-wa' not found. Run `bun run db:seed` first.",
+		);
+		process.exit(1);
+	}
+
+	botUserId = botUser.id;
+
 	const { state, saveCreds } = await useMultiFileAuthState("auth_info");
 
 	const sock = makeWASocket({
@@ -89,6 +103,13 @@ async function main() {
 						await sendWithRateLimit(sock, jid, {
 							text: "Maaf, nomor Anda tidak terdaftar sebagai penghuni kos. Silakan hubungi admin untuk informasi lebih lanjut.",
 						});
+
+						await db.insert(auditLogs).values({
+							userId: botUserId,
+							action: "REJECT",
+							tableName: "chatbot_messages",
+							details: `Menolak pesan dari nomor tidak terdaftar: ${phone}`,
+						});
 					}, 10_000),
 				);
 
@@ -118,13 +139,25 @@ async function main() {
 					if (!data) return;
 
 					// Proses perintah
-					const responseText = await processCommand(data.tenant, data.text);
+					const responseText = await processCommand(
+						data.tenant,
+						data.text,
+						botUserId,
+					);
 
 					// Simpan pesan keluar
 					await db.insert(chatbotMessages).values({
 						tenantId: data.tenant.id,
 						direction: "outgoing",
 						message: responseText,
+					});
+
+					// Catat interaksi ke audit log
+					await db.insert(auditLogs).values({
+						userId: botUserId,
+						action: "INSERT",
+						tableName: "chatbot_messages",
+						details: `Bot merespons pesan dari tenant #${data.tenant.id} (${data.tenant.phoneNumber}): "${data.text.slice(0, 80)}"`,
 					});
 
 					// Kirim respons (rate limited: maks 1 pesan/detik)
@@ -136,8 +169,8 @@ async function main() {
 
 	// ─── Polling tiap 30 detik ─────────────────────────────────
 	setInterval(async () => {
-		await pollNotifications(sock);
-		await pollResolvedComplaints(sock);
+		await pollNotifications(sock, botUserId);
+		await pollResolvedComplaints(sock, botUserId);
 	}, 30_000);
 
 	console.log("[Bot] WhatsApp bot started");
@@ -147,6 +180,7 @@ async function main() {
 async function processCommand(
 	tenant: typeof tenants.$inferSelect,
 	text: string,
+	botUserId: number,
 ): Promise<string> {
 	const lower = text.toLowerCase().trim();
 
@@ -162,7 +196,7 @@ async function processCommand(
 	}
 
 	if (lower === "komplain" || lower.startsWith("komplain ")) {
-		return submitComplaint(tenant, text);
+		return submitComplaint(tenant, text, botUserId);
 	}
 
 	if (lower === "tagihan") {

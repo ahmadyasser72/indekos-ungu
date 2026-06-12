@@ -1,8 +1,8 @@
 import { db } from "@e-kos/database";
 import { auditLogs, notifications } from "@e-kos/database/schema";
 
-const cronUser = (await db.query.users.findFirst({
-	where: { username: "cron" },
+const systemUser = (await db.query.users.findFirst({
+	where: { username: "system" },
 }))!;
 
 const now = new Date();
@@ -39,7 +39,7 @@ for (const inv of dueInvoices) {
 
 if (count > 0) {
 	await db.insert(auditLogs).values({
-		userId: cronUser.id,
+		userId: systemUser.id,
 		action: "INSERT",
 		tableName: "notifications",
 		details: `Cron created ${count} payment reminder notification(s)`,

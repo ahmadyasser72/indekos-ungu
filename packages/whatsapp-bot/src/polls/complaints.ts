@@ -1,8 +1,12 @@
 import { db, eq } from "@e-kos/database";
-import { complaints, tenants } from "@e-kos/database/schema";
+import { auditLogs, complaints, tenants } from "@e-kos/database/schema";
+
 import type { WASocket } from "baileys";
 
-export async function pollResolvedComplaints(sock: WASocket) {
+export async function pollResolvedComplaints(
+	sock: WASocket,
+	botUserId: number,
+) {
 	const resolved = await db.query.complaints.findMany({
 		where: { status: "resolved", resolvedNotified: false },
 	});
@@ -53,11 +57,21 @@ export async function pollResolvedComplaints(sock: WASocket) {
 				.set({ resolvedNotified: true })
 				.where(eq(complaints.id, c.id));
 
+			await db.insert(auditLogs).values({
+				userId: botUserId,
+				action: "INSERT",
+				tableName: "notifications",
+				details: `Bot memberitahu tenant #${tenant.id} bahwa komplain #${c.id} selesai diproses`,
+			});
+
 			console.log(
 				`[Bot] Complaint #${c.id} resolved notified to ${tenant.phoneNumber}`,
 			);
 		} catch (err) {
-			console.error(`[Bot] Complaint #${c.id} resolved notification failed:`, err);
+			console.error(
+				`[Bot] Complaint #${c.id} resolved notification failed:`,
+				err,
+			);
 		}
 	}
 }

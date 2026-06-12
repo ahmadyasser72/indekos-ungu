@@ -1,9 +1,10 @@
 import { db } from "@e-kos/database";
-import { complaints, tenants } from "@e-kos/database/schema";
+import { auditLogs, complaints, tenants } from "@e-kos/database/schema";
 
 export async function submitComplaint(
 	tenant: typeof tenants.$inferSelect,
 	text: string,
+	botUserId: number,
 ): Promise<string> {
 	const complaintDesc = text.replace(/^komplain\s*/i, "").trim();
 
@@ -33,6 +34,14 @@ export async function submitComplaint(
 			status: "open",
 		})
 		.returning({ id: complaints.id, createdAt: complaints.createdAt });
+
+	await db.insert(auditLogs).values({
+		userId: botUserId,
+		action: "INSERT",
+		tableName: "complaints",
+		recordId: newComplaint.id,
+		details: `Bot membuat komplain dari tenant #${tenant.id}: "${complaintDesc.slice(0, 100)}"`,
+	});
 
 	return [
 		"*✅ Komplain Diterima*",
