@@ -1,5 +1,5 @@
 import { db, eq } from "@e-kos/database";
-import { auditLogs, notifications, tenants } from "@e-kos/database/schema";
+import { auditLogs, notifications } from "@e-kos/database/schema";
 
 import type { WASocket } from "baileys";
 

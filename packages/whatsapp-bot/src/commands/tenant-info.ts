@@ -1,5 +1,5 @@
 import { db } from "@e-kos/database";
-import { leases, tenants } from "@e-kos/database/schema";
+import { tenants } from "@e-kos/database/schema";
 
 export async function tenantInfo(
 	tenant: typeof tenants.$inferSelect,
