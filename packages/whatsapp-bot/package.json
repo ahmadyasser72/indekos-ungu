@@ -5,9 +5,9 @@
 	"private": true,
 	"scripts": {
 		"login": "bun src/login.ts",
-		"dev": "bun --watch src/index.ts",
-		"start": "bun src/index.ts",
-		"check": "tsc --noEmit"
+		"start": "bun src/start.ts",
+		"check": "tsc --noEmit",
+		"dev": "bun --watch src/start.ts"
 	},
 	"dependencies": {
 		"@e-kos/database": "workspace:*",

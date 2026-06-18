@@ -1,14 +1,5 @@
 import { createHmac } from "node:crypto";
 
-// ─── Helper to read env vars (works in both Astro & non-Astro) ─────
-function requireEnv(name: string): string {
-	const val =
-		(typeof import.meta !== "undefined" && import.meta.env?.[name]) ||
-		process.env[name];
-	if (!val) throw new Error(`Environment variable ${name} is not set`);
-	return val;
-}
-
 // ─── DuitkuConfig ──────────────────────────────────────────────────
 export interface DuitkuConfig {
 	merchantCode: string;
@@ -17,10 +8,19 @@ export interface DuitkuConfig {
 }
 
 export function config(): DuitkuConfig {
+	const {
+		DUITKU_MERCHANT_CODE,
+		DUITKU_API_KEY,
+		DUITKU_BASE_URL = "https://api-sandbox.duitku.com",
+	} = process.env;
+
+	if (!DUITKU_MERCHANT_CODE || !DUITKU_API_KEY)
+		throw new Error("DUITKU_MERCHANT_CODE and DUITKU_API_KEY is not set.");
+
 	return {
-		merchantCode: requireEnv("DUITKU_MERCHANT_CODE"),
-		apiKey: requireEnv("DUITKU_API_KEY"),
-		baseUrl: requireEnv("DUITKU_BASE_URL"),
+		merchantCode: DUITKU_MERCHANT_CODE,
+		apiKey: DUITKU_API_KEY,
+		baseUrl: DUITKU_BASE_URL,
 	};
 }
 

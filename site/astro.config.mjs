@@ -6,11 +6,14 @@ import { defineConfig, envField } from "astro/config";
 // https://astro.build/config
 export default defineConfig({
 	output: "server",
-	security: { checkOrigin: false },
-	adapter: node({ mode: "standalone" }),
+	adapter: node({ mode: "middleware" }),
 
 	env: {
 		schema: {
+			DATABASE_PATH: envField.string({
+				access: "secret",
+				context: "server",
+			}),
 			DUITKU_MERCHANT_CODE: envField.string({
 				access: "secret",
 				context: "server",
@@ -22,10 +25,7 @@ export default defineConfig({
 
 	vite: {
 		plugins: [tailwindcss()],
-		server: {
-			allowedHosts: ["indekos.shares.zrok.io"],
-			hmr: false,
-		},
+		server: { allowedHosts: ["indekos-ungu.loophole.site"] },
 	},
 	devToolbar: { enabled: false },
 });

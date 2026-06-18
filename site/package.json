@@ -6,20 +6,22 @@
 		"node": ">=22.12.0"
 	},
 	"scripts": {
-		"check": "astro check",
-		"dev": "astro dev",
+		"start": "bun start-server.ts",
 		"build": "astro build",
-		"preview": "astro preview",
-		"astro": "astro"
+		"check": "astro check",
+		"dev": "astro dev"
 	},
 	"dependencies": {
 		"@astrojs/node": "^10.0.2",
 		"@e-kos/database": "workspace:*",
+		"@fastify/middie": "9.3.2",
+		"@fastify/static": "9.1.3",
 		"@tailwindcss/vite": "^4.3.0",
 		"astro": "^6.0.6",
 		"daisyui": "^5.5.19",
 		"dayjs": "^1.11.20",
 		"es-toolkit": "^1.46.1",
+		"fastify": "5.8.5",
 		"htmx.org": "^2.0.10",
 		"iconify-icon": "^3.0.2",
 		"tailwindcss": "^4.3.0"

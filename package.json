@@ -8,18 +8,16 @@
 		"site"
 	],
 	"scripts": {
-		"check": "bun-workspaces run check",
-		"dev": "bun-workspaces run dev @e-kos/site",
-		"prebuild": "bun check && bun db:push && bun db:seed",
-		"build": "bun-workspaces run build @e-kos/site",
-		"start": "bun bm2 start ecosystem.config.ts --no-daemon",
+		"check": "pacwich run check",
+		"dev": "pacwich run dev",
+		"prebuild": "bun --cwd=packages/database --sequential db:push db:seed",
+		"build": "pacwich run build @e-kos/site",
+		"start": "pacwich run start",
 		"format": "prettier . --write",
 		"format:check": "prettier . --check",
 		"docs:build-css": "tailwindcss --minify --input ./docs/wireframes/tailwind.css --output ./docs/wireframes/style.css",
 		"docs:dump-diagrams": "bun ./docs/scripts/dump.ts",
-		"docs:export-diagrams": "bun ./docs/scripts/export.ts",
-		"db:push": "bun-workspaces run db:push @e-kos/database",
-		"db:seed": "bun-workspaces run db:seed @e-kos/database"
+		"docs:export-diagrams": "bun ./docs/scripts/export.ts"
 	},
 	"devDependencies": {
 		"@ianvs/prettier-plugin-sort-imports": "^4.7.1",
@@ -28,9 +26,8 @@
 		"@types/bun": "^1.3.11",
 		"@types/node": "^25.5.0",
 		"@xeonlink/prettier-plugin-organize-attributes": "^1.1.0",
-		"bm2": "^1.0.39",
-		"bun-workspaces": "^1.0.0",
 		"daisyui": "^5.5.19",
+		"pacwich": "0.1.0",
 		"plantuml-cli": "^1.2026.1",
 		"prettier": "^3.8.1",
 		"prettier-plugin-astro": "^0.14.1",

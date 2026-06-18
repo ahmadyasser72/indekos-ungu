@@ -40,7 +40,7 @@ async function sendWithRateLimit(
 	lastSendTime = Date.now();
 }
 
-async function main() {
+export async function main() {
 	const botUser = await db.query.users.findFirst({
 		where: { username: "bot-wa" },
 	});
@@ -221,5 +221,3 @@ async function processCommand(
 
 	return help();
 }
-
-main();
