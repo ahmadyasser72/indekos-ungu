@@ -43,9 +43,7 @@ const tenantsFromDb = await db.query.tenants.findMany({
 });
 
 const filteredTenants = tenantsFromDb.map((tenant) => {
-	// Find active lease first
 	let currentLease = tenant.leases.find(({ isActive }) => isActive);
-	// If no active lease, find the latest lease (by startDate)
 	if (!currentLease && tenant.leases.length > 0) {
 		currentLease = tenant.leases.reduce(
 			(latest, current) =>
@@ -174,18 +172,14 @@ const formResult = (():
 							<option
 								value="all"
 								selected={params.status === "all" || !params.status}
+								>Semua Status</option
 							>
-								Semua Status
-							</option>
-							<option value="active" selected={params.status === "active"}>
-								Aktif
-							</option>
-							<option
-								value="completed"
-								selected={params.status === "completed"}
+							<option value="active" selected={params.status === "active"}
+								>Aktif</option
 							>
-								Selesai
-							</option>
+							<option value="completed" selected={params.status === "completed"}
+								>Selesai</option
+							>
 						</select>
 					</div>
 				</div>
@@ -288,12 +282,46 @@ const formResult = (():
 														>
 															<Icon name="line-md:edit-twotone" /> Edit
 														</button>
-														{isActive && (
+														{isActive ? (
+															<>
+																<button
+																	class="btn btn-outline btn-xs"
+																	popovertarget={`aksi-popover-${id}`}
+																>
+																	<Icon name="line-md:chevron-down" />
+																	Aksi
+																</button>
+																<ul
+																	class="dropdown dropdown-end menu bg-base-100 rounded-box border-base-300 z-10 mt-1 w-52 border shadow-sm"
+																	id={`aksi-popover-${id}`}
+																	popover
+																>
+																	<li>
+																		<button
+																			hx-get={`/dashboard/manage/tenants/modal/move/${id}`}
+																			class="flex items-center gap-2"
+																		>
+																			<Icon name="line-md:arrow-right-circle-twotone" />
+																			Pindah Kamar
+																		</button>
+																	</li>
+																	<li>
+																		<button
+																			hx-get={`/dashboard/manage/tenants/modal/terminate/${id}`}
+																			class="text-error flex items-center gap-2"
+																		>
+																			<Icon name="line-md:close" /> Berhenti
+																			Menginap
+																		</button>
+																	</li>
+																</ul>
+															</>
+														) : (
 															<button
-																hx-get={`/dashboard/manage/tenants/modal/terminate/${id}`}
-																class="btn btn-outline btn-error btn-xs flex items-center gap-1"
+																hx-get={`/dashboard/manage/tenants/modal/register/${id}`}
+																class="btn btn-outline btn-success btn-xs flex items-center gap-1"
 															>
-																<Icon name="line-md:close" /> Keluar
+																<Icon name="line-md:plus" /> Sewa Baru
 															</button>
 														)}
 													</div>

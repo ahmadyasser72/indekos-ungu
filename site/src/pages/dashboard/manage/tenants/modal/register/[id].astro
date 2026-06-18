@@ -1,0 +1,140 @@
+---
+import { and, db, eq } from "@e-kos/database";
+import { leases as leasesTable, rooms as roomsTable } from "@e-kos/database/schema";
+
+import { actions } from "astro:actions";
+
+import IconLoader from "~/components/icon-loader.astro";
+import Icon from "~/components/icon.astro";
+
+export const partial = true;
+
+const tenant = await db.query.tenants.findFirst({
+	columns: { id: true, fullName: true },
+	where: { id: Number(Astro.params.id) },
+});
+
+const allRooms = await db
+	.select({
+		id: roomsTable.id,
+		roomNumber: roomsTable.roomNumber,
+		roomType: roomsTable.roomType,
+		isActive: roomsTable.isActive,
+		leaseActive: leasesTable.isActive,
+	})
+	.from(roomsTable)
+	.leftJoin(
+		leasesTable,
+		and(eq(leasesTable.roomId, roomsTable.id), eq(leasesTable.isActive, true)),
+	);
+
+const availableRooms = allRooms.filter(
+	({ isActive, leaseActive }) => isActive && !leaseActive,
+);
+
+if (!tenant) Astro.response.status = 404;
+---
+
+<dialog class="modal" id="register_tenant_modal">
+	{
+		tenant ? (
+			<div class="modal-box border-base-300 max-w-lg border">
+				<form method="dialog">
+					<button class="btn btn-sm btn-circle btn-ghost absolute top-2 right-2">
+						✕
+					</button>
+				</form>
+
+				<h3 class="mb-4 flex items-center gap-2 text-xl font-bold">
+					<Icon class="text-primary" name="line-md:account-twotone" size="size-6" />
+					Sewa Baru — {tenant.fullName}
+				</h3>
+
+				<form
+					hx-post={actions.manage.tenants.register}
+					class="flex flex-col gap-4"
+					id="register_tenant_form"
+					hx-indicator="#register_tenant_btn"
+					hx-on--after-request="event.detail.successful && register_tenant_modal.close()"
+					hx-select-oob="#form_error, #form_result, #tenants-rows"
+					hx-swap="none transition:true"
+					action={actions.manage.tenants.register}
+					method="post"
+				>
+					<input name="id" type="hidden" value={tenant.id} />
+
+					<fieldset class="fieldset">
+						<legend class="fieldset-legend text-sm font-semibold"
+							>Pilih Kamar</legend
+						>
+						<select class="select w-full" name="room_id" required>
+							<option value="" disabled selected>Pilih kamar...</option>
+							{
+								availableRooms.map(({ id, roomNumber, roomType }) => (
+									<option value={id}>
+										{roomNumber} – {roomType} (Tersedia)
+									</option>
+								))
+							}
+						</select>
+					</fieldset>
+
+					<div class="grid grid-cols-2 gap-3">
+						<fieldset class="fieldset">
+							<legend class="fieldset-legend text-sm font-semibold"
+								>Tanggal Mulai</legend
+							>
+							<input
+								class="input w-full"
+								name="start_date"
+								type="date"
+								required
+							/>
+						</fieldset>
+						<fieldset class="fieldset">
+							<legend class="fieldset-legend text-sm font-semibold"
+								>Tanggal Selesai</legend
+							>
+							<input class="input w-full" name="end_date" type="date" />
+						</fieldset>
+					</div>
+
+					<p class="text-error text-sm" id="form_error"></p>
+				</form>
+
+				<div class="modal-action">
+					<form class="flex gap-2" method="dialog">
+						<button class="btn btn-outline btn-sm">Batal</button>
+						<button
+							class="btn btn-success btn-sm"
+							id="register_tenant_btn"
+							type="submit"
+							form="register_tenant_form"
+						>
+							<IconLoader />
+							Daftarkan Sewa
+						</button>
+					</form>
+				</div>
+			</div>
+		) : (
+			<div class="modal-box border-base-300 border">
+				<form method="dialog">
+					<button class="btn btn-sm btn-circle btn-ghost absolute top-2 right-2">
+						✕
+					</button>
+				</form>
+
+				<h3 class="mb-4 flex items-center gap-2 text-xl font-bold">
+					<Icon class="text-primary" name="line-md:account-twotone" size="size-6" />
+					Sewa Baru
+				</h3>
+
+				<p class="py-4">Penghuni dengan ID: {Astro.params.id} tidak ditemukan.</p>
+			</div>
+		)
+	}
+	<form class="modal-backdrop" method="dialog">
+		<button>close</button>
+	</form>
+</dialog>

@@ -1,0 +1,157 @@
+---
+import { and, db, eq } from "@e-kos/database";
+import { leases as leasesTable, rooms as roomsTable } from "@e-kos/database/schema";
+
+import { actions } from "astro:actions";
+
+import IconLoader from "~/components/icon-loader.astro";
+import Icon from "~/components/icon.astro";
+import { formatDate } from "~/lib/date";
+
+export const partial = true;
+
+const tenant = await db.query.tenants.findFirst({
+	columns: { id: true, fullName: true },
+	where: { id: Number(Astro.params.id) },
+});
+
+const activeLease = tenant
+	? await db.query.leases.findFirst({
+			where: { tenantId: tenant.id, isActive: true },
+			with: { room: true },
+		})
+	: null;
+
+const allRooms = await db
+	.select({
+		id: roomsTable.id,
+		roomNumber: roomsTable.roomNumber,
+		roomType: roomsTable.roomType,
+		isActive: roomsTable.isActive,
+		leaseActive: leasesTable.isActive,
+	})
+	.from(roomsTable)
+	.leftJoin(
+		leasesTable,
+		and(eq(leasesTable.roomId, roomsTable.id), eq(leasesTable.isActive, true)),
+	);
+
+const availableRooms = allRooms.filter(
+	({ isActive, leaseActive }) => isActive && !leaseActive,
+);
+
+if (!tenant || !activeLease) Astro.response.status = 404;
+---
+
+<dialog class="modal" id="move_tenant_modal">
+	{
+		tenant && activeLease ? (
+			<div class="modal-box border-base-300 max-w-lg border">
+				<form method="dialog">
+					<button class="btn btn-sm btn-circle btn-ghost absolute top-2 right-2">
+						✕
+					</button>
+				</form>
+
+				<h3 class="mb-4 flex items-center gap-2 text-xl font-bold">
+					<Icon class="text-primary" name="line-md:move-twotone" size="size-6" />
+					Pindah Kamar
+				</h3>
+
+				<div class="bg-base-200 mb-4 grid grid-cols-2 gap-2 rounded-lg p-3 text-sm">
+					<span class="font-bold">Penghuni:</span>
+					<span>{tenant.fullName}</span>
+					<span class="font-bold">Kamar Saat Ini:</span>
+					<span class="font-mono font-bold">
+						{activeLease.room?.roomNumber ?? "-"}
+						<span class="text-base-content/50 text-xs">
+							({activeLease.room?.roomType ?? "-"})
+						</span>
+					</span>
+					<span class="font-bold">Mulai Sewa:</span>
+					<span>{formatDate(activeLease.startDate)}</span>
+				</div>
+
+				<form
+					hx-post={actions.manage.tenants.move}
+					class="flex flex-col gap-4"
+					id="move_tenant_form"
+					hx-indicator="#move_tenant_btn"
+					hx-on--after-request="event.detail.successful && move_tenant_modal.close()"
+					hx-select-oob="#form_error, #form_result, #tenants-rows"
+					hx-swap="none transition:true"
+					action={actions.manage.tenants.move}
+					method="post"
+				>
+					<input name="id" type="hidden" value={tenant.id} />
+
+					<fieldset class="fieldset">
+						<legend class="fieldset-legend text-sm font-semibold"
+							>Pilih Kamar Tujuan</legend
+						>
+						<select class="select w-full" name="room_id" required>
+							<option value="" disabled selected>Pilih kamar baru...</option>
+							{
+								availableRooms.map(({ id, roomNumber, roomType }) => (
+									<option value={id}>
+										{roomNumber} – {roomType} (Tersedia)
+									</option>
+								))
+							}
+						</select>
+					</fieldset>
+
+					<fieldset class="fieldset">
+						<legend class="fieldset-legend text-sm font-semibold"
+							>Tanggal Pindah</legend
+						>
+						<input
+							class="input w-full"
+							name="start_date"
+							type="date"
+							required
+						/>
+					</fieldset>
+
+					<p class="text-error text-sm" id="form_error"></p>
+				</form>
+
+				<div class="modal-action">
+					<form class="flex gap-2" method="dialog">
+						<button class="btn btn-outline btn-sm">Batal</button>
+						<button
+							class="btn btn-primary btn-sm"
+							id="move_tenant_btn"
+							type="submit"
+							form="move_tenant_form"
+						>
+							<IconLoader />
+							Konfirmasi Pindah
+						</button>
+					</form>
+				</div>
+			</div>
+		) : (
+			<div class="modal-box border-base-300 border">
+				<form method="dialog">
+					<button class="btn btn-sm btn-circle btn-ghost absolute top-2 right-2">
+						✕
+					</button>
+				</form>
+
+				<h3 class="mb-4 flex items-center gap-2 text-xl font-bold">
+					<Icon class="text-primary" name="line-md:move-twotone" size="size-6" />
+					Pindah Kamar
+				</h3>
+
+				<p class="py-4">
+					Penghuni dengan ID: {Astro.params.id} tidak ditemukan atau tidak memiliki
+					sewa aktif.
+				</p>
+			</div>
+		)
+	}
+	<form class="modal-backdrop" method="dialog">
+		<button>close</button>
+	</form>
+</dialog>

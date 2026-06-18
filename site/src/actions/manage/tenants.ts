@@ -176,3 +176,146 @@ export const edit = defineAction({
 		return updated;
 	},
 });
+
+export const register = defineAction({
+	accept: "form",
+	input: z.object({
+		id: z.coerce.number(),
+		room_id: z.coerce.number(),
+		start_date: z.string(),
+		end_date: z.string().optional(),
+	}),
+	handler: async (input, context) => {
+		const target = await db.query.tenants.findFirst({
+			columns: { id: true, fullName: true },
+			where: { id: input.id },
+		});
+		if (!target)
+			throw new ActionError({
+				code: "BAD_REQUEST",
+				message: "Penghuni tidak ditemukan.",
+			});
+
+		const activeLease = await db.query.leases.findFirst({
+			columns: { id: true },
+			where: { tenantId: input.id, isActive: true },
+		});
+		if (activeLease)
+			throw new ActionError({
+				code: "BAD_REQUEST",
+				message: "Penghuni masih memiliki kontrak sewa aktif.",
+			});
+
+		db.transaction((tx) => {
+			const roomTaken = tx
+				.select({ id: leases.id })
+				.from(leases)
+				.where(and(eq(leases.roomId, input.room_id), eq(leases.isActive, true)))
+				.get();
+
+			if (roomTaken) {
+				throw new ActionError({
+					code: "BAD_REQUEST",
+					message: "Kamar sudah terisi.",
+				});
+			}
+
+			tx.insert(leases)
+				.values({
+					tenantId: input.id,
+					roomId: input.room_id,
+					startDate: new Date(input.start_date),
+					endDate: input.end_date ? new Date(input.end_date) : null,
+					isActive: true,
+				})
+				.run();
+		});
+
+		const user = await context.session?.get("user");
+		await db.insert(auditLogs).values({
+			userId: user?.id ?? null,
+			action: "CREATE",
+			tableName: "leases",
+			recordId: input.id,
+			details: `Mendaftarkan ulang tenant ${target.fullName} ke kamar ID ${input.room_id}`,
+		});
+
+		return { id: input.id };
+	},
+});
+
+export const move = defineAction({
+	accept: "form",
+	input: z.object({
+		id: z.coerce.number(),
+		room_id: z.coerce.number(),
+		start_date: z.string(),
+	}),
+	handler: async (input, context) => {
+		const target = await db.query.tenants.findFirst({
+			columns: { id: true, fullName: true },
+			where: { id: input.id },
+		});
+		if (!target)
+			throw new ActionError({
+				code: "BAD_REQUEST",
+				message: "Penghuni tidak ditemukan.",
+			});
+
+		db.transaction((tx) => {
+			// Terminate old active lease
+			const oldLease = tx
+				.select({ id: leases.id })
+				.from(leases)
+				.where(and(eq(leases.tenantId, input.id), eq(leases.isActive, true)))
+				.get();
+
+			if (!oldLease) {
+				throw new ActionError({
+					code: "BAD_REQUEST",
+					message: "Penghuni tidak memiliki kontrak sewa aktif.",
+				});
+			}
+
+			// Check if target room is available
+			const roomTaken = tx
+				.select({ id: leases.id })
+				.from(leases)
+				.where(and(eq(leases.roomId, input.room_id), eq(leases.isActive, true)))
+				.get();
+
+			if (roomTaken) {
+				throw new ActionError({
+					code: "BAD_REQUEST",
+					message: "Kamar tujuan sudah terisi.",
+				});
+			}
+
+			tx.update(leases)
+				.set({ isActive: false, endDate: new Date() })
+				.where(eq(leases.id, oldLease.id))
+				.run();
+
+			tx.insert(leases)
+				.values({
+					tenantId: input.id,
+					roomId: input.room_id,
+					startDate: new Date(input.start_date),
+					endDate: null,
+					isActive: true,
+				})
+				.run();
+		});
+
+		const user = await context.session?.get("user");
+		await db.insert(auditLogs).values({
+			userId: user?.id ?? null,
+			action: "UPDATE",
+			tableName: "leases",
+			recordId: input.id,
+			details: `Memindahkan tenant ${target.fullName} ke kamar ID ${input.room_id}`,
+		});
+
+		return { id: input.id };
+	},
+});
