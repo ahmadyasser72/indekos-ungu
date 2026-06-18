@@ -38,10 +38,11 @@ const accounts = await db.query.users.findMany({
 	},
 });
 
-export const ROLE_BADGES = {
+export const ROLE_BADGES: Record<string, string> = {
 	admin: "badge-primary",
 	staff: "badge-secondary",
 	owner: "badge-accent",
+	system: "badge-ghost",
 };
 
 const formResult = (():
