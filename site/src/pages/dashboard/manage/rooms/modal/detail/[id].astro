@@ -24,7 +24,7 @@ const roomLeases = room
 	? await db.query.leases.findMany({
 			where: { roomId: room.id },
 			with: { tenant: true },
-			orderBy: (leases, { desc }) => [desc(leases.startDate)],
+			orderBy: { startDate: "desc" },
 		})
 	: [];
 

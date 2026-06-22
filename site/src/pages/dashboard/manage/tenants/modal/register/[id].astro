@@ -1,9 +1,5 @@
 ---
-import { and, db, eq } from "@e-kos/database";
-import {
-	leases as leasesTable,
-	rooms as roomsTable,
-} from "@e-kos/database/schema";
+import { db } from "@e-kos/database";
 
 import { actions } from "astro:actions";
 
@@ -20,22 +16,18 @@ const tenant = await db.query.tenants.findFirst({
 	where: { id: Number(Astro.params.id) },
 });
 
-const allRooms = await db
-	.select({
-		id: roomsTable.id,
-		roomNumber: roomsTable.roomNumber,
-		roomType: roomsTable.roomType,
-		isActive: roomsTable.isActive,
-		leaseActive: leasesTable.isActive,
-	})
-	.from(roomsTable)
-	.leftJoin(
-		leasesTable,
-		and(eq(leasesTable.roomId, roomsTable.id), eq(leasesTable.isActive, true)),
-	);
+const allRooms = await db.query.rooms.findMany({
+	columns: { id: true, roomNumber: true, roomType: true, isActive: true },
+	with: {
+		leases: {
+			columns: {},
+			where: { isActive: true },
+		},
+	},
+});
 
 const availableRooms = allRooms.filter(
-	({ isActive, leaseActive }) => isActive && !leaseActive,
+	({ isActive, leases }) => isActive && leases.length === 0,
 );
 
 if (!tenant) Astro.response.status = 404;

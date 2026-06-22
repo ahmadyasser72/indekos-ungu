@@ -3,8 +3,8 @@ import { db } from "@e-kos/database";
 
 import { sumBy } from "es-toolkit";
 
-import Icon from "~/components/ui/icon.astro";
 import Stats from "~/components/data/stats.astro";
+import Icon from "~/components/ui/icon.astro";
 import DashboardLayout from "~/layouts/dashboard-layout.astro";
 import { formatDate } from "~/lib/date";
 
@@ -62,7 +62,7 @@ const unpaidInvoices = await db.query.invoices.findMany({
 			},
 		},
 	},
-	orderBy: (invoices, { asc }) => [asc(invoices.dueDate)],
+	orderBy: { dueDate: "asc" },
 });
 
 const totalUnpaidAmount = sumBy(unpaidInvoices, (inv) => inv.amount);
@@ -96,7 +96,7 @@ const complaintsFromDb = await db.query.complaints.findMany({
 			},
 		},
 	},
-	orderBy: (complaints, { desc }) => [desc(complaints.createdAt)],
+	orderBy: { createdAt: "desc" },
 	limit: 5,
 });
 

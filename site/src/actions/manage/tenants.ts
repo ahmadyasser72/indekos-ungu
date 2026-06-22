@@ -1,4 +1,4 @@
-import { and, db, eq } from "@e-kos/database";
+import { db, eq } from "@e-kos/database";
 import {
 	auditDetail,
 	auditLogs,
@@ -38,11 +38,12 @@ export const add = defineAction({
 		// Run in a transaction synchronously for SQLite sync driver
 		const insertedTenant = db.transaction((tx) => {
 			// Check if room is already occupied using standard sync query
-			const activeLease = tx
-				.select({ id: leases.id })
-				.from(leases)
-				.where(and(eq(leases.roomId, input.room_id), eq(leases.isActive, true)))
-				.get();
+			const activeLease = tx.query.leases
+				.findFirst({
+					columns: { id: true },
+					where: { roomId: input.room_id, isActive: true },
+				})
+				.sync();
 
 			if (activeLease?.id) {
 				throw new ActionError({
@@ -232,11 +233,12 @@ export const register = defineAction({
 			});
 
 		db.transaction((tx) => {
-			const roomTaken = tx
-				.select({ id: leases.id })
-				.from(leases)
-				.where(and(eq(leases.roomId, input.room_id), eq(leases.isActive, true)))
-				.get();
+			const roomTaken = tx.query.leases
+				.findFirst({
+					columns: { id: true },
+					where: { roomId: input.room_id, isActive: true },
+				})
+				.sync();
 
 			if (roomTaken) {
 				throw new ActionError({
@@ -309,11 +311,12 @@ export const move = defineAction({
 
 		db.transaction((tx) => {
 			// Check if target room is available
-			const roomTaken = tx
-				.select({ id: leases.id })
-				.from(leases)
-				.where(and(eq(leases.roomId, input.room_id), eq(leases.isActive, true)))
-				.get();
+			const roomTaken = tx.query.leases
+				.findFirst({
+					columns: { id: true },
+					where: { roomId: input.room_id, isActive: true },
+				})
+				.sync();
 
 			if (roomTaken) {
 				throw new ActionError({
