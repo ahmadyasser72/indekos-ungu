@@ -53,6 +53,32 @@ function buildTransactionWhere(
 	return where;
 }
 
+function buildCarryoverWhere(
+	startDate: Date,
+	params: z.infer<typeof transactionQuerySchema>,
+	extra?: { useQuery?: boolean },
+): Record<string, unknown> {
+	const where: Record<string, unknown> = {
+		dueDate: { lt: startDate },
+	};
+
+	// Only unpaid/overdue invoices from before the period
+	if (params.status && params.status !== "all") {
+		where.status = params.status;
+	} else {
+		where.status = { ne: "paid" };
+	}
+
+	if (extra?.useQuery && params.query) {
+		where.OR = [
+			{ lease: { tenant: { fullName: { like: `%${params.query}%` } } } },
+			{ lease: { room: { roomNumber: { like: `%${params.query}%` } } } },
+		];
+	}
+
+	return where;
+}
+
 function getPaymentUrl(reference: string | null): string | null {
 	if (!reference) return null;
 	return getPaymentUrlFromReference(reference);
@@ -87,6 +113,9 @@ export async function fetchTransactions(
 	params: z.infer<typeof transactionQuerySchema>,
 	extra?: { useQuery?: boolean },
 ): Promise<TransactionRow[]> {
+	const { startDate } = parseDateRange(params.from, params.to);
+
+	// Main query: invoices within the period
 	const where = buildTransactionWhere(params, extra);
 
 	const invoices = await db.query.invoices.findMany({
@@ -97,6 +126,29 @@ export async function fetchTransactions(
 			},
 		},
 	});
+
+	// Carry-over: unpaid/overdue invoices from before the period
+	if (startDate && params.status !== "paid") {
+		const carryoverWhere = buildCarryoverWhere(startDate, params, extra);
+
+		const carryover = await db.query.invoices.findMany({
+			where: carryoverWhere,
+			with: {
+				lease: {
+					with: { tenant: true, room: true },
+				},
+			},
+		});
+
+		// Merge, deduplicate by id (safety — date ranges are disjoint)
+		const seen = new Set(invoices.map((i) => i.id));
+		for (const inv of carryover) {
+			if (!seen.has(inv.id)) {
+				invoices.push(inv);
+				seen.add(inv.id);
+			}
+		}
+	}
 
 	return invoices.map(mapInvoice);
 }

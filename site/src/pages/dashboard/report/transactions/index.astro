@@ -42,15 +42,27 @@ const summaryStats = [
 		icon: "line-md:circle-to-confirm-circle-transition",
 	},
 	{
-		title: "Belum Terbayar",
+		title: "Pembayaran Tertunggak",
 		value: `${unpaidCount} Invoice`,
-		desc: `Rp ${outstandingAmount.toLocaleString("id-ID")} outstanding`,
+		desc: `Rp ${outstandingAmount.toLocaleString("id-ID")} belum dibayar`,
 		icon: "line-md:close-circle",
 	},
 ];
 
 // Query filtered invoices
 const filteredInvoices = await fetchTransactions(params, { useQuery: true });
+
+// Sort: overdue/late at top
+const now = new Date();
+const sortedInvoices = [...filteredInvoices].sort((a, b) => {
+	const aLate =
+		a.status === "overdue" || (a.status === "unpaid" && a.dueDate < now);
+	const bLate =
+		b.status === "overdue" || (b.status === "unpaid" && b.dueDate < now);
+	if (aLate && !bLate) return -1;
+	if (!aLate && bLate) return 1;
+	return 0;
+});
 ---
 
 <FormResult
@@ -81,9 +93,6 @@ const filteredInvoices = await fetchTransactions(params, { useQuery: true });
 		>
 			<Icon name="line-md:download" /> PDF
 		</a>
-		<button class="btn btn-outline btn-sm">
-			<Icon name="line-md:download" /> Export Excel
-		</button>
 	</Fragment>
 
 	<FilterToolbar name="transactions" from={params.from} to={params.to}>
@@ -141,7 +150,7 @@ const filteredInvoices = await fetchTransactions(params, { useQuery: true });
 				</thead>
 				<tbody>
 					{
-						filteredInvoices.map(
+						sortedInvoices.map(
 							({
 								id,
 								invoiceNumber,
@@ -261,31 +270,28 @@ const filteredInvoices = await fetchTransactions(params, { useQuery: true });
 													</button>
 												</form>
 												<ActionsMenu id={id} menuClass="w-36">
-													<li>
-														<form
-															hx-post={actions.manage.invoices.markAsPaid}
-															class="contents"
-															hx-select="#transactions-content-wrapper"
-															hx-swap="outerHTML transition:true"
-															hx-target="#transactions-content-wrapper"
-															action={actions.manage.invoices.markAsPaid}
-															enctype="multipart/form-data"
-															method="post"
-														>
+													<form
+														hx-post={actions.manage.invoices.markAsPaid}
+														class="contents"
+														hx-select="#transactions-content-wrapper"
+														hx-swap="outerHTML transition:true"
+														hx-target="#transactions-content-wrapper"
+														action={actions.manage.invoices.markAsPaid}
+														enctype="multipart/form-data"
+														method="post"
+													>
+														<li>
 															<input
 																name="invoice_id"
 																type="hidden"
 																value={id}
 															/>
-															<button
-																class="flex items-center gap-2"
-																type="submit"
-															>
+															<button type="submit">
 																<Icon name="line-md:confirm-circle" />
 																Tandai Lunas
 															</button>
-														</form>
-													</li>
+														</li>
+													</form>
 												</ActionsMenu>
 											</div>
 										)}
