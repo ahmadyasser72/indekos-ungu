@@ -76,6 +76,7 @@ export const NOTIFICATION_TYPE_BADGES: Record<
 > = {
 	reminder: "badge-warning",
 	payment_success: "badge-success",
+	welcome: "badge-primary",
 	custom: "badge-info",
 };
 
@@ -85,6 +86,7 @@ export const NOTIFICATION_TYPE_LABELS: Record<
 > = {
 	reminder: "Pengingat",
 	payment_success: "Pembayaran Berhasil",
+	welcome: "Selamat Datang",
 	custom: "Pesan Khusus",
 };
 

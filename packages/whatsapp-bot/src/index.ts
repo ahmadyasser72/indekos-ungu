@@ -1,4 +1,4 @@
-import { db } from "@e-kos/database";
+import { db, eq } from "@e-kos/database";
 import {
 	auditDetail,
 	auditLogs,
@@ -105,6 +105,7 @@ export const main = async () => {
 			const text = message.message?.conversation?.trim() || "";
 			if (!text) continue;
 
+			const lower = text.toLowerCase().trim();
 			const phone = jid.replace("@s.whatsapp.net", "");
 			const tenant = await db.query.tenants.findFirst({
 				where: { phoneNumber: phone },
@@ -142,6 +143,25 @@ export const main = async () => {
 				direction: "incoming",
 				message: text,
 			});
+
+			// Tenant belum verifikasi — cek konfirmasi "YA"
+			if (!tenant.isVerified) {
+				if (lower === "ya") {
+					await db
+						.update(tenants)
+						.set({ isVerified: true })
+						.where(eq(tenants.id, tenant.id));
+
+					await sendWithRateLimit(sock, jid, {
+						text: `*✅ Verifikasi Berhasil!*\n\nHalo *${tenant.fullName}*! Akun Anda telah aktif.\n\nKetik *help* untuk melihat daftar perintah yang tersedia.`,
+					});
+				} else {
+					await sendWithRateLimit(sock, jid, {
+						text: `*⚠️ Akun Belum Aktif*\n\nHalo *${tenant.fullName}*! Anda belum melakukan verifikasi.\n\nSilakan balas pesan selamat datang dengan kata *YA* untuk mengaktifkan akun Anda.`,
+					});
+				}
+				continue;
+			}
 
 			// Tenant dikenal — debounce 5 detik, simpan pesan terbaru
 			pendingMessages.set(jid, { tenant, text });

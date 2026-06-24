@@ -136,10 +136,11 @@ const filteredTenants = await fetchTenants(params);
 							startDate,
 							endDate,
 							isActive,
+							isVerified,
 						}) => {
 							const status = isActive ? "Aktif" : "Selesai";
 							return (
-								<tr>
+								<tr class:list={[!isVerified && "opacity-60"]}>
 									<td class="font-semibold">
 										<div class="flex items-center gap-3">
 											<div class="avatar avatar-placeholder">
@@ -150,7 +151,14 @@ const filteredTenants = await fetchTenants(params);
 												</div>
 											</div>
 											<div class="flex flex-col">
-												<span class="font-semibold">{fullName}</span>
+												<span class="font-semibold">
+													{fullName}
+													{!isVerified && (
+														<span class="ml-1 badge align-middle badge-xs badge-warning">
+															Belum Verifikasi
+														</span>
+													)}
+												</span>
 											</div>
 										</div>
 									</td>
@@ -164,10 +172,14 @@ const filteredTenants = await fetchTenants(params);
 											+{phoneNumber}
 										</a>
 									</td>
-									<td>
-										<span class="badge font-mono badge-neutral">
-											{roomNumber}
-										</span>
+									<td class="text-center">
+										{isActive ? (
+											<span class="badge font-mono badge-neutral">
+												{roomNumber}
+											</span>
+										) : (
+											<span class="text-xs text-base-content/30 italic">-</span>
+										)}
 									</td>
 									<td class="font-mono text-xs text-base-content/70">
 										{formatDate(startDate)}

@@ -1,6 +1,11 @@
 import { db, eq } from "@e-kos/database";
 import { getPaymentUrlFromReference } from "@e-kos/database/duitku";
-import { auditDetail, auditLogs, notifications } from "@e-kos/database/schema";
+import {
+	auditDetail,
+	auditLogs,
+	chatbotMessages,
+	notifications,
+} from "@e-kos/database/schema";
 
 import type { WASocket } from "baileys";
 
@@ -34,7 +39,23 @@ export async function pollNotifications(sock: WASocket, botUserId: number) {
 					})
 				: undefined;
 
-			if (notification.type === "payment_success") {
+			if (notification.type === "welcome") {
+				const lease = await db.query.leases.findFirst({
+					where: { tenantId: notification.tenantId, isActive: true },
+					with: { room: true },
+				});
+
+				msg = `*🎉 Selamat Datang di ${lease?.room?.roomNumber ? `Kamar ${lease.room.roomNumber} - ` : ""}Indekos Ungu!*\n\n`;
+				msg += `Halo *${tenant.fullName}*,\n\n`;
+				msg += `Data Anda telah terdaftar sebagai penghuni kos. Untuk mengaktifkan akun Anda, silakan balas pesan ini dengan kata:\n\n`;
+				msg += `*YA*\n\n`;
+				msg += `Setelah itu, Anda bisa menggunakan berbagai layanan seperti:\n`;
+				msg += `• *tagihan* — Cek tagihan sewa\n`;
+				msg += `• *riwayat* — Riwayat pembayaran\n`;
+				msg += `• *komplain* — Ajukan keluhan\n`;
+				msg += `• *info* — Info kamar & data diri\n\n`;
+				msg += `_Pesan ini dikirim otomatis oleh sistem._`;
+			} else if (notification.type === "payment_success") {
 				msg = `*✅ Pembayaran Diterima*\n\n`;
 				msg += `Yth. ${tenant.fullName},\n\n`;
 
@@ -69,15 +90,26 @@ export async function pollNotifications(sock: WASocket, botUserId: number) {
 				text: msg,
 			});
 
+			const [sent] = await db
+				.insert(chatbotMessages)
+				.values({
+					tenantId: notification.tenantId,
+					direction: "outgoing",
+					message: msg,
+				})
+				.returning({ id: chatbotMessages.id });
+
 			await db
 				.update(notifications)
-				.set({ status: "sent" })
+				.set({ status: "sent", chatbotMessageId: sent.id })
 				.where(eq(notifications.id, notification.id));
 
 			const actionDesc =
-				notification.type === "payment_success"
-					? `Bot mengirim konfirmasi pembayaran sukses ke tenant #${tenant.id}`
-					: `Bot mengirim pengingat pembayaran ke tenant #${tenant.id}`;
+				notification.type === "welcome"
+					? `Bot mengirim pesan selamat datang ke tenant #${tenant.id}`
+					: notification.type === "payment_success"
+						? `Bot mengirim konfirmasi pembayaran sukses ke tenant #${tenant.id}`
+						: `Bot mengirim pengingat pembayaran ke tenant #${tenant.id}`;
 
 			await db.insert(auditLogs).values({
 				userId: botUserId,

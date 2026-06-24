@@ -28,6 +28,7 @@ const tenantLeases = tenant
 	: [];
 
 const activeLease = tenantLeases.find((lease) => lease.isActive) ?? null;
+const pastLeases = tenantLeases.filter((lease) => !lease.isActive);
 
 if (!tenant) Astro.response.status = 404;
 ---
@@ -71,52 +72,39 @@ if (!tenant) Astro.response.status = 404;
 					</span>
 				</div>
 
-				<div class="mt-4">
-					<h4 class="mb-2 flex items-center gap-1.5 text-sm font-bold text-base-content/80">
-						<Icon name="line-md:document-list-twotone" size="size-4" />
-						Riwayat Sewa
-					</h4>
-					{tenantLeases.length === 0 ? (
-						<p class="py-2 text-xs text-base-content/50 italic">
-							Belum ada riwayat sewa.
-						</p>
-					) : (
+				{pastLeases.length > 0 && (
+					<div class="mt-4">
+						<h4 class="mb-2 flex items-center gap-1.5 text-sm font-bold text-base-content/80">
+							<Icon name="line-md:document-list-twotone" size="size-4" />
+							Riwayat Sewa
+						</h4>
 						<div class="max-h-48 divide-y divide-base-200 overflow-y-auto">
-							{tenantLeases
-								.filter((lease) => !lease.isActive)
-								.map((lease) => (
-									<div class="flex items-center justify-between py-2.5 text-xs">
-										<div class="flex flex-col gap-0.5">
-											<div class="flex items-center gap-2">
-												<span class="badge font-mono badge-xs badge-neutral">
-													{lease.room?.roomNumber ?? "—"}
-												</span>
-												<span class="font-mono text-xs">
-													{formatCurrency(lease.room?.monthlyPrice ?? 0)}
-												</span>
-											</div>
-											<span class="text-base-content/60">
-												{formatDate(lease.startDate)} s/d{" "}
-												{formatDate(lease.endDate)}
+							{pastLeases.map((lease) => (
+								<div class="flex items-center justify-between py-2.5 text-xs">
+									<div class="flex flex-col gap-0.5">
+										<div class="flex items-center gap-2">
+											<span class="badge font-mono badge-xs badge-neutral">
+												{lease.room?.roomNumber ?? "—"}
+											</span>
+											<span class="font-mono text-xs">
+												{formatCurrency(lease.room?.monthlyPrice ?? 0)}
 											</span>
 										</div>
-										<div class="flex flex-col items-end gap-1">
-											<span
-												class:list={[
-													"badge badge-xs font-bold",
-													lease.isActive
-														? "badge-success"
-														: "opacity-60 badge-neutral",
-												]}
-											>
-												{lease.isActive ? "Aktif" : "Selesai"}
-											</span>
-										</div>
+										<span class="text-base-content/60">
+											{formatDate(lease.startDate)} s/d{" "}
+											{formatDate(lease.endDate)}
+										</span>
 									</div>
-								))}
+									<div class="flex flex-col items-end gap-1">
+										<span class="badge badge-xs font-bold opacity-60 badge-neutral">
+											Selesai
+										</span>
+									</div>
+								</div>
+							))}
 						</div>
-					)}
-				</div>
+					</div>
+				)}
 			</>
 		) : (
 			<NotFound label="Penghuni" />

@@ -1,5 +1,10 @@
 import { db, eq } from "@e-kos/database";
-import { auditDetail, leases, tenants } from "@e-kos/database/schema";
+import {
+	auditDetail,
+	leases,
+	notifications,
+	tenants,
+} from "@e-kos/database/schema";
 
 import { ActionError, defineAction } from "astro:actions";
 import { z } from "astro/zod";
@@ -60,6 +65,7 @@ export const add = defineAction({
 					fullName: input.full_name,
 					phoneNumber: phoneNumber,
 					originRegion: input.origin_region || null,
+					isVerified: false,
 				})
 				.returning({ id: tenants.id })
 				.all();
@@ -94,6 +100,12 @@ export const add = defineAction({
 				toCamelCaseKeys(input),
 			),
 		);
+
+		await db.insert(notifications).values({
+			tenantId: insertedTenant.id,
+			type: "welcome",
+			status: "pending",
+		});
 
 		return insertedTenant;
 	},

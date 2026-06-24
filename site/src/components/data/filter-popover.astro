@@ -36,7 +36,7 @@ const { name, groups, checkbox } = Astro.props;
 	Filter
 </button>
 <div
-	class="menu dropdown mt-2 min-w-64 bg-base-100 shadow-sm"
+	class="menu dropdown mt-2 w-72 bg-base-100 shadow-sm"
 	id={`filter-${name}-popover`}
 	popover
 	style={`position-anchor:--filter-${name}`}
@@ -45,7 +45,7 @@ const { name, groups, checkbox } = Astro.props;
 		groups.map((group) => (
 			<>
 				{group.title && <li class="menu-title">{group.title}</li>}
-				<div class="filter mx-2 mb-4">
+				<div class="filter mx-2 mb-4 gap-y-1">
 					<input
 						hx-get
 						class={`filter-reset btn btn-sm filter-${name}`}

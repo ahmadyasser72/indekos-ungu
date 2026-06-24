@@ -14,6 +14,7 @@ export const CHATBOT_DIRECTIONS = ["incoming", "outgoing"] as const;
 export const NOTIFICATION_TYPES = [
 	"reminder",
 	"payment_success",
+	"welcome",
 	"custom",
 ] as const;
 export const NOTIFICATION_STATUS = ["pending", "sent", "failed"] as const;
@@ -42,6 +43,9 @@ export const tenants = sqliteTable("tenants", {
 	fullName: text("full_name").notNull(),
 	phoneNumber: text("phone_number").notNull(),
 	originRegion: text("origin_region"),
+	isVerified: integer("is_verified", { mode: "boolean" })
+		.notNull()
+		.default(true),
 	createdAt: integer("created_at", { mode: "timestamp" })
 		.notNull()
 		.default(sql`(unixepoch())`),

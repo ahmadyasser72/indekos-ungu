@@ -65,12 +65,7 @@ const filteredNotifications = await fetchNotifications(params, {
 						name: "type",
 						options: NOTIFICATION_TYPES.map((type) => ({
 							value: type,
-							label:
-								type === "reminder"
-									? "Pengingat"
-									: type === "payment_success"
-										? "Pembayaran Berhasil"
-										: "Pesan Khusus",
+							label: NOTIFICATION_TYPE_LABELS[type],
 							checked: params.type === type,
 						})),
 					},

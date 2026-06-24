@@ -1,9 +1,5 @@
 import { db } from "@e-kos/database";
-import {
-	auditDetail,
-	chatbotMessages,
-	notifications,
-} from "@e-kos/database/schema";
+import { auditDetail, notifications } from "@e-kos/database/schema";
 
 import { ActionError, defineAction } from "astro:actions";
 import { z } from "astro/zod";
@@ -29,21 +25,10 @@ export const send = defineAction({
 			});
 		}
 
-		const [msg] = await db
-			.insert(chatbotMessages)
-			.values({
-				tenantId: tenant_id,
-				direction: "outgoing",
-				message,
-				sentAt: new Date(),
-			})
-			.returning({ id: chatbotMessages.id });
-
 		const [inserted] = await db
 			.insert(notifications)
 			.values({
 				tenantId: tenant_id,
-				chatbotMessageId: msg.id,
 				type: "custom",
 				status: "sent",
 			})

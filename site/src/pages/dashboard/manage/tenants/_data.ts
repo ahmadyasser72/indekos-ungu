@@ -16,6 +16,7 @@ export type TenantRow = {
 	startDate: Date | null;
 	endDate: Date | null;
 	isActive: boolean;
+	isVerified: boolean;
 };
 
 const mapTenantFromDb = (tenant: {
@@ -23,6 +24,7 @@ const mapTenantFromDb = (tenant: {
 	fullName: string;
 	phoneNumber: string;
 	originRegion: string | null;
+	isVerified: boolean;
 	createdAt: Date;
 	leases: Array<
 		{
@@ -43,6 +45,7 @@ const mapTenantFromDb = (tenant: {
 		startDate: (currentLease?.startDate as Date) ?? null,
 		endDate: (currentLease?.endDate as Date) ?? null,
 		isActive: Boolean(currentLease?.isActive),
+		isVerified: tenant.isVerified,
 	};
 };
 
