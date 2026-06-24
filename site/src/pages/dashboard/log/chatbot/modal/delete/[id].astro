@@ -45,7 +45,7 @@ if (!log) Astro.response.status = 404;
 	{
 		chatbotLog ? (
 			<>
-				<div class="border-base-200 grid grid-cols-2 gap-2 border-b pb-4 text-sm">
+				<div class="grid grid-cols-2 gap-2 border-b border-base-200 pb-4 text-sm">
 					<span class="font-bold">Penghuni:</span>
 					<span>
 						{chatbotLog.tenantName} (Kamar {chatbotLog.roomNumber})
@@ -58,7 +58,7 @@ if (!log) Astro.response.status = 404;
 
 				<div class="mt-4 text-sm">
 					<span class="mb-1 block font-bold">Isi Pesan:</span>
-					<p class="bg-base-200 border-base-300 max-h-32 overflow-y-auto rounded border p-3 text-xs leading-relaxed wrap-break-word whitespace-pre-wrap">
+					<p class="max-h-32 overflow-y-auto rounded border border-base-300 bg-base-200 p-3 text-xs leading-relaxed wrap-break-word whitespace-pre-wrap">
 						{chatbotLog.message}
 					</p>
 				</div>

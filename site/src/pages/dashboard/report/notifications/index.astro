@@ -86,10 +86,10 @@ const filteredNotifications = await fetchNotifications(params, {
 
 	<!-- Content Wrapper for HTMX -->
 	<div
-		class="border-base-300 rounded-box overflow-x-auto border shadow-sm"
+		class="overflow-x-auto rounded-box border border-base-300 shadow-sm"
 		id="notifications-content-wrapper"
 	>
-		<table class="table-sm table w-full">
+		<table class="table w-full table-sm">
 			<thead>
 				<tr>
 					<th>Waktu Kirim</th>
@@ -109,7 +109,7 @@ const filteredNotifications = await fetchNotifications(params, {
 								</td>
 								<td class="flex items-center gap-2 text-sm font-semibold">
 									{tenantName}
-									<span class="badge badge-neutral badge-xs font-mono">
+									<span class="badge font-mono badge-xs badge-neutral">
 										{roomNumber}
 									</span>
 								</td>

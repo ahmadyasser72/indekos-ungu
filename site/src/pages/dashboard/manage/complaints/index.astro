@@ -107,7 +107,7 @@ const complaintStats = getComplaintStats(filteredComplaints).map((s) => ({
 					return (
 						<div
 							class:list={[
-								"card bg-base-100 border-base-200 border border-l-4 shadow-sm transition-all hover:shadow-md",
+								"card border border-l-4 border-base-200 bg-base-100 shadow-sm transition-all hover:shadow-md",
 								COMPLAINT_STATUS_BORDERS[
 									status as keyof typeof COMPLAINT_STATUS_BORDERS
 								],
@@ -117,7 +117,7 @@ const complaintStats = getComplaintStats(filteredComplaints).map((s) => ({
 							<div class="card-body justify-between gap-4 p-5 md:flex-row md:items-center">
 								<div class="flex flex-1 flex-col gap-2">
 									<div class="flex flex-wrap items-center gap-2">
-										<span class="text-mono text-base-content/40 text-xs font-bold">
+										<span class="text-mono text-xs font-bold text-base-content/40">
 											KMP-{id}
 										</span>
 										<span
@@ -134,34 +134,34 @@ const complaintStats = getComplaintStats(filteredComplaints).map((s) => ({
 												]
 											}
 										</span>
-										<span class="badge badge-neutral font-mono font-bold">
+										<span class="badge font-mono font-bold badge-neutral">
 											{roomNumber || "-"}
 										</span>
-										<span class="text-base-content/50 text-xs">•</span>
-										<span class="text-base-content/60 text-xs font-semibold">
+										<span class="text-xs text-base-content/50">•</span>
+										<span class="text-xs font-semibold text-base-content/60">
 											{tenantName}
 										</span>
 									</div>
-									<p class="text-base-content text-base font-bold">
+									<p class="text-base font-bold text-base-content">
 										{description}
 									</p>
 									{resolveNotes && (
-										<div class="bg-success/5 border-success/20 mt-2 max-w-xl rounded border p-2.5 text-xs">
-											<span class="text-success mb-0.5 block font-bold">
+										<div class="mt-2 max-w-xl rounded border border-success/20 bg-success/5 p-2.5 text-xs">
+											<span class="mb-0.5 block font-bold text-success">
 												Catatan Penyelesaian:
 											</span>
-											<p class="text-base-content/85 wrap-break-word whitespace-pre-wrap">
+											<p class="wrap-break-word whitespace-pre-wrap text-base-content/85">
 												{resolveNotes}
 											</p>
 										</div>
 									)}
-									<div class="text-base-content/50 mt-1 flex items-center gap-2 text-xs">
+									<div class="mt-1 flex items-center gap-2 text-xs text-base-content/50">
 										<Icon name="line-md:calendar" size="size-3.5" />
 										<span>Dilaporkan pada: {formatDate(createdAt)}</span>
 										{resolvedByUserName && (
 											<>
 												<span>•</span>
-												<span class="text-success flex items-center gap-1 font-semibold">
+												<span class="flex items-center gap-1 font-semibold text-success">
 													<Icon name="line-md:circle-to-confirm-circle-transition" />
 													Ditangani oleh: {resolvedByUserName}
 												</span>
@@ -176,13 +176,13 @@ const complaintStats = getComplaintStats(filteredComplaints).map((s) => ({
 											hx-get={
 												"/dashboard/manage/complaints/modal/resolve/" + id
 											}
-											class="btn btn-sm btn-outline btn-success"
+											class="btn btn-outline btn-sm btn-success"
 										>
 											<Icon name="line-md:circle-to-confirm-circle-transition" />
 											Tandai Selesai
 										</button>
 									) : (
-										<span class="text-success flex items-center gap-1 text-xs font-bold">
+										<span class="flex items-center gap-1 text-xs font-bold text-success">
 											<Icon
 												name="line-md:circle-to-confirm-circle-transition"
 												size="size-4"

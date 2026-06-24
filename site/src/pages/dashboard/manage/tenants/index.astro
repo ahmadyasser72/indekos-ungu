@@ -110,10 +110,10 @@ const filteredTenants = await fetchTenants(params);
 	</div>
 
 	<div
-		class="border-base-300 rounded-box overflow-x-auto border shadow-sm"
+		class="overflow-x-auto rounded-box border border-base-300 shadow-sm"
 		id="tenants-content-wrapper"
 	>
-		<table class="table-sm table w-full">
+		<table class="table w-full table-sm">
 			<thead>
 				<tr>
 					<th>Nama Penghuni</th>
@@ -143,7 +143,7 @@ const filteredTenants = await fetchTenants(params);
 									<td class="font-semibold">
 										<div class="flex items-center gap-3">
 											<div class="avatar avatar-placeholder">
-												<div class="bg-neutral text-neutral-content w-9 rounded-full">
+												<div class="w-9 rounded-full bg-neutral text-neutral-content">
 													<span class="text-xs font-bold">
 														{fullName.slice(0, 2)}
 													</span>
@@ -156,7 +156,7 @@ const filteredTenants = await fetchTenants(params);
 									</td>
 									<td>
 										<a
-											class="btn btn-outline btn-success btn-xs flex items-center gap-1"
+											class="btn flex items-center gap-1 btn-outline btn-xs btn-success"
 											href={`https://wa.me/${phoneNumber}`}
 											target="_blank"
 										>
@@ -165,14 +165,14 @@ const filteredTenants = await fetchTenants(params);
 										</a>
 									</td>
 									<td>
-										<span class="badge badge-neutral font-mono">
+										<span class="badge font-mono badge-neutral">
 											{roomNumber}
 										</span>
 									</td>
-									<td class="text-base-content/70 font-mono text-xs">
+									<td class="font-mono text-xs text-base-content/70">
 										{formatDate(startDate)}
 									</td>
-									<td class="text-base-content/70 font-mono text-xs">
+									<td class="font-mono text-xs text-base-content/70">
 										{formatDate(endDate)}
 									</td>
 									<td>
@@ -189,7 +189,7 @@ const filteredTenants = await fetchTenants(params);
 										<div class="flex justify-end gap-1.5">
 											<button
 												hx-get={`/dashboard/manage/tenants/modal/detail/${id}`}
-												class="btn btn-outline btn-primary btn-xs flex items-center gap-1"
+												class="btn flex items-center gap-1 btn-outline btn-xs btn-primary"
 											>
 												<Icon name="line-md:document-list" /> Detail
 											</button>

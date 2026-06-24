@@ -14,7 +14,7 @@ const { items } = Astro.props;
 ---
 
 <div
-	class="stats stats-vertical sm:stats-horizontal border-base-300 w-full border shadow-sm"
+	class="stats w-full stats-vertical border border-base-300 shadow-sm sm:stats-horizontal"
 >
 	{
 		items.map(({ title, value, desc, icon }) => (

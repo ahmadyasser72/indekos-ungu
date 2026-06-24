@@ -41,29 +41,29 @@ if (!tenant) Astro.response.status = 404;
 	{
 		tenant ? (
 			<>
-				<div class="border-base-200 grid grid-cols-2 gap-x-4 gap-y-2.5 border-b pb-4 text-sm">
-					<span class="text-base-content/60 font-semibold">Nama Lengkap:</span>
+				<div class="grid grid-cols-2 gap-x-4 gap-y-2.5 border-b border-base-200 pb-4 text-sm">
+					<span class="font-semibold text-base-content/60">Nama Lengkap:</span>
 					<span class="font-bold">{tenant.fullName}</span>
 
-					<span class="text-base-content/60 font-semibold">No. HP:</span>
+					<span class="font-semibold text-base-content/60">No. HP:</span>
 					<span class="font-mono">+{tenant.phoneNumber ?? "-"}</span>
 
-					<span class="text-base-content/60 font-semibold">Daerah Asal:</span>
+					<span class="font-semibold text-base-content/60">Daerah Asal:</span>
 					<span>{tenant.originRegion ?? "-"}</span>
 
-					<span class="text-base-content/60 font-semibold">Kamar:</span>
+					<span class="font-semibold text-base-content/60">Kamar:</span>
 					<span class="font-mono font-bold">
 						{activeLease?.room?.roomNumber ?? (
 							<span class="text-base-content/40 italic">Tidak ada</span>
 						)}
 					</span>
 
-					<span class="text-base-content/60 font-semibold">
+					<span class="font-semibold text-base-content/60">
 						Tanggal Mulai Sewa:
 					</span>
 					<span>{activeLease ? formatDate(activeLease.startDate) : "-"}</span>
 
-					<span class="text-base-content/60 font-semibold">
+					<span class="font-semibold text-base-content/60">
 						Tanggal Selesai Sewa:
 					</span>
 					<span>
@@ -72,23 +72,23 @@ if (!tenant) Astro.response.status = 404;
 				</div>
 
 				<div class="mt-4">
-					<h4 class="text-base-content/80 mb-2 flex items-center gap-1.5 text-sm font-bold">
+					<h4 class="mb-2 flex items-center gap-1.5 text-sm font-bold text-base-content/80">
 						<Icon name="line-md:document-list-twotone" size="size-4" />
 						Riwayat Sewa
 					</h4>
 					{tenantLeases.length === 0 ? (
-						<p class="text-base-content/50 py-2 text-xs italic">
+						<p class="py-2 text-xs text-base-content/50 italic">
 							Belum ada riwayat sewa.
 						</p>
 					) : (
-						<div class="divide-base-200 max-h-48 divide-y overflow-y-auto">
+						<div class="max-h-48 divide-y divide-base-200 overflow-y-auto">
 							{tenantLeases
 								.filter((lease) => !lease.isActive)
 								.map((lease) => (
 									<div class="flex items-center justify-between py-2.5 text-xs">
 										<div class="flex flex-col gap-0.5">
 											<div class="flex items-center gap-2">
-												<span class="badge badge-neutral badge-xs font-mono">
+												<span class="badge font-mono badge-xs badge-neutral">
 													{lease.room?.roomNumber ?? "—"}
 												</span>
 												<span class="font-mono text-xs">
@@ -106,7 +106,7 @@ if (!tenant) Astro.response.status = 404;
 													"badge badge-xs font-bold",
 													lease.isActive
 														? "badge-success"
-														: "badge-neutral opacity-60",
+														: "opacity-60 badge-neutral",
 												]}
 											>
 												{lease.isActive ? "Aktif" : "Selesai"}

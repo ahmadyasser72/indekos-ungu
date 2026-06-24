@@ -103,7 +103,7 @@ const isPending = actualResultCode === "01";
 			<!-- Tombol Aksi (no-print) -->
 			<div class="no-print mb-4 flex items-stretch gap-2">
 				<button
-					class="btn btn-outline btn-sm flex-1"
+					class="btn flex-1 btn-outline btn-sm"
 					id="btn-capture"
 					data-filename={merchantOrderId}
 				>
@@ -111,7 +111,7 @@ const isPending = actualResultCode === "01";
 				</button>
 				{
 					isLoggedIn && (
-						<a class="btn btn-primary btn-sm flex-1" href="/dashboard">
+						<a class="btn flex-1 btn-sm btn-primary" href="/dashboard">
 							← Dashboard
 						</a>
 					)
@@ -123,8 +123,8 @@ const isPending = actualResultCode === "01";
 				<div class="card-body gap-2 p-5">
 					<!-- Kop / Logo -->
 					<div class="mb-2 text-center">
-						<div class="avatar avatar-placeholder mx-auto mb-2">
-							<div class="bg-neutral text-neutral-content w-14 rounded-full">
+						<div class="avatar mx-auto mb-2 avatar-placeholder">
+							<div class="w-14 rounded-full bg-neutral text-neutral-content">
 								<span class="text-xl font-bold">KU</span>
 							</div>
 						</div>
@@ -228,7 +228,7 @@ const isPending = actualResultCode === "01";
 						<div class="my-2 text-center">
 							<span
 								class:list={[
-									"badge badge-lg px-6 py-3 text-sm font-bold tracking-wider",
+									"badge px-6 py-3 text-sm badge-lg font-bold tracking-wider",
 									resultConfig.statusBadge,
 								]}
 							>

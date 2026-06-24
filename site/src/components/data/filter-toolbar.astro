@@ -12,7 +12,7 @@ const filterClass = `filter-${name}`;
 const targetId = `#${name}-content-wrapper`;
 ---
 
-<div class="card bg-base-100 border-base-300 border shadow-sm">
+<div class="card border border-base-300 bg-base-100 shadow-sm">
 	<div
 		class="card-body gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
 		hx-include={`.${filterClass}`}
@@ -28,11 +28,11 @@ const targetId = `#${name}-content-wrapper`;
 					hx-select-oob="#filter-period"
 				>
 					<Icon
-						class="text-primary shrink-0"
+						class="shrink-0 text-primary"
 						name="line-md:calendar"
 						size="size-5"
 					/>
-					<span class="text-base-content/75 hidden text-sm font-semibold md:inline">
+					<span class="hidden text-sm font-semibold text-base-content/75 md:inline">
 						Pilih Periode:
 					</span>
 					<input
@@ -42,7 +42,7 @@ const targetId = `#${name}-content-wrapper`;
 						type="month"
 						value={from}
 					/>
-					<span class="text-base-content/70 text-sm font-semibold">
+					<span class="text-sm font-semibold text-base-content/70">
 						Sampai:
 					</span>
 					<input

@@ -49,13 +49,13 @@ if (!tenant || !activeLease) Astro.response.status = 404;
 	{
 		tenant && activeLease ? (
 			<>
-				<div class="bg-base-200 mb-4 grid grid-cols-2 gap-2 rounded-lg p-3 text-sm">
+				<div class="mb-4 grid grid-cols-2 gap-2 rounded-lg bg-base-200 p-3 text-sm">
 					<span class="font-bold">Penghuni:</span>
 					<span>{tenant.fullName}</span>
 					<span class="font-bold">Kamar Saat Ini:</span>
 					<span class="font-mono font-bold">
 						{activeLease.room?.roomNumber ?? "-"}
-						<span class="text-base-content/50 text-xs">
+						<span class="text-xs text-base-content/50">
 							(
 							{activeLease.room?.roomType
 								? ROOM_TYPE_LABELS[activeLease.room.roomType]

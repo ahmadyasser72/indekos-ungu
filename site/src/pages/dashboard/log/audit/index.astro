@@ -85,10 +85,10 @@ const auditLogs = await fetchAuditLogs(params);
 	</FilterToolbar>
 
 	<div
-		class="border-base-300 rounded-box overflow-x-auto border shadow-sm"
+		class="overflow-x-auto rounded-box border border-base-300 shadow-sm"
 		id="audit-content-wrapper"
 	>
-		<table class="table-sm table w-full">
+		<table class="table w-full table-sm">
 			<thead>
 				<tr>
 					<th class="w-48">Waktu Kejadian</th>
@@ -130,7 +130,7 @@ const auditLogs = await fetchAuditLogs(params);
 								</td>
 								<td class="font-mono">{table}</td>
 								<td class="font-mono">
-									<span class="bg-base-200 border-base-300 rounded border px-2 py-0.5 font-bold">
+									<span class="rounded border border-base-300 bg-base-200 px-2 py-0.5 font-bold">
 										{recordId}
 									</span>
 								</td>
@@ -139,7 +139,7 @@ const auditLogs = await fetchAuditLogs(params);
 									{Astro.locals.canEdit() && (
 										<button
 											hx-get={`/dashboard/log/audit/modal/delete/${id}`}
-											class="btn btn-square btn-ghost btn-xs text-error"
+											class="btn btn-square text-error btn-ghost btn-xs"
 										>
 											<Icon name="line-md:close" size="size-4" />
 										</button>

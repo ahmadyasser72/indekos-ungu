@@ -39,7 +39,7 @@ if (!log) Astro.response.status = 404;
 	{
 		auditLog ? (
 			<>
-				<div class="border-base-200 grid grid-cols-2 gap-2 border-b pb-4 text-sm">
+				<div class="grid grid-cols-2 gap-2 border-b border-base-200 pb-4 text-sm">
 					<span class="font-bold">Pengguna:</span>
 					<span>{auditLog.userName}</span>
 					<span class="font-bold">Jenis Aksi:</span>
@@ -52,7 +52,7 @@ if (!log) Astro.response.status = 404;
 						{auditLog.action}
 					</span>
 					<span class="font-bold">Tabel Target:</span>
-					<span class="text-primary font-mono text-xs font-semibold">
+					<span class="font-mono text-xs font-semibold text-primary">
 						{auditLog.table}
 					</span>
 					<span class="font-bold">ID Record:</span>

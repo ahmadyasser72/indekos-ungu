@@ -65,10 +65,10 @@ const chatbotLogs = await fetchChatbotLogs(params);
 	</FilterToolbar>
 
 	<div
-		class="border-base-300 rounded-box overflow-x-auto border shadow-sm"
+		class="overflow-x-auto rounded-box border border-base-300 shadow-sm"
 		id="chatbot-content-wrapper"
 	>
-		<table class="table-sm table w-full">
+		<table class="table w-full table-sm">
 			<thead>
 				<tr>
 					<th class="w-48">Waktu</th>
@@ -88,14 +88,14 @@ const chatbotLogs = await fetchChatbotLogs(params);
 								</td>
 								<td>
 									{tenantName}
-									<span class="badge badge-neutral badge-xs font-mono">
+									<span class="badge font-mono badge-xs badge-neutral">
 										{roomNumber}
 									</span>
 								</td>
 								<td>
 									<span
 										class:list={[
-											"badge badge-sm flex items-center gap-1 font-bold",
+											"badge flex items-center gap-1 badge-sm font-bold",
 											DIRECTION_BADGES[
 												direction as keyof typeof DIRECTION_BADGES
 											],
@@ -121,7 +121,7 @@ const chatbotLogs = await fetchChatbotLogs(params);
 									{Astro.locals.canEdit() && (
 										<button
 											hx-get={`/dashboard/log/chatbot/modal/delete/${id}`}
-											class="btn btn-square btn-ghost btn-xs text-error"
+											class="btn btn-square text-error btn-ghost btn-xs"
 										>
 											<Icon name="line-md:close" size="size-4" />
 										</button>

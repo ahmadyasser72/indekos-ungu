@@ -170,7 +170,7 @@ const getStatusBadge = (status: string) => {
 	<Stats items={stats} />
 
 	<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-		<div class="card bg-base-100 border-base-300 border shadow-sm">
+		<div class="card border border-base-300 bg-base-100 shadow-sm">
 			<div class="card-body p-6">
 				<div class="mb-4 flex items-center justify-between">
 					<h2 class="card-title text-lg font-bold">
@@ -184,7 +184,7 @@ const getStatusBadge = (status: string) => {
 					{
 						showTransactionsLink && (
 							<a
-								class="btn btn-outline btn-primary btn-xs"
+								class="btn btn-outline btn-xs btn-primary"
 								href="/dashboard/report/transactions"
 							>
 								Lihat Semua
@@ -193,7 +193,7 @@ const getStatusBadge = (status: string) => {
 					}
 				</div>
 				<div class="overflow-x-auto">
-					<table class="table-sm table w-full">
+					<table class="table w-full table-sm">
 						<thead>
 							<tr>
 								<th>Penghuni</th>
@@ -210,7 +210,7 @@ const getStatusBadge = (status: string) => {
 										<tr>
 											<td>{tenant}</td>
 											<td>
-												<span class="badge badge-neutral font-mono">
+												<span class="badge font-mono badge-neutral">
 													{room}
 												</span>
 											</td>
@@ -235,7 +235,7 @@ const getStatusBadge = (status: string) => {
 				</div>
 			</div>
 		</div>
-		<div class="card bg-base-100 border-base-300 border shadow-sm">
+		<div class="card border border-base-300 bg-base-100 shadow-sm">
 			<div class="card-body p-6">
 				<div class="mb-4 flex items-center justify-between">
 					<h2 class="card-title text-lg font-bold">
@@ -249,7 +249,7 @@ const getStatusBadge = (status: string) => {
 					{
 						showComplaintsLink && (
 							<a
-								class="btn btn-outline btn-primary btn-xs"
+								class="btn btn-outline btn-xs btn-primary"
 								href="/dashboard/manage/complaints"
 							>
 								Kelola Komplain
@@ -257,16 +257,16 @@ const getStatusBadge = (status: string) => {
 						)
 					}
 				</div>
-				<div class="divide-base-200 divide-y">
+				<div class="divide-y divide-base-200">
 					{
 						recentComplaints.map(
 							({ title, room, tenant, date, status, badge }) => (
-								<div class="hover:bg-base-200/20 flex items-start justify-between rounded-lg px-2 py-3.5 transition-colors first:pt-0 last:pb-0">
+								<div class="flex items-start justify-between rounded-lg px-2 py-3.5 transition-colors first:pt-0 last:pb-0 hover:bg-base-200/20">
 									<div class="flex flex-col gap-1">
-										<span class="text-base-content text-sm font-bold">
+										<span class="text-sm font-bold text-base-content">
 											{title}
 										</span>
-										<div class="text-base-content/60 flex flex-wrap items-center gap-2 text-xs">
+										<div class="flex flex-wrap items-center gap-2 text-xs text-base-content/60">
 											<span class="badge badge-ghost badge-sm">{room}</span>
 											<span>•</span>
 											<span>{tenant}</span>

@@ -31,7 +31,7 @@ if (logoutResult && !logoutResult.error) {
 	<div class="drawer lg:drawer-open">
 		<input class="drawer-toggle" id="dashboard-drawer" type="checkbox" />
 		<div class="drawer-content">
-			<nav class="navbar bg-base-200 w-full">
+			<nav class="navbar w-full bg-base-200">
 				<label
 					class="btn btn-square btn-ghost lg:hidden"
 					for="dashboard-drawer"
@@ -50,7 +50,7 @@ if (logoutResult && !logoutResult.error) {
 								<div class="flex flex-col gap-1">
 									<h1 class="text-3xl font-bold">{pageTitle}</h1>
 									{description && (
-										<p class="text-base-content/60 text-sm">{description}</p>
+										<p class="text-sm text-base-content/60">{description}</p>
 									)}
 								</div>
 								<div class="flex items-center gap-2">
@@ -71,11 +71,11 @@ if (logoutResult && !logoutResult.error) {
 				aria-label="close sidebar"></label>
 
 			<div
-				class="bg-base-100 border-base-300/80 flex min-h-full w-64 flex-col border-r"
+				class="flex min-h-full w-64 flex-col border-r border-base-300/80 bg-base-100"
 			>
 				<NavbarMenu role={user.role} />
 
-				<div class="border-base-300 mt-auto border-t p-3">
+				<div class="mt-auto border-t border-base-300 p-3">
 					<UserDropdown user={user} />
 				</div>
 			</div>

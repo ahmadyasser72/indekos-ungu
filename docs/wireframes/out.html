@@ -135,85 +135,85 @@
 		</style>
 	</head>
 
-	<body class="bg-base-200 min-h-screen">
+	<body class="min-h-screen bg-base-200">
 		<div
-			class="bg-neutral text-neutral-content no-print fixed top-0 right-0 left-0 z-50 flex flex-wrap gap-1 px-3 py-1.5 text-xs shadow-lg"
+			class="no-print fixed top-0 right-0 left-0 z-50 flex flex-wrap gap-1 bg-neutral px-3 py-1.5 text-xs text-neutral-content shadow-lg"
 		>
-			<span class="wf-label text-neutral-content mr-2 self-center"
+			<span class="wf-label mr-2 self-center text-neutral-content"
 				>Output:</span
 			>
 			<button
 				onclick="showPage('laporan')"
-				class="btn btn-xs btn-ghost"
+				class="btn btn-ghost btn-xs"
 				id="nav-laporan"
 			>
 				1. Laporan Transaksi
 			</button>
 			<button
 				onclick="showPage('invoice')"
-				class="btn btn-xs btn-ghost"
+				class="btn btn-ghost btn-xs"
 				id="nav-invoice"
 			>
 				2. Struk Invoice
 			</button>
 			<button
 				onclick="showPage('lap-audit')"
-				class="btn btn-xs btn-ghost"
+				class="btn btn-ghost btn-xs"
 				id="nav-lap-audit"
 			>
 				3. Lap. Interaksi User
 			</button>
 			<button
 				onclick="showPage('lap-chatbot-msg')"
-				class="btn btn-xs btn-ghost"
+				class="btn btn-ghost btn-xs"
 				id="nav-lap-chatbot-msg"
 			>
 				4. Lap. Interaksi Penghuni
 			</button>
 			<button
 				onclick="showPage('daftar-penghuni')"
-				class="btn btn-xs btn-ghost"
+				class="btn btn-ghost btn-xs"
 				id="nav-daftar-penghuni"
 			>
 				5. Daftar Penghuni
 			</button>
 			<button
 				onclick="showPage('rekap-kamar')"
-				class="btn btn-xs btn-ghost"
+				class="btn btn-ghost btn-xs"
 				id="nav-rekap-kamar"
 			>
 				6. Rekap Kamar
 			</button>
 			<button
 				onclick="showPage('lap-komplain')"
-				class="btn btn-xs btn-ghost"
+				class="btn btn-ghost btn-xs"
 				id="nav-lap-komplain"
 			>
 				7. Lap. Komplain
 			</button>
 			<button
 				onclick="showPage('lap-pengingat')"
-				class="btn btn-xs btn-ghost"
+				class="btn btn-ghost btn-xs"
 				id="nav-lap-pengingat"
 			>
 				8. Lap. Pengingat
 			</button>
 			<button
 				onclick="showPage('rekap-tagihan')"
-				class="btn btn-xs btn-ghost"
+				class="btn btn-ghost btn-xs"
 				id="nav-rekap-tagihan"
 			>
 				9. Rekap Tagihan
 			</button>
 			<button
 				onclick="showPage('notif')"
-				class="btn btn-xs btn-ghost"
+				class="btn btn-ghost btn-xs"
 				id="nav-notif"
 			>
 				Template Notif
 			</button>
-			<div class="divider divider-horizontal mx-1"></div>
-			<button onclick="exportAll()" class="btn btn-xs btn-primary gap-1">
+			<div class="divider mx-1 divider-horizontal"></div>
+			<button onclick="exportAll()" class="btn gap-1 btn-xs btn-primary">
 				📸 Ekspor Semua PNG
 			</button>
 			<span class="ml-auto self-center text-xs opacity-40"
@@ -235,53 +235,53 @@
 						<div class="no-print flex gap-2">
 							<input type="month" class="input input-sm" />
 							<button class="btn btn-sm btn-primary">Tampilkan</button>
-							<button class="btn btn-sm btn-outline" onclick="window.print()">
+							<button class="btn btn-outline btn-sm" onclick="window.print()">
 								🖨 Cetak
 							</button>
 						</div>
 					</div>
 					<div class="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-						<div class="stat bg-base-100 rounded-box shadow-sm">
+						<div class="stat rounded-box bg-base-100 shadow-sm">
 							<div class="stat-title text-xs">Total Pemasukan</div>
 							<div class="stat-value">
-								<div class="skeleton mt-1 h-8 w-32 rounded"></div>
+								<div class="mt-1 h-8 w-32 skeleton rounded"></div>
 							</div>
 							<div class="stat-desc">
-								<div class="skeleton mt-1 h-3 w-20 rounded"></div>
+								<div class="mt-1 h-3 w-20 skeleton rounded"></div>
 							</div>
 						</div>
-						<div class="stat bg-base-100 rounded-box shadow-sm">
+						<div class="stat rounded-box bg-base-100 shadow-sm">
 							<div class="stat-title text-xs">Tagihan Lunas</div>
 							<div class="stat-value">
-								<div class="skeleton mt-1 h-8 w-12 rounded"></div>
+								<div class="mt-1 h-8 w-12 skeleton rounded"></div>
 							</div>
 							<div class="stat-desc">
-								<div class="skeleton mt-1 h-3 w-24 rounded"></div>
+								<div class="mt-1 h-3 w-24 skeleton rounded"></div>
 							</div>
 						</div>
-						<div class="stat bg-base-100 rounded-box shadow-sm">
+						<div class="stat rounded-box bg-base-100 shadow-sm">
 							<div class="stat-title text-xs">Belum Lunas</div>
 							<div class="stat-value">
-								<div class="skeleton mt-1 h-8 w-12 rounded"></div>
+								<div class="mt-1 h-8 w-12 skeleton rounded"></div>
 							</div>
 							<div class="stat-desc">
-								<div class="skeleton mt-1 h-3 w-20 rounded"></div>
+								<div class="mt-1 h-3 w-20 skeleton rounded"></div>
 							</div>
 						</div>
-						<div class="stat bg-base-100 rounded-box shadow-sm">
+						<div class="stat rounded-box bg-base-100 shadow-sm">
 							<div class="stat-title text-xs">Tingkat Lunas</div>
 							<div class="stat-value">
-								<div class="skeleton mt-1 h-8 w-16 rounded"></div>
+								<div class="mt-1 h-8 w-16 skeleton rounded"></div>
 							</div>
 							<div class="stat-desc">
-								<div class="skeleton mt-1 h-3 w-16 rounded"></div>
+								<div class="mt-1 h-3 w-16 skeleton rounded"></div>
 							</div>
 						</div>
 					</div>
 					<div class="card bg-base-100 shadow-sm">
 						<div class="card-body p-0">
 							<div class="overflow-x-auto">
-								<table class="table-zebra table-sm table">
+								<table class="table table-zebra table-sm">
 									<thead>
 										<tr>
 											<th>No. Invoice</th>
@@ -297,106 +297,106 @@
 									<tbody>
 										<tr>
 											<td>
-												<div class="skeleton h-4 w-20 rounded"></div>
+												<div class="h-4 w-20 skeleton rounded"></div>
 											</td>
 											<td>
-												<div class="skeleton h-4 w-28 rounded"></div>
+												<div class="h-4 w-28 skeleton rounded"></div>
 											</td>
 											<td>
-												<div class="skeleton h-4 w-8 rounded"></div>
+												<div class="h-4 w-8 skeleton rounded"></div>
 											</td>
 											<td>
-												<div class="skeleton h-4 w-20 rounded"></div>
+												<div class="h-4 w-20 skeleton rounded"></div>
 											</td>
 											<td>
-												<div class="skeleton h-4 w-20 rounded"></div>
+												<div class="h-4 w-20 skeleton rounded"></div>
 											</td>
 											<td>
-												<div class="skeleton h-4 w-20 rounded"></div>
+												<div class="h-4 w-20 skeleton rounded"></div>
 											</td>
 											<td>
-												<div class="skeleton h-5 w-14 rounded-full"></div>
+												<div class="h-5 w-14 skeleton rounded-full"></div>
 											</td>
 											<td>
-												<div class="skeleton h-4 w-24 rounded"></div>
-											</td>
-										</tr>
-										<tr>
-											<td>
-												<div class="skeleton h-4 w-20 rounded"></div>
-											</td>
-											<td>
-												<div class="skeleton h-4 w-28 rounded"></div>
-											</td>
-											<td>
-												<div class="skeleton h-4 w-8 rounded"></div>
-											</td>
-											<td>
-												<div class="skeleton h-4 w-20 rounded"></div>
-											</td>
-											<td>
-												<div class="skeleton h-4 w-20 rounded"></div>
-											</td>
-											<td>
-												<div class="skeleton h-4 w-20 rounded"></div>
-											</td>
-											<td>
-												<div class="skeleton h-5 w-14 rounded-full"></div>
-											</td>
-											<td>
-												<div class="skeleton h-4 w-24 rounded"></div>
+												<div class="h-4 w-24 skeleton rounded"></div>
 											</td>
 										</tr>
 										<tr>
 											<td>
-												<div class="skeleton h-4 w-20 rounded"></div>
+												<div class="h-4 w-20 skeleton rounded"></div>
 											</td>
 											<td>
-												<div class="skeleton h-4 w-28 rounded"></div>
+												<div class="h-4 w-28 skeleton rounded"></div>
 											</td>
 											<td>
-												<div class="skeleton h-4 w-8 rounded"></div>
+												<div class="h-4 w-8 skeleton rounded"></div>
 											</td>
 											<td>
-												<div class="skeleton h-4 w-20 rounded"></div>
+												<div class="h-4 w-20 skeleton rounded"></div>
 											</td>
 											<td>
-												<div class="skeleton h-4 w-20 rounded"></div>
+												<div class="h-4 w-20 skeleton rounded"></div>
 											</td>
 											<td>
-												<div class="skeleton h-4 w-20 rounded"></div>
+												<div class="h-4 w-20 skeleton rounded"></div>
 											</td>
 											<td>
-												<div class="skeleton h-5 w-14 rounded-full"></div>
+												<div class="h-5 w-14 skeleton rounded-full"></div>
 											</td>
 											<td>
-												<div class="skeleton h-4 w-24 rounded"></div>
+												<div class="h-4 w-24 skeleton rounded"></div>
 											</td>
 										</tr>
 										<tr>
 											<td>
-												<div class="skeleton h-4 w-20 rounded"></div>
+												<div class="h-4 w-20 skeleton rounded"></div>
 											</td>
 											<td>
-												<div class="skeleton h-4 w-28 rounded"></div>
+												<div class="h-4 w-28 skeleton rounded"></div>
 											</td>
 											<td>
-												<div class="skeleton h-4 w-8 rounded"></div>
+												<div class="h-4 w-8 skeleton rounded"></div>
 											</td>
 											<td>
-												<div class="skeleton h-4 w-20 rounded"></div>
+												<div class="h-4 w-20 skeleton rounded"></div>
 											</td>
 											<td>
-												<div class="skeleton h-4 w-20 rounded"></div>
+												<div class="h-4 w-20 skeleton rounded"></div>
 											</td>
 											<td>
-												<div class="skeleton h-4 w-20 rounded"></div>
+												<div class="h-4 w-20 skeleton rounded"></div>
 											</td>
 											<td>
-												<div class="skeleton h-5 w-14 rounded-full"></div>
+												<div class="h-5 w-14 skeleton rounded-full"></div>
 											</td>
 											<td>
-												<div class="skeleton h-4 w-24 rounded"></div>
+												<div class="h-4 w-24 skeleton rounded"></div>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<div class="h-4 w-20 skeleton rounded"></div>
+											</td>
+											<td>
+												<div class="h-4 w-28 skeleton rounded"></div>
+											</td>
+											<td>
+												<div class="h-4 w-8 skeleton rounded"></div>
+											</td>
+											<td>
+												<div class="h-4 w-20 skeleton rounded"></div>
+											</td>
+											<td>
+												<div class="h-4 w-20 skeleton rounded"></div>
+											</td>
+											<td>
+												<div class="h-4 w-20 skeleton rounded"></div>
+											</td>
+											<td>
+												<div class="h-5 w-14 skeleton rounded-full"></div>
+											</td>
+											<td>
+												<div class="h-4 w-24 skeleton rounded"></div>
 											</td>
 										</tr>
 									</tbody>
@@ -404,7 +404,7 @@
 										<tr class="font-bold">
 											<td colspan="3">Total</td>
 											<td>
-												<div class="skeleton h-4 w-28 rounded"></div>
+												<div class="h-4 w-28 skeleton rounded"></div>
 											</td>
 											<td colspan="4"></td>
 										</tr>
@@ -421,29 +421,29 @@
 				<div class="mx-auto max-w-xs p-4">
 					<div class="no-print mb-4 flex gap-2">
 						<button
-							class="btn btn-sm btn-outline flex-1"
+							class="btn flex-1 btn-outline btn-sm"
 							onclick="window.print()"
 						>
 							🖨 Cetak
 						</button>
-						<button class="btn btn-sm btn-primary flex-1">⬇ PDF</button>
+						<button class="btn flex-1 btn-sm btn-primary">⬇ PDF</button>
 					</div>
 					<div class="card bg-base-100 shadow-xl">
 						<div class="card-body gap-2 p-5">
 							<div class="mb-2 text-center">
-								<div class="avatar avatar-placeholder mx-auto mb-2">
+								<div class="avatar mx-auto mb-2 avatar-placeholder">
 									<div
-										class="bg-neutral text-neutral-content w-12 rounded-full"
+										class="w-12 rounded-full bg-neutral text-neutral-content"
 									>
 										<span class="text-sm">KU</span>
 									</div>
 								</div>
 								<h2 class="text-base font-bold tracking-wide uppercase">
-									<span class="skeleton inline-block h-5 w-32 rounded"></span>
+									<span class="inline-block h-5 w-32 skeleton rounded"></span>
 								</h2>
 								<p class="text-xs opacity-60">
 									<span
-										class="skeleton mt-1 inline-block h-3 w-48 rounded"
+										class="mt-1 inline-block h-3 w-48 skeleton rounded"
 									></span>
 								</p>
 							</div>
@@ -451,15 +451,15 @@
 							<div class="flex flex-col gap-1">
 								<div class="inv-row">
 									<span class="opacity-60">No. Invoice</span>
-									<div class="skeleton h-4 w-24 rounded"></div>
+									<div class="h-4 w-24 skeleton rounded"></div>
 								</div>
 								<div class="inv-row">
 									<span class="opacity-60">Diterbitkan</span>
-									<div class="skeleton h-4 w-20 rounded"></div>
+									<div class="h-4 w-20 skeleton rounded"></div>
 								</div>
 								<div class="inv-row">
 									<span class="opacity-60">Jatuh Tempo</span>
-									<div class="skeleton h-4 w-20 rounded"></div>
+									<div class="h-4 w-20 skeleton rounded"></div>
 								</div>
 							</div>
 							<hr class="dash-sep" />
@@ -471,26 +471,26 @@
 							<div class="flex flex-col gap-1">
 								<div class="inv-row">
 									<span class="opacity-60">Nama</span>
-									<div class="skeleton h-4 w-28 rounded"></div>
+									<div class="h-4 w-28 skeleton rounded"></div>
 								</div>
 								<div class="inv-row">
 									<span class="opacity-60">Kamar</span>
-									<div class="skeleton h-4 w-16 rounded"></div>
+									<div class="h-4 w-16 skeleton rounded"></div>
 								</div>
 								<div class="inv-row">
 									<span class="opacity-60">Masa Sewa</span>
-									<div class="skeleton h-4 w-20 rounded"></div>
+									<div class="h-4 w-20 skeleton rounded"></div>
 								</div>
 							</div>
 							<hr class="dash-sep" />
 							<div class="inv-row">
 								<span class="opacity-70">Sewa kamar/bulan</span>
-								<div class="skeleton h-4 w-20 rounded"></div>
+								<div class="h-4 w-20 skeleton rounded"></div>
 							</div>
 							<hr class="dash-sep" />
 							<div class="mt-1 flex justify-between text-base font-bold">
 								<span>TOTAL</span>
-								<div class="skeleton h-6 w-24 rounded"></div>
+								<div class="h-6 w-24 skeleton rounded"></div>
 							</div>
 							<hr class="dash-sep" />
 							<p
@@ -501,25 +501,25 @@
 							<div class="flex flex-col gap-1">
 								<div class="inv-row">
 									<span class="opacity-60">Metode</span>
-									<div class="skeleton h-4 w-28 rounded"></div>
+									<div class="h-4 w-28 skeleton rounded"></div>
 								</div>
 								<div class="inv-row">
 									<span class="opacity-60">Tanggal</span>
-									<div class="skeleton h-4 w-32 rounded"></div>
+									<div class="h-4 w-32 skeleton rounded"></div>
 								</div>
 								<div class="inv-row">
 									<span class="opacity-60">Ref.</span>
-									<div class="skeleton h-4 w-28 rounded"></div>
+									<div class="h-4 w-28 skeleton rounded"></div>
 								</div>
 							</div>
 							<hr class="dash-sep" />
 							<div class="my-2 text-center">
-								<span class="badge badge-success badge-lg px-6 py-3 text-sm"
+								<span class="badge px-6 py-3 text-sm badge-lg badge-success"
 									>✅ LUNAS</span
 								>
 							</div>
 							<hr class="dash-sep" />
-							<div class="skeleton mt-1 h-12 w-full rounded"></div>
+							<div class="mt-1 h-12 w-full skeleton rounded"></div>
 							<p class="mt-1 text-center text-xs opacity-30">
 								Simpan struk ini sebagai bukti pembayaran
 							</p>
@@ -532,7 +532,7 @@
 			<div id="page-lap-audit" class="page">
 				<div class="p-6">
 					<div class="no-print mx-auto mb-4 flex max-w-3xl justify-end gap-2">
-						<button class="btn btn-sm btn-outline" onclick="window.print()">
+						<button class="btn btn-outline btn-sm" onclick="window.print()">
 							🖨 Cetak
 						</button>
 						<button class="btn btn-sm btn-primary">⬇ PDF</button>
@@ -544,7 +544,7 @@
 							<p>
 								Periode:
 								<span
-									class="skeleton inline-block h-4 w-28 rounded align-middle"
+									class="inline-block h-4 w-28 skeleton rounded align-middle"
 								></span>
 							</p>
 						</div>
@@ -553,18 +553,18 @@
 							<p class="text-sm font-semibold">
 								Nama Pengguna:
 								<span
-									class="skeleton inline-block h-4 w-32 rounded align-middle"
+									class="inline-block h-4 w-32 skeleton rounded align-middle"
 								></span>
 							</p>
 							<p class="text-xs opacity-60">
 								Role:
 								<span
-									class="skeleton inline-block h-3 w-16 rounded align-middle"
+									class="inline-block h-3 w-16 skeleton rounded align-middle"
 								></span>
 							</p>
 						</div>
 
-						<table class="border-base-200 mb-4 w-full border text-sm">
+						<table class="mb-4 w-full border border-base-200 text-sm">
 							<thead class="bg-base-200">
 								<tr>
 									<th class="p-2 text-left">Waktu</th>
@@ -574,46 +574,46 @@
 								</tr>
 							</thead>
 							<tbody>
-								<tr class="border-base-200 border-t">
+								<tr class="border-t border-base-200">
 									<td class="p-2">
-										<div class="skeleton h-4 w-28 rounded"></div>
+										<div class="h-4 w-28 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-32 rounded"></div>
+										<div class="h-4 w-32 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-16 rounded"></div>
+										<div class="h-4 w-16 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-8 rounded"></div>
-									</td>
-								</tr>
-								<tr class="border-base-200 border-t">
-									<td class="p-2">
-										<div class="skeleton h-4 w-28 rounded"></div>
-									</td>
-									<td class="p-2">
-										<div class="skeleton h-4 w-32 rounded"></div>
-									</td>
-									<td class="p-2">
-										<div class="skeleton h-4 w-16 rounded"></div>
-									</td>
-									<td class="p-2">
-										<div class="skeleton h-4 w-8 rounded"></div>
+										<div class="h-4 w-8 skeleton rounded"></div>
 									</td>
 								</tr>
-								<tr class="border-base-200 border-t">
+								<tr class="border-t border-base-200">
 									<td class="p-2">
-										<div class="skeleton h-4 w-28 rounded"></div>
+										<div class="h-4 w-28 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-32 rounded"></div>
+										<div class="h-4 w-32 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-16 rounded"></div>
+										<div class="h-4 w-16 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-8 rounded"></div>
+										<div class="h-4 w-8 skeleton rounded"></div>
+									</td>
+								</tr>
+								<tr class="border-t border-base-200">
+									<td class="p-2">
+										<div class="h-4 w-28 skeleton rounded"></div>
+									</td>
+									<td class="p-2">
+										<div class="h-4 w-32 skeleton rounded"></div>
+									</td>
+									<td class="p-2">
+										<div class="h-4 w-16 skeleton rounded"></div>
+									</td>
+									<td class="p-2">
+										<div class="h-4 w-8 skeleton rounded"></div>
 									</td>
 								</tr>
 							</tbody>
@@ -628,7 +628,7 @@
 			<div id="page-lap-chatbot-msg" class="page">
 				<div class="p-6">
 					<div class="no-print mx-auto mb-4 flex max-w-3xl justify-end gap-2">
-						<button class="btn btn-sm btn-outline" onclick="window.print()">
+						<button class="btn btn-outline btn-sm" onclick="window.print()">
 							🖨 Cetak
 						</button>
 						<button class="btn btn-sm btn-primary">⬇ PDF</button>
@@ -640,7 +640,7 @@
 							<p>
 								Periode:
 								<span
-									class="skeleton inline-block h-4 w-28 rounded align-middle"
+									class="inline-block h-4 w-28 skeleton rounded align-middle"
 								></span>
 							</p>
 						</div>
@@ -649,18 +649,18 @@
 							<p class="text-sm font-semibold">
 								Nama Penghuni:
 								<span
-									class="skeleton inline-block h-4 w-32 rounded align-middle"
+									class="inline-block h-4 w-32 skeleton rounded align-middle"
 								></span>
 							</p>
 							<p class="text-xs opacity-60">
 								Kamar:
 								<span
-									class="skeleton inline-block h-3 w-8 rounded align-middle"
+									class="inline-block h-3 w-8 skeleton rounded align-middle"
 								></span>
 							</p>
 						</div>
 
-						<table class="border-base-200 mb-4 w-full border text-xs">
+						<table class="mb-4 w-full border border-base-200 text-xs">
 							<thead class="bg-base-200">
 								<tr>
 									<th class="p-2 text-left">Waktu</th>
@@ -669,37 +669,37 @@
 								</tr>
 							</thead>
 							<tbody>
-								<tr class="border-base-200 border-t">
+								<tr class="border-t border-base-200">
 									<td class="p-2">
-										<div class="skeleton h-4 w-28 rounded"></div>
+										<div class="h-4 w-28 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-16 rounded"></div>
+										<div class="h-4 w-16 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-64 rounded"></div>
-									</td>
-								</tr>
-								<tr class="border-base-200 border-t">
-									<td class="p-2">
-										<div class="skeleton h-4 w-28 rounded"></div>
-									</td>
-									<td class="p-2">
-										<div class="skeleton h-4 w-16 rounded"></div>
-									</td>
-									<td class="p-2">
-										<div class="skeleton h-4 w-64 rounded"></div>
+										<div class="h-4 w-64 skeleton rounded"></div>
 									</td>
 								</tr>
-								<tr class="border-base-200 border-t">
+								<tr class="border-t border-base-200">
 									<td class="p-2">
-										<div class="skeleton h-4 w-28 rounded"></div>
+										<div class="h-4 w-28 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-16 rounded"></div>
+										<div class="h-4 w-16 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-64 rounded"></div>
+										<div class="h-4 w-64 skeleton rounded"></div>
+									</td>
+								</tr>
+								<tr class="border-t border-base-200">
+									<td class="p-2">
+										<div class="h-4 w-28 skeleton rounded"></div>
+									</td>
+									<td class="p-2">
+										<div class="h-4 w-16 skeleton rounded"></div>
+									</td>
+									<td class="p-2">
+										<div class="h-4 w-64 skeleton rounded"></div>
 									</td>
 								</tr>
 							</tbody>
@@ -714,7 +714,7 @@
 			<div id="page-daftar-penghuni" class="page">
 				<div class="p-6">
 					<div class="no-print mx-auto mb-4 flex max-w-3xl justify-end gap-2">
-						<button class="btn btn-sm btn-outline" onclick="window.print()">
+						<button class="btn btn-outline btn-sm" onclick="window.print()">
 							🖨 Cetak
 						</button>
 						<button class="btn btn-sm btn-primary">⬇ PDF</button>
@@ -726,11 +726,11 @@
 							<p>
 								Per tanggal:
 								<span
-									class="skeleton inline-block h-4 w-28 rounded align-middle"
+									class="inline-block h-4 w-28 skeleton rounded align-middle"
 								></span>
 							</p>
 						</div>
-						<table class="border-base-200 mb-4 w-full border text-sm">
+						<table class="mb-4 w-full border border-base-200 text-sm">
 							<thead class="bg-base-200">
 								<tr>
 									<th class="p-2 text-left">No</th>
@@ -742,100 +742,100 @@
 								</tr>
 							</thead>
 							<tbody>
-								<tr class="border-base-200 border-t">
+								<tr class="border-t border-base-200">
 									<td class="p-2">1</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-28 rounded"></div>
+										<div class="h-4 w-28 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-24 rounded"></div>
+										<div class="h-4 w-24 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-8 rounded"></div>
+										<div class="h-4 w-8 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-20 rounded"></div>
+										<div class="h-4 w-20 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-20 rounded"></div>
+										<div class="h-4 w-20 skeleton rounded"></div>
 									</td>
 								</tr>
-								<tr class="border-base-200 border-t">
+								<tr class="border-t border-base-200">
 									<td class="p-2">2</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-28 rounded"></div>
+										<div class="h-4 w-28 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-24 rounded"></div>
+										<div class="h-4 w-24 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-8 rounded"></div>
+										<div class="h-4 w-8 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-20 rounded"></div>
+										<div class="h-4 w-20 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-20 rounded"></div>
+										<div class="h-4 w-20 skeleton rounded"></div>
 									</td>
 								</tr>
-								<tr class="border-base-200 border-t">
+								<tr class="border-t border-base-200">
 									<td class="p-2">3</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-28 rounded"></div>
+										<div class="h-4 w-28 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-24 rounded"></div>
+										<div class="h-4 w-24 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-8 rounded"></div>
+										<div class="h-4 w-8 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-20 rounded"></div>
+										<div class="h-4 w-20 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-20 rounded"></div>
+										<div class="h-4 w-20 skeleton rounded"></div>
 									</td>
 								</tr>
-								<tr class="border-base-200 border-t">
+								<tr class="border-t border-base-200">
 									<td class="p-2">4</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-28 rounded"></div>
+										<div class="h-4 w-28 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-24 rounded"></div>
+										<div class="h-4 w-24 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-8 rounded"></div>
+										<div class="h-4 w-8 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-20 rounded"></div>
+										<div class="h-4 w-20 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-20 rounded"></div>
+										<div class="h-4 w-20 skeleton rounded"></div>
 									</td>
 								</tr>
-								<tr class="border-base-200 border-t">
+								<tr class="border-t border-base-200">
 									<td class="p-2">5</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-28 rounded"></div>
+										<div class="h-4 w-28 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-24 rounded"></div>
+										<div class="h-4 w-24 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-8 rounded"></div>
+										<div class="h-4 w-8 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-20 rounded"></div>
+										<div class="h-4 w-20 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-20 rounded"></div>
+										<div class="h-4 w-20 skeleton rounded"></div>
 									</td>
 								</tr>
-								<tr class="border-base-300 border-t font-bold">
+								<tr class="border-t border-base-300 font-bold">
 									<td colspan="2" class="p-2">Total penghuni</td>
 									<td colspan="4" class="p-2">
-										<div class="skeleton h-4 w-8 rounded"></div>
+										<div class="h-4 w-8 skeleton rounded"></div>
 									</td>
 								</tr>
 							</tbody>
@@ -845,26 +845,26 @@
 								<p>
 									Banjarbaru,
 									<span
-										class="skeleton inline-block h-4 w-20 rounded align-middle"
+										class="inline-block h-4 w-20 skeleton rounded align-middle"
 									></span>
 								</p>
 								<p class="mt-1 font-semibold">Dibuat oleh</p>
 								<p class="text-xs opacity-60">(Staff/Admin)</p>
 								<div class="ttd-name-line">
-									<div class="skeleton mx-auto h-4 w-32 rounded"></div>
+									<div class="mx-auto h-4 w-32 skeleton rounded"></div>
 								</div>
 							</div>
 							<div>
 								<p>
 									Banjarbaru,
 									<span
-										class="skeleton inline-block h-4 w-20 rounded align-middle"
+										class="inline-block h-4 w-20 skeleton rounded align-middle"
 									></span>
 								</p>
 								<p class="mt-1 font-semibold">Diketahui oleh</p>
 								<p class="text-xs opacity-60">(Pemilik Kos)</p>
 								<div class="ttd-name-line">
-									<div class="skeleton mx-auto h-4 w-32 rounded"></div>
+									<div class="mx-auto h-4 w-32 skeleton rounded"></div>
 								</div>
 							</div>
 						</div>
@@ -876,7 +876,7 @@
 			<div id="page-rekap-kamar" class="page">
 				<div class="p-6">
 					<div class="no-print mx-auto mb-4 flex max-w-3xl justify-end gap-2">
-						<button class="btn btn-sm btn-outline" onclick="window.print()">
+						<button class="btn btn-outline btn-sm" onclick="window.print()">
 							🖨 Cetak
 						</button>
 						<button class="btn btn-sm btn-primary">⬇ PDF</button>
@@ -888,38 +888,38 @@
 							<p>
 								Per tanggal:
 								<span
-									class="skeleton inline-block h-4 w-28 rounded align-middle"
+									class="inline-block h-4 w-28 skeleton rounded align-middle"
 								></span>
 							</p>
 						</div>
 						<div class="mb-4 flex gap-4 text-sm">
 							<div
-								class="border-base-200 flex-1 rounded border p-3 text-center"
+								class="flex-1 rounded border border-base-200 p-3 text-center"
 							>
 								<p class="text-xs opacity-60">Total Kamar</p>
-								<div class="skeleton mx-auto mt-1 h-7 w-8 rounded"></div>
+								<div class="mx-auto mt-1 h-7 w-8 skeleton rounded"></div>
 							</div>
 							<div
-								class="border-base-200 flex-1 rounded border p-3 text-center"
+								class="flex-1 rounded border border-base-200 p-3 text-center"
 							>
 								<p class="text-xs opacity-60">Terisi</p>
-								<div class="skeleton mx-auto mt-1 h-7 w-8 rounded"></div>
+								<div class="mx-auto mt-1 h-7 w-8 skeleton rounded"></div>
 							</div>
 							<div
-								class="border-base-200 flex-1 rounded border p-3 text-center"
+								class="flex-1 rounded border border-base-200 p-3 text-center"
 							>
 								<p class="text-xs opacity-60">Tersedia</p>
-								<div class="skeleton mx-auto mt-1 h-7 w-8 rounded"></div>
+								<div class="mx-auto mt-1 h-7 w-8 skeleton rounded"></div>
 							</div>
 							<div
-								class="border-base-200 flex-1 rounded border p-3 text-center"
+								class="flex-1 rounded border border-base-200 p-3 text-center"
 							>
 								<p class="text-xs opacity-60">Nonaktif</p>
-								<div class="skeleton mx-auto mt-1 h-7 w-8 rounded"></div>
+								<div class="mx-auto mt-1 h-7 w-8 skeleton rounded"></div>
 							</div>
 						</div>
 						<p class="mb-2 font-semibold">Rincian Status Setiap Kamar:</p>
-						<table class="border-base-200 mb-4 w-full border text-sm">
+						<table class="mb-4 w-full border border-base-200 text-sm">
 							<thead class="bg-base-200">
 								<tr>
 									<th class="p-2 text-left">No. Kamar</th>
@@ -931,94 +931,94 @@
 								</tr>
 							</thead>
 							<tbody>
-								<tr class="border-base-200 border-t">
+								<tr class="border-t border-base-200">
 									<td class="p-2">
-										<div class="skeleton h-4 w-8 rounded"></div>
+										<div class="h-4 w-8 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-16 rounded"></div>
+										<div class="h-4 w-16 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton ml-auto h-4 w-20 rounded"></div>
+										<div class="ml-auto h-4 w-20 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-5 w-14 rounded-full"></div>
+										<div class="h-5 w-14 skeleton rounded-full"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-24 rounded"></div>
+										<div class="h-4 w-24 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-20 rounded"></div>
-									</td>
-								</tr>
-								<tr class="border-base-200 border-t">
-									<td class="p-2">
-										<div class="skeleton h-4 w-8 rounded"></div>
-									</td>
-									<td class="p-2">
-										<div class="skeleton h-4 w-16 rounded"></div>
-									</td>
-									<td class="p-2">
-										<div class="skeleton ml-auto h-4 w-20 rounded"></div>
-									</td>
-									<td class="p-2">
-										<div class="skeleton h-5 w-14 rounded-full"></div>
-									</td>
-									<td class="p-2">
-										<div class="skeleton h-4 w-24 rounded"></div>
-									</td>
-									<td class="p-2">
-										<div class="skeleton h-4 w-20 rounded"></div>
+										<div class="h-4 w-20 skeleton rounded"></div>
 									</td>
 								</tr>
-								<tr class="border-base-200 border-t">
+								<tr class="border-t border-base-200">
 									<td class="p-2">
-										<div class="skeleton h-4 w-8 rounded"></div>
+										<div class="h-4 w-8 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-16 rounded"></div>
+										<div class="h-4 w-16 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton ml-auto h-4 w-20 rounded"></div>
+										<div class="ml-auto h-4 w-20 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-5 w-14 rounded-full"></div>
+										<div class="h-5 w-14 skeleton rounded-full"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-24 rounded"></div>
+										<div class="h-4 w-24 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-20 rounded"></div>
+										<div class="h-4 w-20 skeleton rounded"></div>
 									</td>
 								</tr>
-								<tr class="border-base-200 border-t">
+								<tr class="border-t border-base-200">
 									<td class="p-2">
-										<div class="skeleton h-4 w-8 rounded"></div>
+										<div class="h-4 w-8 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-16 rounded"></div>
+										<div class="h-4 w-16 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton ml-auto h-4 w-20 rounded"></div>
+										<div class="ml-auto h-4 w-20 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-5 w-14 rounded-full"></div>
+										<div class="h-5 w-14 skeleton rounded-full"></div>
+									</td>
+									<td class="p-2">
+										<div class="h-4 w-24 skeleton rounded"></div>
+									</td>
+									<td class="p-2">
+										<div class="h-4 w-20 skeleton rounded"></div>
+									</td>
+								</tr>
+								<tr class="border-t border-base-200">
+									<td class="p-2">
+										<div class="h-4 w-8 skeleton rounded"></div>
+									</td>
+									<td class="p-2">
+										<div class="h-4 w-16 skeleton rounded"></div>
+									</td>
+									<td class="p-2">
+										<div class="ml-auto h-4 w-20 skeleton rounded"></div>
+									</td>
+									<td class="p-2">
+										<div class="h-5 w-14 skeleton rounded-full"></div>
 									</td>
 									<td class="p-2 text-xs opacity-40">—</td>
 									<td class="p-2 text-xs opacity-40">—</td>
 								</tr>
-								<tr class="border-base-200 border-t">
+								<tr class="border-t border-base-200">
 									<td class="p-2">
-										<div class="skeleton h-4 w-8 rounded"></div>
+										<div class="h-4 w-8 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-16 rounded"></div>
+										<div class="h-4 w-16 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton ml-auto h-4 w-20 rounded"></div>
+										<div class="ml-auto h-4 w-20 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-5 w-14 rounded-full"></div>
+										<div class="h-5 w-14 skeleton rounded-full"></div>
 									</td>
 									<td class="p-2 text-xs opacity-40">—</td>
 									<td class="p-2 text-xs opacity-40">—</td>
@@ -1030,26 +1030,26 @@
 								<p>
 									Banjarbaru,
 									<span
-										class="skeleton inline-block h-4 w-20 rounded align-middle"
+										class="inline-block h-4 w-20 skeleton rounded align-middle"
 									></span>
 								</p>
 								<p class="mt-1 font-semibold">Dibuat oleh</p>
 								<p class="text-xs opacity-60">(Staff/Admin)</p>
 								<div class="ttd-name-line">
-									<div class="skeleton mx-auto h-4 w-32 rounded"></div>
+									<div class="mx-auto h-4 w-32 skeleton rounded"></div>
 								</div>
 							</div>
 							<div>
 								<p>
 									Banjarbaru,
 									<span
-										class="skeleton inline-block h-4 w-20 rounded align-middle"
+										class="inline-block h-4 w-20 skeleton rounded align-middle"
 									></span>
 								</p>
 								<p class="mt-1 font-semibold">Diketahui oleh</p>
 								<p class="text-xs opacity-60">(Pemilik Kos)</p>
 								<div class="ttd-name-line">
-									<div class="skeleton mx-auto h-4 w-32 rounded"></div>
+									<div class="mx-auto h-4 w-32 skeleton rounded"></div>
 								</div>
 							</div>
 						</div>
@@ -1061,7 +1061,7 @@
 			<div id="page-lap-komplain" class="page">
 				<div class="p-6">
 					<div class="no-print mx-auto mb-4 flex max-w-3xl justify-end gap-2">
-						<button class="btn btn-sm btn-outline" onclick="window.print()">
+						<button class="btn btn-outline btn-sm" onclick="window.print()">
 							🖨 Cetak
 						</button>
 						<button class="btn btn-sm btn-primary">⬇ PDF</button>
@@ -1073,37 +1073,37 @@
 							<p>
 								Periode:
 								<span
-									class="skeleton inline-block h-4 w-28 rounded align-middle"
+									class="inline-block h-4 w-28 skeleton rounded align-middle"
 								></span>
 							</p>
 						</div>
 						<div class="mb-4 flex gap-4 text-sm">
 							<div
-								class="border-base-200 flex-1 rounded border p-3 text-center"
+								class="flex-1 rounded border border-base-200 p-3 text-center"
 							>
 								<p class="text-xs opacity-60">Total Masuk</p>
-								<div class="skeleton mx-auto mt-1 h-7 w-8 rounded"></div>
+								<div class="mx-auto mt-1 h-7 w-8 skeleton rounded"></div>
 							</div>
 							<div
-								class="border-base-200 flex-1 rounded border p-3 text-center"
+								class="flex-1 rounded border border-base-200 p-3 text-center"
 							>
 								<p class="text-xs opacity-60">Selesai</p>
-								<div class="skeleton mx-auto mt-1 h-7 w-8 rounded"></div>
+								<div class="mx-auto mt-1 h-7 w-8 skeleton rounded"></div>
 							</div>
 							<div
-								class="border-base-200 flex-1 rounded border p-3 text-center"
+								class="flex-1 rounded border border-base-200 p-3 text-center"
 							>
 								<p class="text-xs opacity-60">Dalam Proses</p>
-								<div class="skeleton mx-auto mt-1 h-7 w-8 rounded"></div>
+								<div class="mx-auto mt-1 h-7 w-8 skeleton rounded"></div>
 							</div>
 							<div
-								class="border-base-200 flex-1 rounded border p-3 text-center"
+								class="flex-1 rounded border border-base-200 p-3 text-center"
 							>
 								<p class="text-xs opacity-60">Terbuka</p>
-								<div class="skeleton mx-auto mt-1 h-7 w-8 rounded"></div>
+								<div class="mx-auto mt-1 h-7 w-8 skeleton rounded"></div>
 							</div>
 						</div>
-						<table class="border-base-200 mb-4 w-full border text-sm">
+						<table class="mb-4 w-full border border-base-200 text-sm">
 							<thead class="bg-base-200">
 								<tr>
 									<th class="p-2 text-left">No.</th>
@@ -1116,67 +1116,67 @@
 								</tr>
 							</thead>
 							<tbody>
-								<tr class="border-base-200 border-t">
+								<tr class="border-t border-base-200">
 									<td class="p-2">1</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-24 rounded"></div>
+										<div class="h-4 w-24 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-8 rounded"></div>
+										<div class="h-4 w-8 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-36 rounded"></div>
+										<div class="h-4 w-36 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-20 rounded"></div>
+										<div class="h-4 w-20 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-5 w-16 rounded-full"></div>
+										<div class="h-5 w-16 skeleton rounded-full"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-20 rounded"></div>
+										<div class="h-4 w-20 skeleton rounded"></div>
 									</td>
 								</tr>
-								<tr class="border-base-200 border-t">
+								<tr class="border-t border-base-200">
 									<td class="p-2">2</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-24 rounded"></div>
+										<div class="h-4 w-24 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-8 rounded"></div>
+										<div class="h-4 w-8 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-36 rounded"></div>
+										<div class="h-4 w-36 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-20 rounded"></div>
+										<div class="h-4 w-20 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-5 w-16 rounded-full"></div>
+										<div class="h-5 w-16 skeleton rounded-full"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-20 rounded"></div>
+										<div class="h-4 w-20 skeleton rounded"></div>
 									</td>
 								</tr>
-								<tr class="border-base-200 border-t">
+								<tr class="border-t border-base-200">
 									<td class="p-2">3</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-24 rounded"></div>
+										<div class="h-4 w-24 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-8 rounded"></div>
+										<div class="h-4 w-8 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-36 rounded"></div>
+										<div class="h-4 w-36 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-20 rounded"></div>
+										<div class="h-4 w-20 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-5 w-16 rounded-full"></div>
+										<div class="h-5 w-16 skeleton rounded-full"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-20 rounded"></div>
+										<div class="h-4 w-20 skeleton rounded"></div>
 									</td>
 								</tr>
 							</tbody>
@@ -1186,26 +1186,26 @@
 								<p>
 									Banjarbaru,
 									<span
-										class="skeleton inline-block h-4 w-20 rounded align-middle"
+										class="inline-block h-4 w-20 skeleton rounded align-middle"
 									></span>
 								</p>
 								<p class="mt-1 font-semibold">Dibuat oleh</p>
 								<p class="text-xs opacity-60">(Staff/Admin)</p>
 								<div class="ttd-name-line">
-									<div class="skeleton mx-auto h-4 w-32 rounded"></div>
+									<div class="mx-auto h-4 w-32 skeleton rounded"></div>
 								</div>
 							</div>
 							<div>
 								<p>
 									Banjarbaru,
 									<span
-										class="skeleton inline-block h-4 w-20 rounded align-middle"
+										class="inline-block h-4 w-20 skeleton rounded align-middle"
 									></span>
 								</p>
 								<p class="mt-1 font-semibold">Diketahui oleh</p>
 								<p class="text-xs opacity-60">(Pemilik Kos)</p>
 								<div class="ttd-name-line">
-									<div class="skeleton mx-auto h-4 w-32 rounded"></div>
+									<div class="mx-auto h-4 w-32 skeleton rounded"></div>
 								</div>
 							</div>
 						</div>
@@ -1217,7 +1217,7 @@
 			<div id="page-lap-pengingat" class="page">
 				<div class="p-6">
 					<div class="no-print mx-auto mb-4 flex max-w-3xl justify-end gap-2">
-						<button class="btn btn-sm btn-outline" onclick="window.print()">
+						<button class="btn btn-outline btn-sm" onclick="window.print()">
 							🖨 Cetak
 						</button>
 						<button class="btn btn-sm btn-primary">⬇ PDF</button>
@@ -1229,37 +1229,37 @@
 							<p>
 								Periode:
 								<span
-									class="skeleton inline-block h-4 w-28 rounded align-middle"
+									class="inline-block h-4 w-28 skeleton rounded align-middle"
 								></span>
 							</p>
 						</div>
 						<div class="mb-4 flex gap-4 text-sm">
 							<div
-								class="border-base-200 flex-1 rounded border p-3 text-center"
+								class="flex-1 rounded border border-base-200 p-3 text-center"
 							>
 								<p class="text-xs opacity-60">Total Terkirim</p>
-								<div class="skeleton mx-auto mt-1 h-7 w-8 rounded"></div>
+								<div class="mx-auto mt-1 h-7 w-8 skeleton rounded"></div>
 							</div>
 							<div
-								class="border-base-200 flex-1 rounded border p-3 text-center"
+								class="flex-1 rounded border border-base-200 p-3 text-center"
 							>
 								<p class="text-xs opacity-60">Otomatis</p>
-								<div class="skeleton mx-auto mt-1 h-7 w-8 rounded"></div>
+								<div class="mx-auto mt-1 h-7 w-8 skeleton rounded"></div>
 							</div>
 							<div
-								class="border-base-200 flex-1 rounded border p-3 text-center"
+								class="flex-1 rounded border border-base-200 p-3 text-center"
 							>
 								<p class="text-xs opacity-60">Manual</p>
-								<div class="skeleton mx-auto mt-1 h-7 w-8 rounded"></div>
+								<div class="mx-auto mt-1 h-7 w-8 skeleton rounded"></div>
 							</div>
 							<div
-								class="border-base-200 flex-1 rounded border p-3 text-center"
+								class="flex-1 rounded border border-base-200 p-3 text-center"
 							>
 								<p class="text-xs opacity-60">Gagal</p>
-								<div class="skeleton mx-auto mt-1 h-7 w-8 rounded"></div>
+								<div class="mx-auto mt-1 h-7 w-8 skeleton rounded"></div>
 							</div>
 						</div>
-						<table class="border-base-200 mb-4 w-full border text-sm">
+						<table class="mb-4 w-full border border-base-200 text-sm">
 							<thead class="bg-base-200">
 								<tr>
 									<th class="p-2 text-left">Waktu Kirim</th>
@@ -1270,72 +1270,72 @@
 								</tr>
 							</thead>
 							<tbody>
-								<tr class="border-base-200 border-t">
+								<tr class="border-t border-base-200">
 									<td class="p-2">
-										<div class="skeleton h-4 w-32 rounded"></div>
+										<div class="h-4 w-32 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-28 rounded"></div>
+										<div class="h-4 w-28 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-20 rounded"></div>
+										<div class="h-4 w-20 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-5 w-16 rounded-full"></div>
+										<div class="h-5 w-16 skeleton rounded-full"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-5 w-16 rounded-full"></div>
-									</td>
-								</tr>
-								<tr class="border-base-200 border-t">
-									<td class="p-2">
-										<div class="skeleton h-4 w-32 rounded"></div>
-									</td>
-									<td class="p-2">
-										<div class="skeleton h-4 w-28 rounded"></div>
-									</td>
-									<td class="p-2">
-										<div class="skeleton h-4 w-20 rounded"></div>
-									</td>
-									<td class="p-2">
-										<div class="skeleton h-5 w-16 rounded-full"></div>
-									</td>
-									<td class="p-2">
-										<div class="skeleton h-5 w-16 rounded-full"></div>
+										<div class="h-5 w-16 skeleton rounded-full"></div>
 									</td>
 								</tr>
-								<tr class="border-base-200 border-t">
+								<tr class="border-t border-base-200">
 									<td class="p-2">
-										<div class="skeleton h-4 w-32 rounded"></div>
+										<div class="h-4 w-32 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-28 rounded"></div>
+										<div class="h-4 w-28 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-20 rounded"></div>
+										<div class="h-4 w-20 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-5 w-16 rounded-full"></div>
+										<div class="h-5 w-16 skeleton rounded-full"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-5 w-16 rounded-full"></div>
+										<div class="h-5 w-16 skeleton rounded-full"></div>
 									</td>
 								</tr>
-								<tr class="border-base-200 border-t">
+								<tr class="border-t border-base-200">
 									<td class="p-2">
-										<div class="skeleton h-4 w-32 rounded"></div>
+										<div class="h-4 w-32 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-28 rounded"></div>
+										<div class="h-4 w-28 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-20 rounded"></div>
+										<div class="h-4 w-20 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-5 w-16 rounded-full"></div>
+										<div class="h-5 w-16 skeleton rounded-full"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-5 w-16 rounded-full"></div>
+										<div class="h-5 w-16 skeleton rounded-full"></div>
+									</td>
+								</tr>
+								<tr class="border-t border-base-200">
+									<td class="p-2">
+										<div class="h-4 w-32 skeleton rounded"></div>
+									</td>
+									<td class="p-2">
+										<div class="h-4 w-28 skeleton rounded"></div>
+									</td>
+									<td class="p-2">
+										<div class="h-4 w-20 skeleton rounded"></div>
+									</td>
+									<td class="p-2">
+										<div class="h-5 w-16 skeleton rounded-full"></div>
+									</td>
+									<td class="p-2">
+										<div class="h-5 w-16 skeleton rounded-full"></div>
 									</td>
 								</tr>
 							</tbody>
@@ -1345,26 +1345,26 @@
 								<p>
 									Banjarbaru,
 									<span
-										class="skeleton inline-block h-4 w-20 rounded align-middle"
+										class="inline-block h-4 w-20 skeleton rounded align-middle"
 									></span>
 								</p>
 								<p class="mt-1 font-semibold">Dibuat oleh</p>
 								<p class="text-xs opacity-60">(Staff/Admin)</p>
 								<div class="ttd-name-line">
-									<div class="skeleton mx-auto h-4 w-32 rounded"></div>
+									<div class="mx-auto h-4 w-32 skeleton rounded"></div>
 								</div>
 							</div>
 							<div>
 								<p>
 									Banjarbaru,
 									<span
-										class="skeleton inline-block h-4 w-20 rounded align-middle"
+										class="inline-block h-4 w-20 skeleton rounded align-middle"
 									></span>
 								</p>
 								<p class="mt-1 font-semibold">Diketahui oleh</p>
 								<p class="text-xs opacity-60">(Pemilik Kos)</p>
 								<div class="ttd-name-line">
-									<div class="skeleton mx-auto h-4 w-32 rounded"></div>
+									<div class="mx-auto h-4 w-32 skeleton rounded"></div>
 								</div>
 							</div>
 						</div>
@@ -1376,7 +1376,7 @@
 			<div id="page-rekap-tagihan" class="page">
 				<div class="p-6">
 					<div class="no-print mx-auto mb-4 flex max-w-3xl justify-end gap-2">
-						<button class="btn btn-sm btn-outline" onclick="window.print()">
+						<button class="btn btn-outline btn-sm" onclick="window.print()">
 							🖨 Cetak
 						</button>
 						<button class="btn btn-sm btn-primary">⬇ PDF</button>
@@ -1388,35 +1388,35 @@
 							<p>
 								Per tanggal:
 								<span
-									class="skeleton inline-block h-4 w-28 rounded align-middle"
+									class="inline-block h-4 w-28 skeleton rounded align-middle"
 								></span>
 							</p>
 						</div>
 						<p class="mb-2 font-semibold">Data Penghuni:</p>
-						<table class="border-base-200 mb-4 w-full border text-sm">
+						<table class="mb-4 w-full border border-base-200 text-sm">
 							<tbody>
-								<tr class="border-base-200 border-b">
+								<tr class="border-b border-base-200">
 									<td class="w-40 p-2 opacity-70">Nama</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-36 rounded"></div>
+										<div class="h-4 w-36 skeleton rounded"></div>
 									</td>
 								</tr>
-								<tr class="border-base-200 border-b">
+								<tr class="border-b border-base-200">
 									<td class="p-2 opacity-70">Kamar</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-16 rounded"></div>
+										<div class="h-4 w-16 skeleton rounded"></div>
 									</td>
 								</tr>
-								<tr class="border-base-200 border-b">
+								<tr class="border-b border-base-200">
 									<td class="p-2 opacity-70">Periode Tinggal</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-40 rounded"></div>
+										<div class="h-4 w-40 skeleton rounded"></div>
 									</td>
 								</tr>
 							</tbody>
 						</table>
 						<p class="mb-2 font-semibold">Riwayat Tagihan:</p>
-						<table class="border-base-200 mb-2 w-full border text-sm">
+						<table class="mb-2 w-full border border-base-200 text-sm">
 							<thead class="bg-base-200">
 								<tr>
 									<th class="p-2 text-left">No. Invoice</th>
@@ -1428,70 +1428,70 @@
 								</tr>
 							</thead>
 							<tbody>
-								<tr class="border-base-200 border-t">
+								<tr class="border-t border-base-200">
 									<td class="p-2">
-										<div class="skeleton h-4 w-20 rounded"></div>
+										<div class="h-4 w-20 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-20 rounded"></div>
+										<div class="h-4 w-20 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton ml-auto h-4 w-20 rounded"></div>
+										<div class="ml-auto h-4 w-20 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-20 rounded"></div>
+										<div class="h-4 w-20 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-20 rounded"></div>
+										<div class="h-4 w-20 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-5 w-14 rounded-full"></div>
-									</td>
-								</tr>
-								<tr class="border-base-200 border-t">
-									<td class="p-2">
-										<div class="skeleton h-4 w-20 rounded"></div>
-									</td>
-									<td class="p-2">
-										<div class="skeleton h-4 w-20 rounded"></div>
-									</td>
-									<td class="p-2">
-										<div class="skeleton ml-auto h-4 w-20 rounded"></div>
-									</td>
-									<td class="p-2">
-										<div class="skeleton h-4 w-20 rounded"></div>
-									</td>
-									<td class="p-2">
-										<div class="skeleton h-4 w-20 rounded"></div>
-									</td>
-									<td class="p-2">
-										<div class="skeleton h-5 w-14 rounded-full"></div>
+										<div class="h-5 w-14 skeleton rounded-full"></div>
 									</td>
 								</tr>
-								<tr class="border-base-200 border-t">
+								<tr class="border-t border-base-200">
 									<td class="p-2">
-										<div class="skeleton h-4 w-20 rounded"></div>
+										<div class="h-4 w-20 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-20 rounded"></div>
+										<div class="h-4 w-20 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton ml-auto h-4 w-20 rounded"></div>
+										<div class="ml-auto h-4 w-20 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-20 rounded"></div>
+										<div class="h-4 w-20 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-4 w-20 rounded"></div>
+										<div class="h-4 w-20 skeleton rounded"></div>
 									</td>
 									<td class="p-2">
-										<div class="skeleton h-5 w-14 rounded-full"></div>
+										<div class="h-5 w-14 skeleton rounded-full"></div>
 									</td>
 								</tr>
-								<tr class="border-base-300 border-t-2 font-bold">
+								<tr class="border-t border-base-200">
+									<td class="p-2">
+										<div class="h-4 w-20 skeleton rounded"></div>
+									</td>
+									<td class="p-2">
+										<div class="h-4 w-20 skeleton rounded"></div>
+									</td>
+									<td class="p-2">
+										<div class="ml-auto h-4 w-20 skeleton rounded"></div>
+									</td>
+									<td class="p-2">
+										<div class="h-4 w-20 skeleton rounded"></div>
+									</td>
+									<td class="p-2">
+										<div class="h-4 w-20 skeleton rounded"></div>
+									</td>
+									<td class="p-2">
+										<div class="h-5 w-14 skeleton rounded-full"></div>
+									</td>
+								</tr>
+								<tr class="border-t-2 border-base-300 font-bold">
 									<td colspan="2" class="p-2">Total Tagihan</td>
 									<td class="p-2 text-right">
-										<div class="skeleton ml-auto h-5 w-24 rounded"></div>
+										<div class="ml-auto h-5 w-24 skeleton rounded"></div>
 									</td>
 									<td colspan="3"></td>
 								</tr>
@@ -1502,26 +1502,26 @@
 								<p>
 									Banjarbaru,
 									<span
-										class="skeleton inline-block h-4 w-20 rounded align-middle"
+										class="inline-block h-4 w-20 skeleton rounded align-middle"
 									></span>
 								</p>
 								<p class="mt-1 font-semibold">Dibuat oleh</p>
 								<p class="text-xs opacity-60">(Staff/Admin)</p>
 								<div class="ttd-name-line">
-									<div class="skeleton mx-auto h-4 w-32 rounded"></div>
+									<div class="mx-auto h-4 w-32 skeleton rounded"></div>
 								</div>
 							</div>
 							<div>
 								<p>
 									Banjarbaru,
 									<span
-										class="skeleton inline-block h-4 w-20 rounded align-middle"
+										class="inline-block h-4 w-20 skeleton rounded align-middle"
 									></span>
 								</p>
 								<p class="mt-1 font-semibold">Diketahui oleh</p>
 								<p class="text-xs opacity-60">(Pemilik Kos)</p>
 								<div class="ttd-name-line">
-									<div class="skeleton mx-auto h-4 w-32 rounded"></div>
+									<div class="mx-auto h-4 w-32 skeleton rounded"></div>
 								</div>
 							</div>
 						</div>
@@ -1544,7 +1544,7 @@
 									<h3 class="text-sm font-bold">
 										🔔 Pengingat Tagihan (Auto — Cron)
 									</h3>
-									<span class="badge badge-info badge-sm">auto</span>
+									<span class="badge badge-sm badge-info">auto</span>
 								</div>
 								<div class="mockup-code p-3 text-xs">
 									<pre><code>Halo, *[Nama Penghuni]*! 👋
@@ -1573,7 +1573,7 @@ Ketik *bayar tagihan* untuk membayar 🙏</code></pre>
 									<h3 class="text-sm font-bold">
 										✅ Konfirmasi Pembayaran (Gateway Callback)
 									</h3>
-									<span class="badge badge-success badge-sm">real-time</span>
+									<span class="badge badge-sm badge-success">real-time</span>
 								</div>
 								<div class="mockup-code p-3 text-xs">
 									<pre><code>Halo, *[Nama Penghuni]*! 🎉
@@ -1729,7 +1729,7 @@ Jika masih ada kendala, ajukan laporan baru. 🙏</code></pre>
 			<div class="kop-border">
 				<div class="flex items-center gap-4">
 					<div class="avatar avatar-placeholder flex-shrink-0">
-						<div class="bg-neutral text-neutral-content w-16 rounded-full">
+						<div class="w-16 rounded-full bg-neutral text-neutral-content">
 							<span class="text-xl">KU</span>
 						</div>
 					</div>
@@ -1754,26 +1754,26 @@ Jika masih ada kendala, ajukan laporan baru. 🙏</code></pre>
 					<p>
 						Banjarbaru,
 						<span
-							class="skeleton inline-block h-4 w-20 rounded align-middle"
+							class="inline-block h-4 w-20 skeleton rounded align-middle"
 						></span>
 					</p>
 					<p class="mt-1 font-semibold">Dibuat oleh</p>
 					<p class="text-xs opacity-60">(Staff/Admin)</p>
 					<div class="ttd-name-line">
-						<div class="skeleton mx-auto h-4 w-32 rounded"></div>
+						<div class="mx-auto h-4 w-32 skeleton rounded"></div>
 					</div>
 				</div>
 				<div>
 					<p>
 						Banjarbaru,
 						<span
-							class="skeleton inline-block h-4 w-20 rounded align-middle"
+							class="inline-block h-4 w-20 skeleton rounded align-middle"
 						></span>
 					</p>
 					<p class="mt-1 font-semibold">Diketahui oleh</p>
 					<p class="text-xs opacity-60">(Pemilik Kos)</p>
 					<div class="ttd-name-line">
-						<div class="skeleton mx-auto h-4 w-32 rounded"></div>
+						<div class="mx-auto h-4 w-32 skeleton rounded"></div>
 					</div>
 				</div>
 			</div>

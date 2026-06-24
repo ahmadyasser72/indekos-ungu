@@ -1,3 +1,4 @@
+import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { db } from "@e-kos/database";
 import {
 	invoices,
@@ -6,8 +7,6 @@ import {
 	tenants,
 	users,
 } from "@e-kos/database/schema";
-
-import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 
 import { runRentReminder } from "../rent-reminder";
 

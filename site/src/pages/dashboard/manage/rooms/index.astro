@@ -134,11 +134,11 @@ const roomStats = (await getAllRoomsStats(filteredRooms)).map((s) => ({
 							: "vacant";
 					const price = formatCurrency(monthlyPrice);
 					return (
-						<div class="card bg-base-100 border-base-300 border shadow-sm transition-all hover:shadow-md">
+						<div class="card border border-base-300 bg-base-100 shadow-sm transition-all hover:shadow-md">
 							<div class="card-body gap-3 p-5">
 								<div class="flex items-start justify-between">
 									<div class="flex flex-col">
-										<span class="text-base-content/50 text-xs font-bold">
+										<span class="text-xs font-bold text-base-content/50">
 											{roomType}
 										</span>
 										<span class="text-2xl font-bold">{roomNumber}</span>
@@ -153,14 +153,14 @@ const roomStats = (await getAllRoomsStats(filteredRooms)).map((s) => ({
 									</span>
 								</div>
 
-								<div class="border-base-200 my-1 flex flex-col gap-1 border-t border-b py-3">
+								<div class="my-1 flex flex-col gap-1 border-t border-b border-base-200 py-3">
 									<div class="flex justify-between text-xs">
 										<span class="text-base-content/60">Harga Sewa:</span>
 										<span class="font-mono font-bold">{price}/Bln</span>
 									</div>
 									<div class="mt-1 flex justify-between text-xs">
 										<span class="text-base-content/60">Penghuni:</span>
-										<span class="text-base-content max-w-30 truncate font-semibold">
+										<span class="max-w-30 truncate font-semibold text-base-content">
 											{tenantName || "-"}
 										</span>
 									</div>
@@ -169,7 +169,7 @@ const roomStats = (await getAllRoomsStats(filteredRooms)).map((s) => ({
 								<div class="card-actions flex-row gap-2">
 									<button
 										hx-get={`/dashboard/manage/rooms/modal/detail/${id}`}
-										class="btn btn-outline btn-primary btn-xs flex flex-1 items-center justify-center gap-1"
+										class="btn flex flex-1 items-center justify-center gap-1 btn-outline btn-xs btn-primary"
 									>
 										<Icon name="line-md:document-list" /> Detail
 									</button>
@@ -190,7 +190,7 @@ const roomStats = (await getAllRoomsStats(filteredRooms)).map((s) => ({
 											<li>
 												<button
 													hx-get={`/dashboard/manage/rooms/modal/delete/${id}`}
-													class="text-error flex items-center gap-2"
+													class="flex items-center gap-2 text-error"
 												>
 													<Icon name="line-md:remove" /> Hapus
 												</button>

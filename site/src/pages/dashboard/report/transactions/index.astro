@@ -135,8 +135,8 @@ const sortedInvoices = [...filteredInvoices].sort((a, b) => {
 	<div class="contents" id="transactions-content-wrapper">
 		<Stats items={summaryStats} />
 
-		<div class="border-base-300 rounded-box overflow-x-auto border shadow-sm">
-			<table class="table-zebra table-sm table w-full">
+		<div class="overflow-x-auto rounded-box border border-base-300 shadow-sm">
+			<table class="table w-full table-zebra table-sm">
 				<thead>
 					<tr>
 						<th>No. Invoice</th>
@@ -168,7 +168,7 @@ const sortedInvoices = [...filteredInvoices].sort((a, b) => {
 									<td class="font-mono text-xs">{invoiceNumber}</td>
 									<td>{tenantName}</td>
 									<td>
-										<span class="badge badge-neutral font-mono">
+										<span class="badge font-mono badge-neutral">
 											{roomNumber}
 										</span>
 									</td>
@@ -202,7 +202,7 @@ const sortedInvoices = [...filteredInvoices].sort((a, b) => {
 										) : duitkuReference ? (
 											<div class="flex items-center gap-1">
 												<a
-													class="btn btn-outline btn-success btn-xs w-24"
+													class="btn w-24 btn-outline btn-xs btn-success"
 													href={`/invoice/${id}`}
 													target="_blank"
 												>
@@ -268,7 +268,7 @@ const sortedInvoices = [...filteredInvoices].sort((a, b) => {
 													>
 														<input name="invoice_id" type="hidden" value={id} />
 														<button
-															class="btn btn-outline btn-primary btn-xs w-24"
+															class="btn w-24 btn-outline btn-xs btn-primary"
 															type="submit"
 														>
 															<Icon name="line-md:link" size="size-3.5" />{" "}

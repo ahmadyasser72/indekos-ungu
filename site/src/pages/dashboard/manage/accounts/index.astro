@@ -94,10 +94,10 @@ const accounts = await fetchAccounts(params);
 	</div>
 
 	<div
-		class="border-base-300 rounded-box overflow-x-auto border shadow-sm"
+		class="overflow-x-auto rounded-box border border-base-300 shadow-sm"
 		id="accounts-content-wrapper"
 	>
-		<table class="table-sm table w-full">
+		<table class="table w-full table-sm">
 			<thead>
 				<tr>
 					<th class="w-8">#</th>
@@ -114,7 +114,7 @@ const accounts = await fetchAccounts(params);
 							<td class="font-mono">{id}</td>
 							<td class="flex items-center gap-2 font-semibold">
 								<div class="avatar avatar-placeholder">
-									<div class="bg-neutral text-neutral-content w-8 rounded-full">
+									<div class="w-8 rounded-full bg-neutral text-neutral-content">
 										<span class="text-xs uppercase">
 											{username.slice(0, 2)}
 										</span>
@@ -133,7 +133,7 @@ const accounts = await fetchAccounts(params);
 									{role}
 								</span>
 							</td>
-							<td class="text-base-content/70 text-xs">
+							<td class="text-xs text-base-content/70">
 								{formatDate(lastAccessed)}
 							</td>
 							<td class="text-right">
@@ -142,13 +142,13 @@ const accounts = await fetchAccounts(params);
 										<>
 											<button
 												hx-get={`/dashboard/manage/accounts/modal/edit/${id}`}
-												class="btn btn-outline btn-info btn-xs"
+												class="btn btn-outline btn-xs btn-info"
 											>
 												<Icon name="line-md:edit-twotone" /> Edit
 											</button>
 											<button
 												hx-get={`/dashboard/manage/accounts/modal/delete/${id}`}
-												class="btn btn-outline btn-error btn-xs"
+												class="btn btn-outline btn-xs btn-error"
 											>
 												<Icon name="line-md:remove" /> Hapus
 											</button>

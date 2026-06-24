@@ -41,19 +41,19 @@ if (!room) Astro.response.status = 404;
 	{
 		room ? (
 			<>
-				<div class="border-base-200 grid grid-cols-2 gap-x-4 gap-y-2.5 border-b pb-4 text-sm">
-					<span class="text-base-content/60 font-semibold">Nomor Kamar:</span>
+				<div class="grid grid-cols-2 gap-x-4 gap-y-2.5 border-b border-base-200 pb-4 text-sm">
+					<span class="font-semibold text-base-content/60">Nomor Kamar:</span>
 					<span class="font-bold">{room.roomNumber}</span>
 
-					<span class="text-base-content/60 font-semibold">Jenis Kamar:</span>
+					<span class="font-semibold text-base-content/60">Jenis Kamar:</span>
 					<span>{ROOM_TYPE_LABELS[room.roomType] ?? room.roomType}</span>
 
-					<span class="text-base-content/60 font-semibold">Harga/Bulan:</span>
+					<span class="font-semibold text-base-content/60">Harga/Bulan:</span>
 					<span class="font-mono font-bold">
 						{formatCurrency(room.monthlyPrice)}
 					</span>
 
-					<span class="text-base-content/60 font-semibold">Status:</span>
+					<span class="font-semibold text-base-content/60">Status:</span>
 					<span
 						class:list={[
 							"badge badge-sm",
@@ -63,7 +63,7 @@ if (!room) Astro.response.status = 404;
 						{room.isActive ? "Aktif" : "Tidak Aktif"}
 					</span>
 
-					<span class="text-base-content/60 font-semibold">Penghuni:</span>
+					<span class="font-semibold text-base-content/60">Penghuni:</span>
 					<span>
 						{roomLeases.find((lease) => lease.isActive)?.tenant?.fullName ?? (
 							<span class="text-base-content/40 italic">Kosong</span>
@@ -72,16 +72,16 @@ if (!room) Astro.response.status = 404;
 				</div>
 
 				<div class="mt-4">
-					<h4 class="text-base-content/80 mb-2 flex items-center gap-1.5 text-sm font-bold">
+					<h4 class="mb-2 flex items-center gap-1.5 text-sm font-bold text-base-content/80">
 						<Icon name="line-md:document-list-twotone" size="size-4" />
 						Riwayat Sewa
 					</h4>
 					{roomLeases.length === 0 ? (
-						<p class="text-base-content/50 py-2 text-xs italic">
+						<p class="py-2 text-xs text-base-content/50 italic">
 							Belum ada riwayat sewa.
 						</p>
 					) : (
-						<div class="divide-base-200 max-h-48 divide-y overflow-y-auto">
+						<div class="max-h-48 divide-y divide-base-200 overflow-y-auto">
 							{roomLeases.map((lease) => (
 								<div class="flex items-center justify-between py-2.5 text-xs">
 									<div class="flex flex-col gap-0.5">
@@ -101,7 +101,7 @@ if (!room) Astro.response.status = 404;
 												"badge badge-xs font-bold",
 												lease.isActive
 													? "badge-success"
-													: "badge-neutral opacity-60",
+													: "opacity-60 badge-neutral",
 											]}
 										>
 											{lease.isActive ? "Aktif" : "Selesai"}
