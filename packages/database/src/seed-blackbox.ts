@@ -1,14 +1,12 @@
-import { createHash } from "node:crypto";
-
 import dayjs from "dayjs";
 
-import { db } from "./index";
+import { db, hashPassword } from "./index";
 import { leases, rooms, tenants, users } from "./schema";
 
 // ─── Helpers ────────────────────────────────────────────────────
 
 const PHONE = "62887435034436";
-const hash = (p: string) => createHash("sha512").update(p).digest("hex");
+const hash = (p: string) => hashPassword(p);
 
 /**
  * Relative date shorthand.
@@ -58,7 +56,7 @@ const main = async () => {
 				username,
 				displayName,
 				role,
-				passwordHash: hash(password ?? username),
+				passwordHash: await hash(password ?? username),
 			})
 			.returning({ id: users.id });
 		return u.id;

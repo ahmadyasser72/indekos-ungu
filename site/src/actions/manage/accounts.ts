@@ -36,7 +36,7 @@ export const add = defineAction({
 			.values({
 				username: input.username,
 				displayName: input.display_name,
-				passwordHash: hashPassword(input.password),
+				passwordHash: await hashPassword(input.password),
 				role: input.role,
 			})
 			.returning({ id: users.id });
@@ -96,7 +96,9 @@ export const edit = defineAction({
 			.set({
 				username: input.username,
 				displayName: input.display_name,
-				passwordHash: input.password ? hashPassword(input.password) : undefined,
+				passwordHash: input.password
+					? await hashPassword(input.password)
+					: undefined,
 				role: input.role,
 			})
 			.where(eq(users.id, input.id))

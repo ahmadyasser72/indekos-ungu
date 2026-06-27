@@ -1,6 +1,6 @@
-import { createHash, randomUUID } from "node:crypto";
+import { randomUUID } from "node:crypto";
 
-import { db, eq } from "./index";
+import { db, eq, hashPassword } from "./index";
 import { USER_ROLES, users } from "./schema";
 
 const ensureUser = async (
@@ -14,7 +14,7 @@ const ensureUser = async (
 	});
 
 	const password = passwordOverride ?? randomUUID();
-	const passwordHash = createHash("sha512").update(password).digest("hex");
+	const passwordHash = await hashPassword(password);
 
 	if (existing) {
 		if (!passwordOverride) {

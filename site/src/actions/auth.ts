@@ -4,7 +4,7 @@ import { auditDetail, users } from "@e-kos/database/schema";
 import { ActionError, defineAction } from "astro:actions";
 import { z } from "astro/zod";
 
-import { hashPassword } from "~/lib/auth";
+import { verifyPassword } from "~/lib/auth";
 
 export const logout = defineAction({
 	accept: "form",
@@ -18,12 +18,11 @@ export const login = defineAction({
 	accept: "form",
 	input: z.object({ username: z.string(), password: z.string() }),
 	handler: async (input, context) => {
-		const passwordHash = hashPassword(input.password);
 		const user = await db.query.users.findFirst({
-			where: { username: input.username, passwordHash },
+			where: { username: input.username },
 		});
 
-		if (!user)
+		if (!user || !(await verifyPassword(input.password, user.passwordHash)))
 			throw new ActionError({
 				code: "UNAUTHORIZED",
 				message: "Username atau password tidak sesuai.",
