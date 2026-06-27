@@ -24,3 +24,4 @@ logs/
 *.tsbuildinfo
 /db.sqlite
 /test.db.sqlite
+/packages/whatsapp-bot/qr.svg

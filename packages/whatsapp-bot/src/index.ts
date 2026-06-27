@@ -79,7 +79,6 @@ export const main = async () => {
 				{ level: "info", stream: pino.destination(`${logDir}/bot.log`) },
 			]),
 		),
-		shouldSyncHistoryMessage: () => false,
 	});
 
 	sock.ev.on("creds.update", saveCreds);
@@ -240,3 +239,5 @@ const processCommand = async (
 
 	return help();
 };
+
+main();

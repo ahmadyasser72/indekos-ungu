@@ -1,5 +1,6 @@
 import { DisconnectReason, makeWASocket } from "baileys";
-import qrcode from "qrcode";
+import open from "open";
+import { renderSVG } from "uqr";
 
 import { useSqliteAuthState } from "./auth";
 
@@ -8,23 +9,23 @@ const login = async () => {
 
 	if (state.creds.me) return;
 
-	const sock = makeWASocket({
-		auth: state,
-		shouldSyncHistoryMessage: () => false,
-	});
+	const sock = makeWASocket({ auth: state });
 
 	sock.ev.on("creds.update", saveCreds);
+
+	const SVGFile = Bun.file("qr.svg");
 	sock.ev.on(
 		"connection.update",
 		async ({ connection, lastDisconnect, qr }) => {
 			if (qr) {
-				console.log(
-					await qrcode.toString(qr, { type: "terminal", small: true }),
-				);
+				const qrSVG = renderSVG(qr);
+				await SVGFile.write(qrSVG);
+				await open(SVGFile.name!, { wait: true });
 			}
 
 			if (connection === "open") {
 				console.log("\nWhatsApp berhasil terhubung!");
+				await SVGFile.delete();
 				process.exit(0);
 			}
 
