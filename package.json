@@ -12,7 +12,7 @@
 		"pretest": "DATABASE_PATH=$(pwd)/test.db.sqlite bun --cwd=packages/database --sequential db:push db:seed",
 		"test": "DATABASE_PATH=$(pwd)/test.db.sqlite bun test --sequential",
 		"dev": "pacwich run dev",
-		"prebuild": "bun --cwd=packages/database --sequential db:push db:seed && bun wa:login",
+		"prebuild": "bun --cwd=packages/database --sequential db:push db:seed",
 		"build": "pacwich run build @e-kos/site",
 		"start": "LOG_PATH=$(pwd)/logs pacwich run start",
 		"wa:login": "bun --cwd=packages/whatsapp-bot run login",
