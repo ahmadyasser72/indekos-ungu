@@ -3,16 +3,13 @@ import {
 	auditDetail,
 	auditLogs,
 	notifications,
-	users,
+	type User,
 } from "@e-kos/database/schema";
 import dayjs from "@e-kos/utilities/date";
 
 import { logger } from "../index";
 
-export const runRentReminder = async (
-	systemUser: typeof users.$inferSelect,
-	now?: Date,
-) => {
+export const runRentReminder = async (systemUser: User, now?: Date) => {
 	const ref = now ?? new Date();
 	const threeDaysLater = dayjs(ref).add(3, "days").toDate();
 

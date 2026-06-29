@@ -9,17 +9,9 @@ export const accountsQuerySchema = z.object({
 	role: statusSchema(USER_ROLES),
 });
 
-export type AccountRow = {
-	id: number;
-	username: string;
-	displayName: string | null;
-	lastAccessed: Date | null;
-	role: string;
-};
-
 export const fetchAccounts = async (
 	params: z.infer<typeof accountsQuerySchema>,
-): Promise<AccountRow[]> => {
+) => {
 	const accounts = await db.query.users.findMany({
 		columns: {
 			id: true,
@@ -39,5 +31,6 @@ export const fetchAccounts = async (
 			...(params.role && { role: params.role }),
 		},
 	});
+
 	return accounts;
 };

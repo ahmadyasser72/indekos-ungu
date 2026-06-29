@@ -160,3 +160,13 @@ export const botAuth = sqliteTable("bot_auth", {
 	key: text("key").primaryKey(),
 	value: text("value").notNull(),
 });
+
+export type User = typeof users.$inferSelect;
+export type Tenant = typeof tenants.$inferSelect;
+export type Room = typeof rooms.$inferSelect;
+export type Lease = typeof leases.$inferSelect;
+export type Invoice = typeof invoices.$inferSelect;
+export type ChatbotMessage = typeof chatbotMessages.$inferSelect;
+export type Notification = typeof notifications.$inferSelect;
+export type AuditLog = typeof auditLogs.$inferSelect;
+export type Complaint = typeof complaints.$inferSelect;

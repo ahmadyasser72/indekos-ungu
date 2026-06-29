@@ -31,7 +31,7 @@ export const login = defineAction({
 			context.session?.set("user", {
 				id: user.id,
 				name: user.displayName ?? user.username,
-				role: user.role as App.SessionData["user"]["role"],
+				role: user.role,
 			}),
 			db
 				.update(users)
@@ -42,7 +42,7 @@ export const login = defineAction({
 		context.locals.user = {
 			id: user.id,
 			name: user.displayName ?? user.username,
-			role: user.role as App.SessionData["user"]["role"],
+			role: user.role,
 		};
 
 		await context.locals.logAudit(

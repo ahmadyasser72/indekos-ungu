@@ -1,11 +1,11 @@
 import { db } from "@e-kos/database";
-import { complaints, tenants } from "@e-kos/database/schema";
+import { complaints, type Tenant } from "@e-kos/database/schema";
 import { formatDate } from "@e-kos/utilities/date";
 
 import { render } from "../template";
 
 export const submitComplaint = async (
-	tenant: typeof tenants.$inferSelect,
+	tenant: Tenant,
 	text: string,
 ): Promise<string> => {
 	const complaintDescription = text.replace(/^komplain\s*/i, "").trim();

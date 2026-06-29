@@ -4,6 +4,7 @@ import {
 	auditLogs,
 	chatbotMessages,
 	tenants,
+	type Tenant,
 } from "@e-kos/database/schema";
 import { createLogger } from "@e-kos/utilities/logger";
 
@@ -25,7 +26,7 @@ import { pollNotifications } from "./polls/notifications";
 import { render } from "./template";
 
 interface PendingMessage {
-	tenant: typeof tenants.$inferSelect;
+	tenant: Tenant;
 	text: string;
 }
 
@@ -204,7 +205,7 @@ export const main = async () => {
 };
 
 const processCommand = async (
-	tenant: typeof tenants.$inferSelect,
+	tenant: Tenant,
 	text: string,
 ): Promise<string> => {
 	const lower = text.toLowerCase().trim();

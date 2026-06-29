@@ -1,10 +1,17 @@
-import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { db } from "@e-kos/database";
-import { leases, rooms, tenants, users } from "@e-kos/database/schema";
+import {
+	leases,
+	rooms,
+	tenants,
+	users,
+	type User,
+} from "@e-kos/database/schema";
+
+import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 
 import { runInvoiceGeneration } from "../invoice-generation";
 
-let systemUser: typeof users.$inferSelect;
+let systemUser: User;
 let leaseId: number;
 
 beforeAll(async () => {

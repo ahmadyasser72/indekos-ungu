@@ -3,15 +3,12 @@ import {
 	auditDetail,
 	auditLogs,
 	invoices,
-	users,
+	type User,
 } from "@e-kos/database/schema";
 
 import { logger } from "../index";
 
-export const runOverdueCheck = async (
-	systemUser: typeof users.$inferSelect,
-	now?: Date,
-) => {
+export const runOverdueCheck = async (systemUser: User, now?: Date) => {
 	const ref = now ?? new Date();
 
 	const overdue = await db.query.invoices.findMany({

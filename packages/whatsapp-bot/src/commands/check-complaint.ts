@@ -1,12 +1,12 @@
 import { db } from "@e-kos/database";
-import { tenants } from "@e-kos/database/schema";
+import type { Tenant } from "@e-kos/database/schema";
 import { formatDate } from "@e-kos/utilities/date";
 
 import { render } from "../template";
 import { STATUS_LABEL } from "./constants";
 
 export const checkComplaint = async (
-	tenant: typeof tenants.$inferSelect,
+	tenant: Tenant,
 	complaintId: number,
 ): Promise<string> => {
 	const complaint = await db.query.complaints.findFirst({

@@ -120,7 +120,7 @@ const auditLogs = await fetchAuditLogs(params);
 									<span
 										class:list={[
 											"badge badge-xs font-bold",
-											ACTION_BADGES[action as keyof typeof ACTION_BADGES],
+											ACTION_BADGES[action],
 										]}
 									>
 										{action}

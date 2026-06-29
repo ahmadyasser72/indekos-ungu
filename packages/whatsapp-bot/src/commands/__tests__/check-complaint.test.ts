@@ -1,11 +1,16 @@
 import { db } from "@e-kos/database";
-import { complaints, tenants, users } from "@e-kos/database/schema";
+import {
+	complaints,
+	tenants,
+	users,
+	type Tenant,
+} from "@e-kos/database/schema";
 
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 
 import { checkComplaint } from "../check-complaint";
 
-let testTenant: typeof tenants.$inferSelect;
+let testTenant: Tenant;
 let complaintId: number;
 
 beforeAll(async () => {

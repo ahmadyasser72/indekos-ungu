@@ -1,11 +1,11 @@
 import { db } from "@e-kos/database";
-import { tenants } from "@e-kos/database/schema";
+import type { Tenant } from "@e-kos/database/schema";
 import { formatDate } from "@e-kos/utilities/date";
 
 import { render } from "../template";
 import { STATUS_LABEL } from "./constants";
 
-export const listComplaints = async (tenant: typeof tenants.$inferSelect) => {
+export const listComplaints = async (tenant: Tenant) => {
 	const latest = await db.query.complaints.findMany({
 		where: { tenantId: tenant.id },
 		limit: 3,

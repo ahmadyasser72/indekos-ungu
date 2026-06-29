@@ -1,11 +1,11 @@
 import { db } from "@e-kos/database";
-import { complaints, tenants } from "@e-kos/database/schema";
+import { complaints, tenants, type Tenant } from "@e-kos/database/schema";
 
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 
 import { listComplaints } from "../list-complaints";
 
-let testTenant: typeof tenants.$inferSelect;
+let testTenant: Tenant;
 
 beforeAll(async () => {
 	db.run("BEGIN");
@@ -57,7 +57,7 @@ describe("listComplaints", () => {
 });
 
 describe("listComplaints no complaints", () => {
-	let tenantNoComplaints: typeof tenants.$inferSelect;
+	let tenantNoComplaints: Tenant;
 
 	beforeAll(async () => {
 		const [tenant] = await db

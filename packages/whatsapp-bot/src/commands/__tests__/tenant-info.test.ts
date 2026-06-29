@@ -1,11 +1,17 @@
 import { db } from "@e-kos/database";
-import { invoices, leases, rooms, tenants } from "@e-kos/database/schema";
+import {
+	invoices,
+	leases,
+	rooms,
+	tenants,
+	type Tenant,
+} from "@e-kos/database/schema";
 
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 
 import { tenantInfo } from "../tenant-info";
 
-let testTenant: typeof tenants.$inferSelect;
+let testTenant: Tenant;
 
 beforeAll(async () => {
 	db.run("BEGIN");
@@ -73,7 +79,7 @@ describe("tenantInfo", () => {
 });
 
 describe("tenantInfo with unpaid invoices", () => {
-	let tenantWithBills: typeof tenants.$inferSelect;
+	let tenantWithBills: Tenant;
 
 	beforeAll(async () => {
 		const [room] = await db
@@ -125,7 +131,7 @@ describe("tenantInfo with unpaid invoices", () => {
 });
 
 describe("tenantInfo no lease", () => {
-	let tenantNoLease: typeof tenants.$inferSelect;
+	let tenantNoLease: Tenant;
 
 	beforeAll(async () => {
 		const [tenant] = await db
@@ -148,7 +154,7 @@ describe("tenantInfo no lease", () => {
 });
 
 describe("tenantInfo with end date", () => {
-	let tenantWithEnd: typeof tenants.$inferSelect;
+	let tenantWithEnd: Tenant;
 
 	beforeAll(async () => {
 		const [room] = await db

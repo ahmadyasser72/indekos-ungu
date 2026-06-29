@@ -1,4 +1,3 @@
-import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { db, eq } from "@e-kos/database";
 import {
 	invoices,
@@ -6,11 +5,14 @@ import {
 	rooms,
 	tenants,
 	users,
+	type User,
 } from "@e-kos/database/schema";
+
+import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 
 import { runOverdueCheck } from "../overdue";
 
-let systemUser: typeof users.$inferSelect;
+let systemUser: User;
 let leaseId: number;
 
 beforeAll(async () => {

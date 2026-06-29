@@ -72,7 +72,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 			context.locals.user = {
 				id: user?.id ?? 0,
 				name: user?.displayName ?? user?.username ?? "Staff",
-				role: (user?.role ?? "staff") as App.SessionData["user"]["role"],
+				role: user?.role ?? "staff",
 			};
 
 			return next();

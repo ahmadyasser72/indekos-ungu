@@ -3,7 +3,7 @@ declare namespace App {
 		user: {
 			id: number;
 			name: string;
-			role: "admin" | "staff" | "owner";
+			role: import("@e-kos/database/schema").User["role"];
 		};
 	}
 

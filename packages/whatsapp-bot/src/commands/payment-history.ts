@@ -1,5 +1,5 @@
 import { db } from "@e-kos/database";
-import { tenants } from "@e-kos/database/schema";
+import type { Tenant } from "@e-kos/database/schema";
 import { formatDate } from "@e-kos/utilities/date";
 import {
 	formatCurrency,
@@ -8,9 +8,7 @@ import {
 
 import { render } from "../template";
 
-export const paymentHistory = async (
-	tenant: typeof tenants.$inferSelect,
-): Promise<string> => {
+export const paymentHistory = async (tenant: Tenant): Promise<string> => {
 	const lease = await db.query.leases.findFirst({
 		columns: { id: true },
 		where: { tenantId: tenant.id, isActive: true },

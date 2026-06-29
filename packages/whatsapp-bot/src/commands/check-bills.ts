@@ -1,6 +1,6 @@
 import { db } from "@e-kos/database";
 import { getPaymentUrlFromReference } from "@e-kos/database/duitku";
-import { tenants } from "@e-kos/database/schema";
+import type { Tenant } from "@e-kos/database/schema";
 import { formatDate } from "@e-kos/utilities/date";
 import {
 	formatCurrency,
@@ -11,9 +11,7 @@ import { sumBy } from "es-toolkit";
 
 import { render } from "../template";
 
-export const checkBills = async (
-	tenant: typeof tenants.$inferSelect,
-): Promise<string> => {
+export const checkBills = async (tenant: Tenant): Promise<string> => {
 	const lease = await db.query.leases.findFirst({
 		where: { tenantId: tenant.id, isActive: true },
 		with: {
