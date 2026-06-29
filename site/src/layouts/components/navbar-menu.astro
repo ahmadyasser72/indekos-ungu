@@ -1,4 +1,6 @@
 ---
+import type { User } from "@e-kos/database/schema";
+
 import Icon from "~/components/ui/icon.astro";
 
 interface MenuItem {
@@ -8,7 +10,7 @@ interface MenuItem {
 }
 
 export interface Props {
-	role?: "admin" | "staff" | "owner";
+	role?: User["role"];
 }
 
 const { role = "staff" } = Astro.props;

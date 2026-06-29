@@ -5,15 +5,10 @@ import Icon from "~/components/ui/icon.astro";
 import { ROLE_BADGES } from "~/lib/auth";
 
 export interface Props {
-	user: {
-		id: number;
-		name: string;
-		role: "admin" | "staff" | "owner";
-	};
+	user: NonNullable<App.Locals["user"]>;
 }
 
 const { user } = Astro.props;
-
 const initial = user.name.charAt(0).toUpperCase();
 ---
 
