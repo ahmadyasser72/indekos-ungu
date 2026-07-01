@@ -531,3 +531,9 @@ Di html.astro:
 - **`makeDownloadHandler` reusable** — semua `download.ts` cukup 1 baris panggil fungsi ini. Tidak ada duplikasi kode.
 - **Tidak perlu endpoint API khusus** — `makeDownloadHandler` return `APIRoute`, langsung export sebagai `GET`.
 - **`CHROMIUM_PATH`** dari `astro:env/server` (schema required). Jika binary tidak ada di path tsb, `generatePDF` throw error.
+
+---
+
+## 13. Status Implementasi
+
+Rencana di atas telah diimplementasikan sepenuhnya. Semua 9 laporan PDF telah berfungsi, termasuk struk invoice digital. Pola `makeDownloadHandler()` telah digunakan secara konsisten di seluruh endpoint download. Autentikasi puppeteer via token in-memory dan browser singleton telah berfungsi sebagaimana dirancang.

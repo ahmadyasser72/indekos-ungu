@@ -277,35 +277,38 @@ ERD pada sistem ini memberikan gambaran menyeluruh tentang bagaimana data diorga
 
 Relasi di dalam ERD ini dirancang untuk menjaga keteraturan dan integritas data, seperti menghubungkan penghuni dengan kamar yang mereka tempati melalui kontrak sewa (lease), serta menghubungkan setiap pembayaran dengan dokumen tagihan yang sesuai. Dengan struktur yang terintegrasi ini, sistem dapat dengan mudah melacak riwayat penyewaan, mengelola data pembayaran secara akurat, serta memproses komplain dan notifikasi pengingat secara otomatis kepada penghuni yang bersangkutan.
 
+> **Catatan:** Diagram ERD di atas merupakan representasi awal. Rincian kolom dan tabel pada bagian berikut mencerminkan implementasi aktual, termasuk tabel `bot_auth` dan kolom-kolom tambahan yang tidak tergambar dalam diagram.
+
 ### 2.2 Rincian Tabel Basis Data
 
 ### `users`
 
 Tabel users digunakan untuk menyimpan data autentikasi pengguna sistem, yang mencakup admin, staff, owner, serta sistem otomatis seperti cron. Keberadaan tabel ini berkaitan langsung dengan proses verifikasi akun pada activity dan sequence diagram, di mana sistem melakukan validasi kredensial sebelum memberikan akses ke fitur tertentu.
 
-| Nama Kolom      | Tipe Data        | Keterangan                          |
-| --------------- | ---------------- | ----------------------------------- |
-| `id`            | INTEGER (PK, AI) | ID pengguna.                        |
-| `username`      | TEXT (Unique)    | Nama pengguna untuk masuk sistem.   |
-| `password_hash` | TEXT             | Kata sandi akun.                    |
-| `role`          | TEXT             | Role akun (admin/staff/owner/cron). |
-| `last_accessed` | TIMESTAMP        | Kapan terakhir kali akun diakses.   |
+| Nama Kolom      | Tipe Data        | Keterangan                            |
+| --------------- | ---------------- | ------------------------------------- |
+| `id`            | INTEGER (PK, AI) | ID pengguna.                          |
+| `username`      | TEXT (Unique)    | Nama pengguna untuk masuk sistem.     |
+| `password_hash` | TEXT             | Kata sandi akun.                      |
+| `display_name`  | TEXT NULL        | Nama tampilan pengguna.               |
+| `role`          | TEXT             | Role akun (admin/staff/owner/system). |
+| `last_accessed` | TIMESTAMP NULL   | Kapan terakhir kali akun diakses.     |
 
-Atribut seperti username, password_hash, dan role memungkinkan sistem untuk mengatur hak akses sesuai dengan peran pengguna, sebagaimana dijelaskan pada use case diagram. Kolom last_accessed digunakan untuk mencatat aktivitas terakhir pengguna sebagai bagian dari monitoring sistem.
+Atribut seperti username, password_hash, dan role memungkinkan sistem untuk mengatur hak akses sesuai dengan peran pengguna, sebagaimana dijelaskan pada use case diagram. Kolom display_name digunakan sebagai nama yang ditampilkan di UI dan laporan. Kolom last_accessed digunakan untuk mencatat aktivitas terakhir pengguna sebagai bagian dari monitoring sistem. Role `system` digunakan untuk aksi otomatis oleh cron dan chatbot.
 
 ### `tenants`
 
 Tabel tenants berfungsi sebagai pusat penyimpanan data penghuni kos. Data ini menjadi dasar bagi berbagai proses dalam sistem, seperti penyewaan kamar, pengiriman notifikasi, serta interaksi melalui chatbot.
 
-| Nama Kolom      | Tipe Data        | Keterangan                        |
-| --------------- | ---------------- | --------------------------------- |
-| `id`            | INTEGER (PK, AI) | ID penghuni.                      |
-| `full_name`     | TEXT             | Nama lengkap penghuni.            |
-| `phone_number`  | TEXT (Unique)    | Nomor kontak untuk obrolan bot.   |
-| `origin_region` | TEXT NULL        | Daerah kediaman asal penghuni.    |
-| `created_at`    | TIMESTAMP        | Waktu pertama kali didata sistem. |
+| Nama Kolom      | Tipe Data        | Keterangan                           |
+| --------------- | ---------------- | ------------------------------------ |
+| `id`            | INTEGER (PK, AI) | ID penghuni.                         |
+| `full_name`     | TEXT             | Nama lengkap penghuni.               |
+| `phone_number`  | TEXT             | Nomor kontak untuk obrolan bot.      |
+| `origin_region` | TEXT NULL        | Daerah kediaman asal penghuni.       |
+| `is_verified`   | BOOLEAN          | Status verifikasi nomor WhatsApp.    |
 
-Kolom phone_number memiliki peran penting karena digunakan sebagai identitas dalam komunikasi chatbot, sesuai dengan proses pada sequence diagram interaksi chatbot. Tabel ini juga terhubung dengan banyak tabel lain, seperti leases, chatbot_messages, notifications, dan complaints, sehingga menjadi salah satu entitas inti dalam sistem.
+Kolom phone_number memiliki peran penting karena digunakan sebagai identitas dalam komunikasi chatbot, sesuai dengan proses pada sequence diagram interaksi chatbot. Kolom is_verified menandakan apakah penghuni telah mengkonfirmasi identitasnya melalui chatbot (dengan membalas "YA" saat pertama kali mengirim pesan). Tabel ini juga terhubung dengan banyak tabel lain, seperti leases, chatbot_messages, notifications, dan complaints, sehingga menjadi salah satu entitas inti dalam sistem.
 
 ### `rooms`
 
@@ -315,7 +318,7 @@ Tabel rooms menyimpan informasi terkait kamar yang tersedia dalam sistem. Data i
 | --------------- | ---------------- | ----------------------------------------- |
 | `id`            | INTEGER (PK, AI) | ID kamar.                                 |
 | `room_number`   | TEXT (Unique)    | Nomor di pintu kamar.                     |
-| `room_type`     | TEXT NULL        | Jenis kamar.                              |
+| `room_type`     | TEXT             | Jenis kamar (standard/premium).           |
 | `monthly_price` | INTEGER          | Harga sewa setiap bulannya.               |
 | `is_active`     | BOOLEAN          | Penentu apakah kamar tersedia atau tidak. |
 
@@ -346,9 +349,11 @@ Tabel invoices digunakan untuk mencatat seluruh tagihan yang dihasilkan dari pro
 | `lease_id`         | INTEGER (FK)     | Data sewa yang sedang ditagihkan ke penghuni. |
 | `amount`           | INTEGER          | Nominal uang yang wajib dibayar.              |
 | `due_date`         | TIMESTAMP        | Tanggal batas akhir setor uang.               |
+| `paid_at`          | TIMESTAMP NULL   | Kapan tagihan dibayar.                        |
 | `duitku_reference` | TEXT NULL        | Kode resi payment gateway (DUITKU).           |
 | `callback_payload` | TEXT NULL        | Payload raw hasil callback payment gateway.   |
-| `status`           | TEXT             | Status pelunasan.                             |
+| `status`           | TEXT             | Status pelunasan (unpaid/paid/overdue).       |
+| `created_at`       | TIMESTAMP        | Waktu tagihan dibuat.                         |
 
 Kolom seperti due_date, status, dan duitku_reference mendukung proses pembayaran yang tergambar pada sequence diagram pembayaran. Selain itu, kolom callback_payload digunakan untuk menyimpan data hasil callback dari payment gateway, yang menunjukkan bahwa sistem terintegrasi dengan layanan eksternal.
 
@@ -389,24 +394,126 @@ Tabel audit_logs berfungsi untuk mencatat setiap aktivitas perubahan data dalam 
 | ------------ | ---------------- | ------------------------------------- |
 | `id`         | INTEGER (PK, AI) | ID rekam jejak perubahan sistem.      |
 | `user_id`    | INTEGER (FK)     | Pengguna yang mengubah datanya.       |
-| `action`     | TEXT             | Aksi perubahannya.                    |
+| `action`     | TEXT             | Aksi perubahannya (CREATE/UPDATE/DELETE/REJECT/LOGIN). |
 | `table_name` | TEXT             | Tabel yang dirubah.                   |
-| `record_id`  | INTEGER          | ID dari record yang dirubah.          |
+| `record_id`  | INTEGER NULL     | ID dari record yang dirubah.          |
+| `details`    | TEXT NULL        | Detail perubahan dalam format JSON.   |
 | `created_at` | TIMESTAMP        | Waktu tindakan mengubah hal tersebut. |
 
-Setiap perubahan yang dilakukan oleh user akan direkam, termasuk jenis aksi, tabel yang terlibat, serta waktu kejadian. Meskipun tidak secara eksplisit ditampilkan dalam diagram, tabel ini mendukung kebutuhan non-fungsional seperti auditing dan logging.
+Setiap perubahan yang dilakukan oleh user akan direkam, termasuk jenis aksi, tabel yang terlibat, serta waktu kejadian. Kolom details berisi JSON dengan struktur discriminated union yang menjelaskan konteks perubahan: create/update/delete (dengan perubahan data), cron (jadwal otomatis), bot (interaksi chatbot), reject (penolakan), payment (pembayaran), notification (notifikasi), atau generic. Kolom record_id bersifat nullable untuk aksi LOGIN yang tidak terkait record spesifik.
 
 ### `complaints`
 
 Tabel complaints digunakan untuk menyimpan data komplain yang diajukan oleh penghuni. Tabel ini berkaitan langsung dengan use case dan diagram proses pengajuan serta penanganan komplain.
 
-| Nama Kolom    | Tipe Data         | Keterangan                    |
-| ------------- | ----------------- | ----------------------------- |
-| `id`          | INTEGER (PK, AI)  | ID surat pengaduan.           |
-| `tenant_id`   | INTEGER (FK)      | Penghuni pelapor.             |
-| `description` | TEXT              | Isi detail dari kerusakannya. |
-| `status`      | TEXT              | Status keluhan ini.           |
-| `resolved_by` | INTEGER NULL (FK) | Pengguna yang menyelesaikan.  |
-| `created_at`  | TIMESTAMP         | Waktu keluhan dibuat.         |
+| Nama Kolom      | Tipe Data         | Keterangan                         |
+| --------------- | ----------------- | ---------------------------------- |
+| `id`            | INTEGER (PK, AI)  | ID surat pengaduan.                |
+| `tenant_id`     | INTEGER (FK)      | Penghuni pelapor.                  |
+| `description`   | TEXT              | Isi detail dari kerusakannya.      |
+| `status`        | TEXT              | Status keluhan (open/in_progress/resolved). |
+| `processed_at`  | TIMESTAMP NULL    | Kapan komplain mulai diproses.     |
+| `resolved_by`   | INTEGER NULL (FK) | Pengguna yang menyelesaikan.       |
+| `resolve_notes` | TEXT NULL         | Catatan penyelesaian.              |
+| `resolved_at`   | TIMESTAMP NULL    | Kapan komplain diselesaikan.       |
+| `created_at`    | TIMESTAMP         | Waktu keluhan dibuat.              |
 
-Kolom tenant_id menunjukkan siapa yang mengajukan komplain, sedangkan resolved_by menunjukkan pengguna (staff) yang menangani komplain tersebut. Kolom status digunakan untuk melacak progres penyelesaian, sesuai dengan alur pada activity dan sequence diagram komplain.
+Kolom tenant_id menunjukkan siapa yang mengajukan komplain, sedangkan resolved_by menunjukkan pengguna (staff) yang menangani komplain tersebut. Kolom status digunakan untuk melacak progres penyelesaian: `open` → `in_progress` → `resolved`. Setiap transisi status memicu notifikasi WhatsApp ke penghuni. Kolom processed_at dan resolved_at mencatat kapan komplain mulai ditangani dan diselesaikan.
+
+### `bot_auth`
+
+Tabel bot_auth digunakan sebagai key-value store untuk menyimpan session autentikasi WhatsApp (Baileys). Tabel ini tidak memiliki foreign key karena berfungsi sebagai penyimpanan sementara untuk kredensial bot.
+
+| Nama Kolom | Tipe Data | Keterangan                         |
+| ---------- | --------- | ---------------------------------- |
+| `key`      | TEXT (PK) | Kunci autentikasi (credential key). |
+| `value`    | TEXT      | Nilai kunci (credential value).    |
+
+Tabel ini dikelola secara otomatis oleh library Baileys. Saat login, seluruh kredensial disimpan di sini. Saat logout, seluruh data dihapus. Struktur key menggunakan format Baileys dengan penggantian karakter `/` → `__` dan `:` → `-` untuk kompatibilitas dengan SQLite.
+
+---
+
+## 3. Fitur Tambahan
+
+Bagian ini menjelaskan fitur-fitur yang diimplementasikan namun tidak tercakup dalam diagram UML awal.
+
+### 3.1 Verifikasi Penghuni via Chatbot
+
+Sistem menerapkan alur verifikasi dua langkah untuk penghuni baru:
+
+1. Penghuni mengirim pesan pertama kali ke bot WhatsApp
+2. Sistem memeriksa apakah nomor terdaftar dan apakah sudah diverifikasi (`is_verified`)
+3. Jika belum diverifikasi, sistem meminta konfirmasi dengan pesan "YA"
+4. Setelah konfirmasi, `is_verified` diatur ke `true` dan penghuni dapat menggunakan semua perintah
+
+Nomor yang belum terdaftar menerima pesan penolakan dengan cooldown 30 detik untuk mencegah spam.
+
+### 3.2 Jenis Notifikasi
+
+Sistem mendukung empat jenis notifikasi yang dikirim melalui WhatsApp:
+
+| Jenis | Deskripsi |
+|-------|-----------|
+| `welcome` | Pesan selamat datang untuk penghuni baru beserta instruksi verifikasi |
+| `payment_success` | Konfirmasi pembayaran berhasil setelah callback Duitku diterima |
+| `reminder` | Pengingat tagihan jatuh tempo (dikirim otomatis untuk invoice yang jatuh tempo dalam 3 hari) |
+| `custom` | Notifikasi kustom (placeholder untuk pengembangan masa depan) |
+
+### 3.3 Integrasi Payment Gateway (Duitku)
+
+Alur pembayaran terintegrasi dengan payment gateway Duitku:
+
+1. **Generate Link**: Scheduler membuat invoice dan menghasilkan payment link via API Duitku
+2. **Distribusi**: Link dikirim ke penghuni melalui WhatsApp (perintah `tagihan` atau notifikasi `reminder`)
+3. **Pembayaran**: Penghuni melakukan pembayaran melalui halaman Duitku
+4. **Callback**: Duitku mengirim callback ke endpoint `/api/duitku/callback`
+5. **Konfirmasi**: Sistem memverifikasi signature callback, memperbarui status invoice, dan mengirim notifikasi `payment_success`
+6. **Redirect**: Penghuni diarahkan kembali ke halaman invoice setelah pembayaran
+
+### 3.4 Laporan PDF
+
+Sistem menghasilkan laporan dalam format PDF menggunakan puppeteer-core dengan layout formal monochrome. Semua laporan menggunakan layout bersama (`report-layout.astro`) yang mencakup kop surat, konten, dan blok tanda tangan.
+
+| # | Laporan | Lokasi |
+|---|---------|--------|
+| 1 | Laporan Komplain | `manage/complaints/report/` |
+| 2 | Daftar Penghuni Aktif | `manage/tenants/report/` |
+| 3 | Rekap Status Kamar | `manage/rooms/report/` |
+| 4 | Laporan Transaksi Bulanan | `report/transactions/report/` |
+| 5 | Laporan Riwayat Notifikasi | `report/notifications/report/` |
+| 6 | Laporan Aktivitas Pengguna (Audit) | `log/audit/report/` |
+| 7 | Laporan Percakapan Chatbot | `log/chatbot/report/` |
+| 8 | Struk Invoice Digital | `invoice/[id]/download` |
+
+Setiap laporan dihasilkan melalui endpoint `download.ts` yang menggunakan `makeDownloadHandler()` — pola reusable yang memungkinkan setiap endpoint hanya memerlukan satu baris kode. Autentikasi untuk puppeteer ditangani melalui token in-memory (`_pdf_token`) yang diverifikasi oleh middleware.
+
+### 3.5 Scheduler (Penjadwal Otomatis)
+
+Sistem menggunakan tiga worker cron yang berjalan secara otomatis:
+
+| Worker | Jadwal (UTC/WITA) | Fungsi |
+|--------|-------------------|--------|
+| Invoice Generation | 00:00/08:00 | Membuat tagihan bulanan untuk semua lease aktif, termasuk backfill untuk lease yang terlewat |
+| Overdue Check | 16:00/00:00 | Menandai invoice yang belum dibayar melewati jatuh tempo sebagai `overdue` |
+| Rent Reminder | 00:00/08:00 | Membuat record notifikasi `reminder` untuk invoice yang jatuh tempo dalam 3 hari |
+
+Setiap worker mencatat aktivitasnya ke tabel `audit_logs` dengan action `CREATE` atau `UPDATE` dan detail JSON yang menjelaskan record yang terpengaruh.
+
+### 3.6 Manajemen Penghuni Lanjutan
+
+Sistem mendukung operasi pengelolaan penghuni yang lebih lengkap:
+
+- **Pindah Kamar**: Memindahkan penghuni aktif ke kamar lain (lease lama diakhiri, lease baru dibuat)
+- **Akhiri Sewa**: Mengakhiri masa sewa penghuni (`is_active` diatur ke `false`)
+- **Daftar Ulang**: Mendaftarkan ulang penghuni yang masa sewanya sudah berakhir dengan lease baru
+- **Indeks Unik**: Hanya satu lease aktif per penghuni yang diizinkan (partial unique index)
+
+### 3.7 Sistem Pesan Chatbot
+
+Bot WhatsApp memproses pesan dengan mekanisme:
+
+1. **Filter**: Abaikan pesan sendiri, non-WhatsApp JID, dan pesan kosong
+2. **Debounce**: Timer 5 detik per pengguna untuk menggabungkan pesan beruntun
+3. **Rate Limiting**: Interval minimal 1 detik antar pengiriman pesan
+4. **Cooldown**: 30 detik untuk nomor yang belum terdaftar
+5. **Audit**: Seluruh pesan masuk dan keluar dicatat ke tabel `chatbot_messages`
