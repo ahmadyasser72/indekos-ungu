@@ -19,6 +19,9 @@ const filterParts: string[] = [];
 if (params.type) {
 	filterParts.push(`Jenis: ${NOTIFICATION_TYPE_LABELS[params.type]}`);
 }
+if (params.status) {
+	filterParts.push(`Status: ${NOTIFICATION_STATUS_LABELS[params.status]}`);
+}
 if (params.from) {
 	filterParts.push(
 		params.from !== params.to

@@ -10,6 +10,7 @@ export const notificationQuerySchema = z.object({
 	query: querySchema,
 	...periodFields,
 	type: statusSchema(NOTIFICATION_TYPES),
+	status: statusSchema(NOTIFICATION_STATUS),
 });
 
 export const fetchNotifications = async (
@@ -24,6 +25,7 @@ export const fetchNotifications = async (
 			}),
 
 			...(params.type && { type: params.type }),
+			...(params.status && { status: params.status }),
 
 			createdAt: { gte: startDate, lte: endDate },
 		},

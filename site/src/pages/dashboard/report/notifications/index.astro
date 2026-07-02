@@ -1,5 +1,5 @@
 ---
-import { NOTIFICATION_TYPES } from "@indekos/database";
+import { NOTIFICATION_STATUS, NOTIFICATION_TYPES } from "@indekos/database";
 import { formatDate } from "@indekos/utilities/date";
 
 import { actions } from "astro:actions";
@@ -66,6 +66,15 @@ const notifications = await fetchNotifications(params);
 							value: type,
 							label: NOTIFICATION_TYPE_LABELS[type],
 							checked: params.type === type,
+						})),
+					},
+					{
+						title: "Status Notifikasi",
+						name: "status",
+						options: Object.values(NOTIFICATION_STATUS).map((status) => ({
+							value: status,
+							label: NOTIFICATION_STATUS_LABELS[status],
+							checked: params.status === status,
 						})),
 					},
 				]}
