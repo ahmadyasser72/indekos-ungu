@@ -1,6 +1,8 @@
 ---
 import { formatDate } from "@indekos/utilities/date";
 
+import { render } from "@croct/md-lite";
+
 import ReportLayout from "~/layouts/report-layout.astro";
 import {
 	chatbotQuerySchema,
@@ -31,7 +33,7 @@ const subtitle = filterParts.length > 0 ? filterParts.join(" | ") : undefined;
 	<table>
 		<thead>
 			<tr>
-				<th class="w-[18%]">Waktu</th>
+				<th class="w-[18%]">Terkirim</th>
 				<th class="w-[18%]">Penghuni</th>
 				<th class="w-[10%]">Kamar</th>
 				<th class="w-[10%]">Arah</th>
@@ -48,7 +50,20 @@ const subtitle = filterParts.length > 0 ? filterParts.join(" | ") : undefined;
 						<td class="font-semibold">{row.tenantName}</td>
 						<td class="text-center font-mono">{row.roomNumber}</td>
 						<td class="text-center">{DIRECTION_LABELS[row.direction]}</td>
-						<td class="max-w-[300px] break-words">{row.message}</td>
+						<td
+							class="max-w-75"
+							set:html={render(row.message, {
+								fragment: (node) => node.children[0],
+								text: (node) => node.content,
+								bold: (node) => node.children,
+								italic: (node) => node.children,
+								strike: (node) => node.children,
+								code: (node) => node.content,
+								link: (node) => node.children,
+								image: (node) => `[gambar ${node.alt}]`,
+								paragraph: (node) => node.children.join(""),
+							})}
+						/>
 					</tr>
 				))
 			}

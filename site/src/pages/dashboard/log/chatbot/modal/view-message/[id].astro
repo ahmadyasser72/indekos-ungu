@@ -2,9 +2,8 @@
 import { db } from "@indekos/database";
 import { formatDate } from "@indekos/utilities/date";
 
-import { actions } from "astro:actions";
+import { render } from "@croct/md-lite";
 
-import ModalForm from "~/components/form/modal-form.astro";
 import Modal from "~/components/modal/modal.astro";
 import NotFound from "~/components/ui/not-found.astro";
 import { DIRECTION_LABELS } from "../../_data";
@@ -22,21 +21,40 @@ const log = await db.query.chatbotMessages.findFirst({
 	},
 });
 
-const chatbotLog = log
-	? {
-			...log,
-			tenantName: log.tenant.fullName,
-			roomNumber: log.tenant.lease?.room?.roomNumber ?? "-",
-		}
-	: null;
+const [chatbotLog, message] = log
+	? [
+			{
+				...log,
+				tenantName: log.tenant.fullName,
+				roomNumber: log.tenant.lease?.room?.roomNumber ?? "-",
+			},
+			render(log.message, {
+				fragment: (node) =>
+					node.children
+						.join("")
+						.replaceAll("\n", "<br>")
+						.split("<br>")
+						.filter(Boolean)
+						.join("<br>"),
+				text: (node) => node.content,
+				bold: (node) => `<b>${node.children}</b>`,
+				italic: (node) => `<b>${node.children}</b>`,
+				strike: (node) => `<s>${node.children}</s>`,
+				code: (node) => `<code>${node.content}</code>`,
+				link: (node) => `<a href="${node.href}">${node.children}</a>`,
+				image: (node) => `<p>[gambar ${node.alt}]</p>`,
+				paragraph: (node) => `<p>${node.children.join("")}</p><br>`,
+			}),
+		]
+	: [];
 
 if (!log) Astro.response.status = 404;
 ---
 
 <Modal
-	id="delete_chatbot"
-	title="Hapus Chatbot Log"
-	icon="lucide:message-square-warning"
+	id="view_message"
+	title="Detail Pesan Chatbot"
+	icon="lucide:message-square-text"
 >
 	{
 		chatbotLog ? (
@@ -54,21 +72,11 @@ if (!log) Astro.response.status = 404;
 
 				<div class="mt-4 text-sm">
 					<span class="mb-1 block font-bold">Isi Pesan:</span>
-					<p class="max-h-32 overflow-y-auto rounded border border-base-300 bg-base-200 p-3 text-xs leading-relaxed wrap-break-word whitespace-pre-wrap">
-						{chatbotLog.message}
-					</p>
+					<div
+						class="max-h-96 overflow-y-auto rounded border border-base-300 bg-base-200 p-4 text-sm leading-relaxed"
+						set:html={message}
+					/>
 				</div>
-
-				<ModalForm
-					action={actions.manage.chatbot.remove}
-					hidden
-					modalId="delete_chatbot"
-					submitClass="btn-error"
-					submitLabel="Hapus"
-					target="#form_result, #chatbot-content-wrapper"
-				>
-					<input name="id" type="hidden" value={chatbotLog.id} />
-				</ModalForm>
 			</>
 		) : (
 			<NotFound label="Chatbot Log" />
