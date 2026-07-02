@@ -75,4 +75,12 @@ const { title } = Astro.props;
 			event.detail.swapOverride = "beforeend";
 		}
 	});
+
+	htmx.on("htmx:afterSettle", (e) => {
+		const event = e as Event & { target: HTMLElement };
+
+		const element = event.target.querySelector("[data-scroll-here]");
+		if (element instanceof HTMLElement)
+			element.scrollIntoView({ behavior: "smooth" });
+	});
 </script>

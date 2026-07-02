@@ -10,6 +10,7 @@ import { formatMessageMarkdown } from "../../../../log/chatbot/_data";
 export const partial = true;
 
 const tenantId = Number(Astro.params.id);
+const messageId = Number(Astro.url.searchParams.get("message"));
 
 const tenant = await db.query.tenants.findFirst({
 	where: { id: tenantId },
@@ -39,47 +40,51 @@ if (!tenant) {
 
 				<div class="chat-container max-h-96 space-y-2 overflow-y-auto">
 					{tenant.chatbotLogs.length > 0 ? (
-						tenant.chatbotLogs.map(({ direction, message, sentAt }) => (
-							<div
-								class:list={[
-									"chat",
-									direction === "incoming" ? "chat-start" : "chat-end",
-								]}
-							>
-								<div class="avatar chat-image">
-									<div class="size-8 rounded-full">
-										{direction === "incoming" ? (
-											<div class="flex size-full items-center justify-center bg-base-300">
-												<Icon
-													class="opacity-70"
-													name="lucide:user"
-													size="size-5"
-												/>
-											</div>
-										) : (
-											<div class="flex size-full items-center justify-center bg-primary text-primary-content">
-												<span class="text-xs font-bold">KU</span>
-											</div>
-										)}
-									</div>
-								</div>
-								<div class="chat-header">
-									{direction === "incoming" ? tenant.fullName : "Chatbot"}
-									<time class="text-xs opacity-50">
-										{formatDate(sentAt, "HH:mm")}
-									</time>
-								</div>
+						tenant.chatbotLogs.map(
+							({ id, direction, message, sentAt }, idx) => (
 								<div
 									class:list={[
-										"chat-bubble max-w-xs text-sm",
-										direction === "incoming"
-											? "chat-bubble-info"
-											: "chat-bubble-primary",
+										"chat",
+										direction === "incoming" ? "chat-start" : "chat-end",
 									]}
-									set:html={formatMessageMarkdown(message)}
-								/>
-							</div>
-						))
+									{...(((!messageId && idx === tenant.chatbotLogs.length - 1) ||
+										messageId === id) && { "data-scroll-here": "" })}
+								>
+									<div class="avatar chat-image">
+										<div class="size-8 rounded-full">
+											{direction === "incoming" ? (
+												<div class="flex size-full items-center justify-center bg-base-300">
+													<Icon
+														class="opacity-70"
+														name="lucide:user"
+														size="size-5"
+													/>
+												</div>
+											) : (
+												<div class="flex size-full items-center justify-center bg-primary text-primary-content">
+													<span class="text-xs font-bold">KU</span>
+												</div>
+											)}
+										</div>
+									</div>
+									<div class="chat-header">
+										{direction === "incoming" ? tenant.fullName : "Chatbot"}
+										<time class="text-xs opacity-50">
+											{formatDate(sentAt, "HH:mm")}
+										</time>
+									</div>
+									<div
+										class:list={[
+											"chat-bubble max-w-xs text-sm",
+											direction === "incoming"
+												? "chat-bubble-info"
+												: "chat-bubble-primary",
+										]}
+										set:html={formatMessageMarkdown(message)}
+									/>
+								</div>
+							),
+						)
 					) : (
 						<div class="py-8 text-center text-sm opacity-50">
 							Tidak ada pesan
