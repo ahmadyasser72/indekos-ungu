@@ -1,6 +1,7 @@
 ---
 import { formatDate } from "@indekos/utilities/date";
 
+import ReportStats from "~/components/data/report-stats.astro";
 import ReportLayout from "~/layouts/report-layout.astro";
 import {
 	COMPLAINT_STATUS_LABELS,
@@ -29,18 +30,7 @@ const subtitle = filterParts.length > 0 ? filterParts.join(" | ") : undefined;
 ---
 
 <ReportLayout title="Laporan Komplain Penghuni" subtitle={subtitle}>
-	<div class="mb-4 grid grid-cols-4 gap-2">
-		{
-			stats.map((stat) => (
-				<div class="border border-black p-2 text-center">
-					<p class="mb-1 text-[10px] font-normal">{stat.title}</p>
-					<p class="text-lg font-bold">{stat.value}</p>
-				</div>
-			))
-		}
-	</div>
-
-	<p class="mb-2 text-sm font-bold">Daftar Komplain</p>
+	<ReportStats items={stats} />
 
 	<table>
 		<thead>

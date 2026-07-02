@@ -1,6 +1,7 @@
 ---
 import { formatDate } from "@indekos/utilities/date";
 
+import ReportStats from "~/components/data/report-stats.astro";
 import ReportLayout from "~/layouts/report-layout.astro";
 import { fetchTenants, getTenantsStats, tenantsQuerySchema } from "../_data";
 
@@ -17,28 +18,7 @@ else if (params.status === "completed") subtitle = "Status: Selesai";
 ---
 
 <ReportLayout title="Daftar Penghuni Aktif" subtitle={subtitle}>
-	<div class="mb-6 grid grid-cols-3 gap-4">
-		<div class="border border-black p-3">
-			<div class="mb-1 text-[10px] font-bold tracking-[0.5px] uppercase">
-				Total Penghuni
-			</div>
-			<div class="text-lg font-bold">{tenantsStats[0].value}</div>
-		</div>
-		<div class="border border-black p-3">
-			<div class="mb-1 text-[10px] font-bold tracking-[0.5px] uppercase">
-				Sewa Aktif
-			</div>
-			<div class="text-lg font-bold">{tenantsStats[1].value}</div>
-			<div class="mt-0.5 text-[11px]">{tenantsStats[1].desc}</div>
-		</div>
-		<div class="border border-black p-3">
-			<div class="mb-1 text-[10px] font-bold tracking-[0.5px] uppercase">
-				Terverifikasi
-			</div>
-			<div class="text-lg font-bold">{tenantsStats[2].value}</div>
-			<div class="mt-0.5 text-[11px]">{tenantsStats[2].desc}</div>
-		</div>
-	</div>
+	<ReportStats items={tenantsStats} />
 
 	<table>
 		<thead>

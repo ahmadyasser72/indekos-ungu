@@ -2,6 +2,7 @@
 import { formatDate } from "@indekos/utilities/date";
 import { formatCurrency } from "@indekos/utilities/transforms";
 
+import ReportStats from "~/components/data/report-stats.astro";
 import ReportLayout from "~/layouts/report-layout.astro";
 import {
 	fetchTransactions,
@@ -33,35 +34,23 @@ const subtitle = filterParts.length > 0 ? filterParts.join(" | ") : undefined;
 ---
 
 <ReportLayout title="Laporan Transaksi Bulanan" subtitle={subtitle}>
-	<div class="mb-6 grid grid-cols-3 gap-4">
-		<div class="border border-black p-3">
-			<div class="mb-1 text-[10px] font-bold tracking-[0.5px] uppercase">
-				Total Pemasukan
-			</div>
-			<div class="font-mono text-lg font-bold">
-				{formatCurrency(totalRevenue)}
-			</div>
-		</div>
-		<div class="border border-black p-3">
-			<div class="mb-1 text-[10px] font-bold tracking-[0.5px] uppercase">
-				Sudah Terbayar
-			</div>
-			<div class="text-lg font-bold">
-				{paidCount} Invoice
-			</div>
-		</div>
-		<div class="border border-black p-3">
-			<div class="mb-1 text-[10px] font-bold tracking-[0.5px] uppercase">
-				Pembayaran Tertunggak
-			</div>
-			<div class="text-lg font-bold">
-				{unpaidCount} Invoice
-			</div>
-			<div class="mt-0.5 font-mono text-[11px]">
-				{formatCurrency(outstandingAmount)}
-			</div>
-		</div>
-	</div>
+	<ReportStats
+		items={[
+			{
+				title: "Total Pemasukan",
+				value: formatCurrency(totalRevenue),
+			},
+			{
+				title: "Sudah Terbayar",
+				value: `${paidCount} Invoice`,
+			},
+			{
+				title: "Pembayaran Tertunggak",
+				value: `${unpaidCount} Invoice`,
+				desc: formatCurrency(outstandingAmount),
+			},
+		]}
+	/>
 
 	<table>
 		<thead>

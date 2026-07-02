@@ -1,6 +1,7 @@
 ---
 import { formatDate } from "@indekos/utilities/date";
 
+import ReportStats from "~/components/data/report-stats.astro";
 import ReportLayout from "~/layouts/report-layout.astro";
 import {
 	AUDIT_ACTION_LABELS,
@@ -16,9 +17,7 @@ const auditStats = getAuditStats(auditLogs);
 
 const filterParts: string[] = [];
 if (params.action) {
-	filterParts.push(
-		`Aksi: ${params.action} (${AUDIT_ACTION_LABELS[params.action]})`,
-	);
+	filterParts.push(`Aksi: ${AUDIT_ACTION_LABELS[params.action]}`);
 }
 if (params.from) {
 	filterParts.push(
@@ -31,27 +30,7 @@ const subtitle = filterParts.length > 0 ? filterParts.join(" | ") : undefined;
 ---
 
 <ReportLayout title="Laporan Aktivitas Pengguna" subtitle={subtitle}>
-	<div class="mb-6 grid grid-cols-3 gap-4">
-		<div class="border border-black p-3">
-			<div class="mb-1 text-[10px] font-bold tracking-[0.5px] uppercase">
-				Total Aktivitas
-			</div>
-			<div class="text-lg font-bold">{auditStats[0].value}</div>
-		</div>
-		<div class="border border-black p-3">
-			<div class="mb-1 text-[10px] font-bold tracking-[0.5px] uppercase">
-				Pengguna Aktif
-			</div>
-			<div class="text-lg font-bold">{auditStats[1].value}</div>
-		</div>
-		<div class="border border-black p-3">
-			<div class="mb-1 text-[10px] font-bold tracking-[0.5px] uppercase">
-				Data Dibuat
-			</div>
-			<div class="text-lg font-bold">{auditStats[2].value}</div>
-			<div class="mt-0.5 text-[11px]">{auditStats[2].desc}</div>
-		</div>
-	</div>
+	<ReportStats items={auditStats} />
 
 	<table>
 		<thead>

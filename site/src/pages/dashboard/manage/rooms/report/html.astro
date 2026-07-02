@@ -3,6 +3,7 @@ import { formatCurrency } from "@indekos/utilities/transforms";
 
 import { sumBy } from "es-toolkit";
 
+import ReportStats from "~/components/data/report-stats.astro";
 import ReportLayout from "~/layouts/report-layout.astro";
 import {
 	fetchRooms,
@@ -35,40 +36,14 @@ const subtitle =
 ---
 
 <ReportLayout title="Rekap Status Kamar" subtitle={subtitle}>
-	<div class="mb-6 grid grid-cols-4 gap-3">
-		<div class="border border-black p-3 text-center">
-			<div class="text-[10px] font-bold tracking-[0.5px] uppercase opacity-60">
-				Total Kamar
-			</div>
-			<div class="mt-1 text-xl font-bold">
-				{total}
-			</div>
-		</div>
-		<div class="border border-black p-3 text-center">
-			<div class="text-[10px] font-bold tracking-[0.5px] uppercase opacity-60">
-				Terisi
-			</div>
-			<div class="mt-1 text-xl font-bold">
-				{occupied}
-			</div>
-		</div>
-		<div class="border border-black p-3 text-center">
-			<div class="text-[10px] font-bold tracking-[0.5px] uppercase opacity-60">
-				Tersedia
-			</div>
-			<div class="mt-1 text-xl font-bold">
-				{vacant}
-			</div>
-		</div>
-		<div class="border border-black p-3 text-center">
-			<div class="text-[10px] font-bold tracking-[0.5px] uppercase opacity-60">
-				Nonaktif
-			</div>
-			<div class="mt-1 text-xl font-bold">
-				{inactive}
-			</div>
-		</div>
-	</div>
+	<ReportStats
+		items={[
+			{ title: "Total Kamar", value: total },
+			{ title: "Terisi", value: occupied },
+			{ title: "Tersedia", value: vacant },
+			{ title: "Nonaktif", value: inactive },
+		]}
+	/>
 
 	<table>
 		<thead>

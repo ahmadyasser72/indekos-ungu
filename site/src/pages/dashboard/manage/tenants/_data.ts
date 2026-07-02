@@ -81,9 +81,3 @@ export const getTenantsStats = (
 		},
 	];
 };
-iedCount,
-			desc: `${unverifiedCount} belum verifikasi`,
-			icon: "lucide:badge-check" as const,
-		},
-	];
-};
