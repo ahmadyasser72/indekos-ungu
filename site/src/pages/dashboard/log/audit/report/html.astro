@@ -6,11 +6,13 @@ import {
 	AUDIT_ACTION_LABELS,
 	auditQuerySchema,
 	fetchAuditLogs,
+	getAuditStats,
 } from "../_data";
 
 const params = Astro.locals.parseQuery(auditQuerySchema.omit({ query: true }));
 
 const auditLogs = await fetchAuditLogs(params);
+const auditStats = getAuditStats(auditLogs);
 
 const filterParts: string[] = [];
 if (params.action) {
@@ -29,6 +31,28 @@ const subtitle = filterParts.length > 0 ? filterParts.join(" | ") : undefined;
 ---
 
 <ReportLayout title="Laporan Aktivitas Pengguna" subtitle={subtitle}>
+	<div class="mb-6 grid grid-cols-3 gap-4">
+		<div class="border border-black p-3">
+			<div class="mb-1 text-[10px] font-bold tracking-[0.5px] uppercase">
+				Total Aktivitas
+			</div>
+			<div class="text-lg font-bold">{auditStats[0].value}</div>
+		</div>
+		<div class="border border-black p-3">
+			<div class="mb-1 text-[10px] font-bold tracking-[0.5px] uppercase">
+				Pengguna Aktif
+			</div>
+			<div class="text-lg font-bold">{auditStats[1].value}</div>
+		</div>
+		<div class="border border-black p-3">
+			<div class="mb-1 text-[10px] font-bold tracking-[0.5px] uppercase">
+				Data Dibuat
+			</div>
+			<div class="text-lg font-bold">{auditStats[2].value}</div>
+			<div class="mt-0.5 text-[11px]">{auditStats[2].desc}</div>
+		</div>
+	</div>
+
 	<table>
 		<thead>
 			<tr>

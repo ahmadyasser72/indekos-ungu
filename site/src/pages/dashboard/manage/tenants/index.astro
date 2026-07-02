@@ -5,6 +5,7 @@ import { actions } from "astro:actions";
 
 import FilterPopover from "~/components/data/filter-popover.astro";
 import SearchInput from "~/components/data/search-input.astro";
+import Stats from "~/components/data/stats.astro";
 import FormResult from "~/components/form/form-result.astro";
 import ActionsMenu from "~/components/ui/actions-menu.astro";
 import Icon from "~/components/ui/icon.astro";
@@ -12,12 +13,14 @@ import DashboardLayout from "~/layouts/dashboard-layout.astro";
 import { createActionResult } from "~/lib/form-result";
 import {
 	fetchTenants,
+	getTenantsStats,
 	TENANT_STATUS_BADGES,
 	tenantsQuerySchema,
 } from "./_data";
 
 const params = Astro.locals.parseQuery(tenantsQuerySchema);
 const tenants = await fetchTenants(params);
+const tenantsStats = getTenantsStats(tenants);
 ---
 
 <FormResult
@@ -112,6 +115,8 @@ const tenants = await fetchTenants(params);
 			placeholder="Cari nama penghuni..."
 		/>
 	</div>
+
+	<Stats items={tenantsStats} />
 
 	<div
 		class="overflow-x-auto rounded-box border border-base-300 shadow-sm"

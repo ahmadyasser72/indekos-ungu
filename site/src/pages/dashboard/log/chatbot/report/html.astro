@@ -7,11 +7,13 @@ import {
 	DIRECTION_LABELS,
 	fetchChatbotLogs,
 	formatMessageMarkdown,
+	getChatbotStats,
 } from "../_data";
 
 const params = Astro.locals.parseQuery(chatbotQuerySchema);
 
 const chatbotLogs = await fetchChatbotLogs(params);
+const chatbotStats = getChatbotStats(chatbotLogs);
 
 const filterParts: string[] = [];
 if (params.direction) {
@@ -29,6 +31,29 @@ const subtitle = filterParts.length > 0 ? filterParts.join(" | ") : undefined;
 ---
 
 <ReportLayout title="Laporan Percakapan Chatbot" subtitle={subtitle}>
+	<div class="mb-6 grid grid-cols-3 gap-4">
+		<div class="border border-black p-3">
+			<div class="mb-1 text-[10px] font-bold tracking-[0.5px] uppercase">
+				Total Percakapan
+			</div>
+			<div class="text-lg font-bold">{chatbotStats[0].value}</div>
+		</div>
+		<div class="border border-black p-3">
+			<div class="mb-1 text-[10px] font-bold tracking-[0.5px] uppercase">
+				Pesan Masuk
+			</div>
+			<div class="text-lg font-bold">{chatbotStats[1].value}</div>
+			<div class="mt-0.5 text-[11px]">{chatbotStats[1].desc}</div>
+		</div>
+		<div class="border border-black p-3">
+			<div class="mb-1 text-[10px] font-bold tracking-[0.5px] uppercase">
+				Pesan Keluar
+			</div>
+			<div class="text-lg font-bold">{chatbotStats[2].value}</div>
+			<div class="mt-0.5 text-[11px]">{chatbotStats[2].desc}</div>
+		</div>
+	</div>
+
 	<table>
 		<thead>
 			<tr>

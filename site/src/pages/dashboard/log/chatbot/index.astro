@@ -4,6 +4,7 @@ import { formatDate } from "@indekos/utilities/date";
 import FilterPopover from "~/components/data/filter-popover.astro";
 import FilterToolbar from "~/components/data/filter-toolbar.astro";
 import SearchInput from "~/components/data/search-input.astro";
+import Stats from "~/components/data/stats.astro";
 import Icon from "~/components/ui/icon.astro";
 import DashboardLayout from "~/layouts/dashboard-layout.astro";
 import {
@@ -12,11 +13,13 @@ import {
 	DIRECTION_ICONS,
 	DIRECTION_LABELS,
 	fetchChatbotLogs,
+	getChatbotStats,
 } from "./_data";
 
 const params = Astro.locals.parseQuery(chatbotQuerySchema);
 
 const chatbotLogs = await fetchChatbotLogs(params);
+const chatbotStats = getChatbotStats(chatbotLogs);
 ---
 
 <DashboardLayout
@@ -64,6 +67,8 @@ const chatbotLogs = await fetchChatbotLogs(params);
 			/>
 		</Fragment>
 	</FilterToolbar>
+
+	<Stats items={chatbotStats} />
 
 	<div
 		class="overflow-x-auto rounded-box border border-base-300 shadow-sm"

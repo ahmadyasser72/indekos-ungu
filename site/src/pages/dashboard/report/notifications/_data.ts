@@ -3,6 +3,7 @@ import { parseDateRange } from "@indekos/utilities/date";
 import { formatInvoiceNumber } from "@indekos/utilities/transforms";
 
 import { z } from "astro/zod";
+import { countBy } from "es-toolkit";
 
 import { periodFields, querySchema, statusSchema } from "~/lib/query";
 
@@ -86,3 +87,39 @@ export const NOTIFICATION_STATUS_BADGES = {
 	sent: "badge-success",
 	failed: "badge-error",
 } satisfies Record<(typeof NOTIFICATION_STATUS)[number], string>;
+
+export const getNotificationStats = (
+	notifications: Awaited<ReturnType<typeof fetchNotifications>>,
+) => {
+	const {
+		sent = 0,
+		pending = 0,
+		failed = 0,
+	} = countBy(notifications, ({ status }) => status);
+
+	const successRate =
+		notifications.length > 0
+			? Math.round((sent / notifications.length) * 100)
+			: 0;
+
+	return [
+		{
+			title: "Total Notifikasi",
+			value: notifications.length,
+			desc: "Seluruh notifikasi dalam periode",
+			icon: "lucide:bell" as const,
+		},
+		{
+			title: "Terkirim",
+			value: sent,
+			desc: `${successRate}% sukses terkirim`,
+			icon: "lucide:circle-check" as const,
+		},
+		{
+			title: "Pending & Gagal",
+			value: pending + failed,
+			desc: `${pending} menunggu, ${failed} gagal`,
+			icon: "lucide:clock" as const,
+		},
+	];
+};

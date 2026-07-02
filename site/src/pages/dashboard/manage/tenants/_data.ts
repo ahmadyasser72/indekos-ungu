@@ -1,6 +1,7 @@
 import { db } from "@indekos/database";
 
 import { z } from "astro/zod";
+import { countBy } from "es-toolkit";
 
 import { querySchema, statusSchema } from "~/lib/query";
 
@@ -48,4 +49,41 @@ export const TENANT_STATUS_BADGES: Record<string, string> = {
 	Aktif: "badge-success",
 	Selesai: "badge-neutral opacity-60",
 	Pindah: "badge-neutral",
+};
+
+export const getTenantsStats = (
+	tenants: Awaited<ReturnType<typeof fetchTenants>>,
+) => {
+	const { active, completed } = countBy(tenants, ({ isActive }) =>
+		isActive ? "active" : "completed",
+	);
+	const verifiedCount = tenants.filter(({ isVerified }) => isVerified).length;
+	const unverifiedCount = tenants.length - verifiedCount;
+
+	return [
+		{
+			title: "Total Penghuni",
+			value: tenants.length,
+			desc: "Seluruh data penghuni",
+			icon: "lucide:users" as const,
+		},
+		{
+			title: "Sewa Aktif",
+			value: active,
+			desc: `${completed} sudah selesai`,
+			icon: "lucide:user-check" as const,
+		},
+		{
+			title: "Terverifikasi",
+			value: verifiedCount,
+			desc: `${unverifiedCount} belum verifikasi`,
+			icon: "lucide:badge-check" as const,
+		},
+	];
+};
+iedCount,
+			desc: `${unverifiedCount} belum verifikasi`,
+			icon: "lucide:badge-check" as const,
+		},
+	];
 };

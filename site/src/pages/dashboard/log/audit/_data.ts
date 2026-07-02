@@ -2,6 +2,7 @@ import { AUDIT_ACTIONS, db } from "@indekos/database";
 import { parseDateRange } from "@indekos/utilities/date";
 
 import { z } from "astro/zod";
+import { countBy, uniqBy } from "es-toolkit";
 
 import { periodFields, querySchema, statusSchema } from "~/lib/query";
 
@@ -65,3 +66,35 @@ export const AUDIT_ACTION_LABELS = {
 	REJECT: "Menolak",
 	LOGIN: "Login",
 } satisfies Record<(typeof AUDIT_ACTIONS)[number], string>;
+
+export const getAuditStats = (
+	logs: Awaited<ReturnType<typeof fetchAuditLogs>>,
+) => {
+	const {
+		CREATE = 0,
+		UPDATE = 0,
+		DELETE = 0,
+	} = countBy(logs, ({ action }) => action);
+	const uniqueUsers = uniqBy(logs, ({ username }) => username).length;
+
+	return [
+		{
+			title: "Total Aktivitas",
+			value: logs.length,
+			desc: "Seluruh log dalam periode",
+			icon: "lucide:activity" as const,
+		},
+		{
+			title: "Pengguna Aktif",
+			value: uniqueUsers,
+			desc: "Pengguna yang melakukan aksi",
+			icon: "lucide:users" as const,
+		},
+		{
+			title: "Data Dibuat",
+			value: CREATE,
+			desc: `${UPDATE} diubah, ${DELETE} dihapus`,
+			icon: "lucide:plus-circle" as const,
+		},
+	];
+};

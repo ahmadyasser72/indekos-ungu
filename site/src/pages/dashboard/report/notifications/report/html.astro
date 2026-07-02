@@ -4,6 +4,7 @@ import { formatDate } from "@indekos/utilities/date";
 import ReportLayout from "~/layouts/report-layout.astro";
 import {
 	fetchNotifications,
+	getNotificationStats,
 	NOTIFICATION_STATUS_LABELS,
 	NOTIFICATION_TYPE_LABELS,
 	notificationQuerySchema,
@@ -14,6 +15,7 @@ const params = Astro.locals.parseQuery(
 );
 
 const notifications = await fetchNotifications(params);
+const notificationStats = getNotificationStats(notifications);
 
 const filterParts: string[] = [];
 if (params.type) {
@@ -33,6 +35,29 @@ const subtitle = filterParts.length > 0 ? filterParts.join(" | ") : undefined;
 ---
 
 <ReportLayout title="Laporan Riwayat Notifikasi" subtitle={subtitle}>
+	<div class="mb-6 grid grid-cols-3 gap-4">
+		<div class="border border-black p-3">
+			<div class="mb-1 text-[10px] font-bold tracking-[0.5px] uppercase">
+				Total Notifikasi
+			</div>
+			<div class="text-lg font-bold">{notificationStats[0].value}</div>
+		</div>
+		<div class="border border-black p-3">
+			<div class="mb-1 text-[10px] font-bold tracking-[0.5px] uppercase">
+				Terkirim
+			</div>
+			<div class="text-lg font-bold">{notificationStats[1].value}</div>
+			<div class="mt-0.5 text-[11px]">{notificationStats[1].desc}</div>
+		</div>
+		<div class="border border-black p-3">
+			<div class="mb-1 text-[10px] font-bold tracking-[0.5px] uppercase">
+				Pending & Gagal
+			</div>
+			<div class="text-lg font-bold">{notificationStats[2].value}</div>
+			<div class="mt-0.5 text-[11px]">{notificationStats[2].desc}</div>
+		</div>
+	</div>
+
 	<table>
 		<thead>
 			<tr>

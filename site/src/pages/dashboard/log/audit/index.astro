@@ -6,6 +6,7 @@ import { actions } from "astro:actions";
 import FilterPopover from "~/components/data/filter-popover.astro";
 import FilterToolbar from "~/components/data/filter-toolbar.astro";
 import SearchInput from "~/components/data/search-input.astro";
+import Stats from "~/components/data/stats.astro";
 import FormResult from "~/components/form/form-result.astro";
 import Icon from "~/components/ui/icon.astro";
 import DashboardLayout from "~/layouts/dashboard-layout.astro";
@@ -14,12 +15,14 @@ import {
 	AUDIT_ACTIONS,
 	auditQuerySchema,
 	fetchAuditLogs,
+	getAuditStats,
 } from "./_data";
 import DetailColumn from "./_detail-column.astro";
 
 const params = Astro.locals.parseQuery(auditQuerySchema);
 
 const auditLogs = await fetchAuditLogs(params);
+const auditStats = getAuditStats(auditLogs);
 ---
 
 <FormResult
@@ -77,6 +80,8 @@ const auditLogs = await fetchAuditLogs(params);
 			/>
 		</Fragment>
 	</FilterToolbar>
+
+	<Stats items={auditStats} />
 
 	<div
 		class="overflow-x-auto rounded-box border border-base-300 shadow-sm"
