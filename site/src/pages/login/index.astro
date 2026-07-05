@@ -10,9 +10,7 @@ if (loginResult && !loginResult.error) {
 	if (!Astro.request.headers.get("hx-request"))
 		return Astro.redirect("/dashboard");
 
-	Astro.response.headers.set("hx-retarget", "body");
-	Astro.response.headers.set("hx-reswap", "outerHTML");
-	Astro.response.headers.set("hx-location", "/dashboard");
+	Astro.response.headers.set("hx-redirect", "/dashboard");
 }
 ---
 

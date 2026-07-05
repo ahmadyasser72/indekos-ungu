@@ -23,9 +23,7 @@ const logoutResult = Astro.getActionResult(actions.auth.logout);
 if (logoutResult && !logoutResult.error) {
 	if (!Astro.request.headers.get("hx-request")) return Astro.redirect("/login");
 
-	Astro.response.headers.set("hx-retarget", "body");
-	Astro.response.headers.set("hx-reswap", "outerHTML");
-	Astro.response.headers.set("hx-location", "/login");
+	Astro.response.headers.set("hx-redirect", "/login");
 }
 ---
 
