@@ -8,7 +8,6 @@ import FilterPopover from "~/components/data/filter-popover.astro";
 import FilterToolbar from "~/components/data/filter-toolbar.astro";
 import SearchInput from "~/components/data/search-input.astro";
 import Stats from "~/components/data/stats.astro";
-import FormResult from "~/components/form/form-result.astro";
 import ActionsMenu from "~/components/ui/actions-menu.astro";
 import IconLoader from "~/components/ui/icon-loader.astro";
 import Icon from "~/components/ui/icon.astro";
@@ -23,27 +22,25 @@ import {
 	transactionQuerySchema,
 } from "./_data";
 
+Astro.locals.actionResults.push(
+	createActionResult(
+		actions.manage.invoices.generatePaymentLink,
+		"Buat link bayar",
+		(d) =>
+			`Link pembayaran berhasil dibuat! <a href="${d.paymentUrl}" class="link link-primary" target="_blank">Buka Pembayaran</a>`,
+	),
+	createActionResult(
+		actions.manage.invoices.markAsPaid,
+		"Tandai Lunas",
+		() => "Berhasil menandai invoice sebagai lunas!",
+	),
+);
+
 const params = Astro.locals.parseQuery(transactionQuerySchema);
 
 const invoices = await fetchTransactions(params);
 const transactionStats = getTransactionStats(invoices);
 ---
-
-<FormResult
-	actionResults={[
-		createActionResult(
-			actions.manage.invoices.generatePaymentLink,
-			"Buat link bayar",
-			(d) =>
-				`Link pembayaran berhasil dibuat! <a href="${d.paymentUrl}" class="link link-primary" target="_blank">Buka Pembayaran</a>`,
-		),
-		createActionResult(
-			actions.manage.invoices.markAsPaid,
-			"Tandai Lunas",
-			() => "Berhasil menandai invoice sebagai lunas!",
-		),
-	]}
-/>
 
 <DashboardLayout
 	title="Laporan Transaksi"

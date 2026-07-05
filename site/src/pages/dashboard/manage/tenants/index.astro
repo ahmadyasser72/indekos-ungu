@@ -6,7 +6,6 @@ import { actions } from "astro:actions";
 import FilterPopover from "~/components/data/filter-popover.astro";
 import SearchInput from "~/components/data/search-input.astro";
 import Stats from "~/components/data/stats.astro";
-import FormResult from "~/components/form/form-result.astro";
 import ActionsMenu from "~/components/ui/actions-menu.astro";
 import Icon from "~/components/ui/icon.astro";
 import DashboardLayout from "~/layouts/dashboard-layout.astro";
@@ -18,40 +17,38 @@ import {
 	tenantsQuerySchema,
 } from "./_data";
 
+Astro.locals.actionResults.push(
+	createActionResult(
+		actions.manage.tenants.add,
+		"Tambah kontrak sewa",
+		(d) => `Berhasil menambah kontrak sewa penghuni baru! (ID: ${d.id})`,
+	),
+	createActionResult(
+		actions.manage.tenants.terminate,
+		"Akhiri sewa",
+		(d) => `Berhasil menghentikan sewa penghuni! (ID: ${d.id})`,
+	),
+	createActionResult(
+		actions.manage.tenants.edit,
+		"Edit penghuni",
+		(d) => `Berhasil mengubah data penghuni! (ID: ${d.id})`,
+	),
+	createActionResult(
+		actions.manage.tenants.register,
+		"Daftarkan ulang sewa",
+		(d) => `Berhasil mendaftarkan ulang sewa penghuni! (ID: ${d.id})`,
+	),
+	createActionResult(
+		actions.manage.tenants.move,
+		"Pindah kamar",
+		(d) => `Berhasil memindahkan penghuni ke kamar baru! (ID: ${d.id})`,
+	),
+);
+
 const params = Astro.locals.parseQuery(tenantsQuerySchema);
 const tenants = await fetchTenants(params);
 const tenantsStats = getTenantsStats(tenants);
 ---
-
-<FormResult
-	actionResults={[
-		createActionResult(
-			actions.manage.tenants.add,
-			"Tambah kontrak sewa",
-			(d) => `Berhasil menambah kontrak sewa penghuni baru! (ID: ${d.id})`,
-		),
-		createActionResult(
-			actions.manage.tenants.terminate,
-			"Akhiri sewa",
-			(d) => `Berhasil menghentikan sewa penghuni! (ID: ${d.id})`,
-		),
-		createActionResult(
-			actions.manage.tenants.edit,
-			"Edit penghuni",
-			(d) => `Berhasil mengubah data penghuni! (ID: ${d.id})`,
-		),
-		createActionResult(
-			actions.manage.tenants.register,
-			"Daftarkan ulang sewa",
-			(d) => `Berhasil mendaftarkan ulang sewa penghuni! (ID: ${d.id})`,
-		),
-		createActionResult(
-			actions.manage.tenants.move,
-			"Pindah kamar",
-			(d) => `Berhasil memindahkan penghuni ke kamar baru! (ID: ${d.id})`,
-		),
-	]}
-/>
 
 <DashboardLayout
 	title="Manajemen Penghuni"

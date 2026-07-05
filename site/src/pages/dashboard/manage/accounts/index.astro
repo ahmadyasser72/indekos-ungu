@@ -5,36 +5,33 @@ import { actions } from "astro:actions";
 
 import FilterPopover from "~/components/data/filter-popover.astro";
 import SearchInput from "~/components/data/search-input.astro";
-import FormResult from "~/components/form/form-result.astro";
 import Icon from "~/components/ui/icon.astro";
 import DashboardLayout from "~/layouts/dashboard-layout.astro";
 import { ROLE_BADGES } from "~/lib/auth";
 import { createActionResult } from "~/lib/form-result";
 import { accountsQuerySchema, fetchAccounts } from "./_data";
 
+Astro.locals.actionResults.push(
+	createActionResult(
+		actions.manage.accounts.add,
+		"Tambah akun",
+		(d) => `Berhasil menambah akun! (ID: ${d.id})`,
+	),
+	createActionResult(
+		actions.manage.accounts.edit,
+		"Edit akun",
+		(d) => `Berhasil edit akun! (ID: ${d.id})`,
+	),
+	createActionResult(
+		actions.manage.accounts._delete,
+		"Hapus akun",
+		(d) => `Berhasil menghapus akun! (ID: ${d.id})`,
+	),
+);
+
 const params = Astro.locals.parseQuery(accountsQuerySchema);
 const accounts = await fetchAccounts(params);
 ---
-
-<FormResult
-	actionResults={[
-		createActionResult(
-			actions.manage.accounts.add,
-			"Tambah akun",
-			(d) => `Berhasil menambah akun! (ID: ${d.id})`,
-		),
-		createActionResult(
-			actions.manage.accounts.edit,
-			"Edit akun",
-			(d) => `Berhasil edit akun! (ID: ${d.id})`,
-		),
-		createActionResult(
-			actions.manage.accounts._delete,
-			"Hapus akun",
-			(d) => `Berhasil menghapus akun! (ID: ${d.id})`,
-		),
-	]}
-/>
 
 <DashboardLayout
 	title="Manajemen Akun"

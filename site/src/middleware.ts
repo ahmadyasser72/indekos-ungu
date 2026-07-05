@@ -100,6 +100,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 			recordId,
 			details,
 		);
+	context.locals.actionResults = [];
 
 	const response = await next();
 	if (persistQuery.size > 0) {

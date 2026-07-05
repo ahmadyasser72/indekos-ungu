@@ -26,7 +26,7 @@
 }
 
 @utility toast {
-	@apply w-full sm:w-64;
+	@apply w-full sm:max-w-96;
 
 	> .alert {
 		@apply transition duration-300;

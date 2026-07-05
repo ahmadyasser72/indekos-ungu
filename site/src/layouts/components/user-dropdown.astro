@@ -3,6 +3,7 @@ import { actions } from "astro:actions";
 
 import Icon from "~/components/ui/icon.astro";
 import { ROLE_BADGES } from "~/lib/auth";
+import { createActionResult } from "~/lib/form-result";
 
 export interface Props {
 	user: NonNullable<App.Locals["user"]>;
@@ -10,6 +11,14 @@ export interface Props {
 
 const { user } = Astro.props;
 const initial = user.name.charAt(0).toUpperCase();
+
+Astro.locals.actionResults.push(
+	createActionResult(
+		actions.auth.updateProfile,
+		"Update profil",
+		(d) => `Berhasil memperbarui profil! (ID: ${d.id})`,
+	),
+);
 ---
 
 <button
@@ -49,13 +58,19 @@ const initial = user.name.charAt(0).toUpperCase();
 		</div>
 	</li>
 	<li>
+		<button hx-get="/dashboard/modal/profile" class="btn justify-start btn-sm">
+			<Icon name="lucide:user-circle" size="size-5" />
+			Profil
+		</button>
+	</li>
+	<li>
 		<form
 			hx-post={actions.auth.logout}
 			class="contents"
 			action={actions.auth.logout}
 			method="post"
 		>
-			<button class="btn btn-error btn-sm" type="submit">
+			<button class="btn justify-start btn-error btn-sm" type="submit">
 				<Icon name="lucide:log-out" size="size-5" />
 				Keluar
 			</button>

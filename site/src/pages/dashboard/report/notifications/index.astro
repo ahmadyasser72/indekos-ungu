@@ -8,7 +8,6 @@ import FilterPopover from "~/components/data/filter-popover.astro";
 import FilterToolbar from "~/components/data/filter-toolbar.astro";
 import SearchInput from "~/components/data/search-input.astro";
 import Stats from "~/components/data/stats.astro";
-import FormResult from "~/components/form/form-result.astro";
 import Alert from "~/components/ui/alert.astro";
 import Icon from "~/components/ui/icon.astro";
 import DashboardLayout from "~/layouts/dashboard-layout.astro";
@@ -22,21 +21,17 @@ import {
 	notificationQuerySchema,
 } from "./_data";
 
+Astro.locals.actionResults.push({
+	action: actions.manage.notifications.send,
+	title: "Kirim Notifikasi",
+	getDescription: () => "Notifikasi berhasil dikirimkan via WhatsApp!",
+});
+
 const params = Astro.locals.parseQuery(notificationQuerySchema);
 
 const notifications = await fetchNotifications(params);
 const notificationStats = getNotificationStats(notifications);
 ---
-
-<FormResult
-	actionResults={[
-		{
-			action: actions.manage.notifications.send,
-			title: "Kirim Notifikasi",
-			getDescription: () => "Notifikasi berhasil dikirimkan via WhatsApp!",
-		},
-	]}
-/>
 
 <DashboardLayout
 	title="Laporan Notifikasi"

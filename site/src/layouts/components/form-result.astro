@@ -1,27 +1,11 @@
 ---
-import type { ActionClient } from "astro:actions";
-
 import Alert from "~/components/ui/alert.astro";
-import { checkActionResult } from "~/lib/form-result";
-import type { FormResult } from "~/lib/form-result";
-
-interface ActionResultConfig {
-	action: ActionClient<any, any, any>;
-	title: string;
-	getDescription: (data: any) => string;
-}
-
-export interface Props {
-	result?: FormResult;
-	actionResults?: ActionResultConfig[];
-}
-
-const { result: propResult, actionResults } = Astro.props;
+import { checkActionResult, type FormResult } from "~/lib/form-result";
 
 // Auto-detect from action results array — first non-null wins
-let result: FormResult = propResult;
-if (!result && actionResults) {
-	for (const config of actionResults) {
+let result: FormResult = undefined;
+if (!result && Astro.locals.actionResults.length > 0) {
+	for (const config of Astro.locals.actionResults) {
 		const actionResult = Astro.getActionResult(config.action);
 		if (actionResult) {
 			result = checkActionResult(actionResult, {

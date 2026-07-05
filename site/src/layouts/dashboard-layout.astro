@@ -4,6 +4,7 @@ import { actions } from "astro:actions";
 import Icon from "~/components/ui/icon.astro";
 import type { Props as BaseProps } from "./base-layout.astro";
 import BaseLayout from "./base-layout.astro";
+import FormResult from "./components/form-result.astro";
 import NavbarMenu from "./components/navbar-menu.astro";
 import NotificationDropdown from "./components/notification-dropdown.astro";
 import UserDropdown from "./components/user-dropdown.astro";
@@ -47,7 +48,7 @@ if (logoutResult && !logoutResult.error) {
 					>
 				</div>
 
-				<div class="navbar-end px-4">
+				<div class="navbar-end px-4" id="user-profile">
 					<NotificationDropdown />
 					<UserDropdown user={user} />
 				</div>
@@ -87,4 +88,6 @@ if (logoutResult && !logoutResult.error) {
 			</div>
 		</div>
 	</div>
+
+	<FormResult />
 </BaseLayout>

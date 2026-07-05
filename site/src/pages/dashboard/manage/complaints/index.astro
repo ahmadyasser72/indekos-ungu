@@ -7,7 +7,6 @@ import FilterPopover from "~/components/data/filter-popover.astro";
 import FilterToolbar from "~/components/data/filter-toolbar.astro";
 import SearchInput from "~/components/data/search-input.astro";
 import Stats from "~/components/data/stats.astro";
-import FormResult from "~/components/form/form-result.astro";
 import Icon from "~/components/ui/icon.astro";
 import DashboardLayout from "~/layouts/dashboard-layout.astro";
 import { createActionResult } from "~/lib/form-result";
@@ -20,25 +19,23 @@ import {
 	getComplaintStats,
 } from "./_data";
 
+Astro.locals.actionResults.push(
+	createActionResult(
+		actions.manage.complaints.process,
+		"Proses komplain",
+		(d) => `Komplain sedang diproses! (ID: ${d.id})`,
+	),
+	createActionResult(
+		actions.manage.complaints.resolve,
+		"Selesaikan komplain",
+		(d) => `Berhasil menyelesaikan komplain! (ID: ${d.id})`,
+	),
+);
+
 const params = Astro.locals.parseQuery(complaintQuerySchema);
 const complaints = await fetchComplaints(params);
 const complaintStats = getComplaintStats(complaints);
 ---
-
-<FormResult
-	actionResults={[
-		createActionResult(
-			actions.manage.complaints.process,
-			"Proses komplain",
-			(d) => `Komplain sedang diproses! (ID: ${d.id})`,
-		),
-		createActionResult(
-			actions.manage.complaints.resolve,
-			"Selesaikan komplain",
-			(d) => `Berhasil menyelesaikan komplain! (ID: ${d.id})`,
-		),
-	]}
-/>
 
 <DashboardLayout
 	title="Daftar Komplain"

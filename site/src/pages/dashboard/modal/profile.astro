@@ -1,0 +1,104 @@
+---
+import { db } from "@indekos/database";
+
+import { actions } from "astro:actions";
+
+import FormField from "~/components/form/form-field.astro";
+import ModalForm from "~/components/form/modal-form.astro";
+import Modal from "~/components/modal/modal.astro";
+import NotFound from "~/components/ui/not-found.astro";
+import { ROLE_BADGES } from "~/lib/auth";
+
+export const partial = true;
+
+const user = await db.query.users.findFirst({
+	columns: { id: true, username: true, displayName: true, role: true },
+	where: { id: Astro.locals.user!.id },
+});
+
+if (!user) Astro.response.status = 404;
+---
+
+<Modal id="profile" title="Profil Saya" icon="lucide:user-circle">
+	{
+		user ? (
+			<div class="flex flex-col gap-4">
+				<div class="card bg-base-200 card-border">
+					<div class="card-body items-center gap-3 text-center">
+						<div class="avatar avatar-placeholder">
+							<div class="size-20 rounded-full bg-neutral text-neutral-content">
+								<span class="text-3xl font-bold">
+									{(user.displayName ?? user.username).charAt(0).toUpperCase()}
+								</span>
+							</div>
+						</div>
+
+						<div>
+							<h3 class="text-xl font-semibold">
+								{user.displayName ?? user.username}
+							</h3>
+							<div class="mt-1 flex items-center justify-center gap-2">
+								<span class="text-base-content/60">@{user.username}</span>
+								<span
+									class:list={[
+										"badge badge-sm uppercase",
+										ROLE_BADGES[user.role],
+									]}
+								>
+									{user.role}
+								</span>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<ModalForm
+					action={actions.auth.updateProfile}
+					modalId="profile"
+					submitLabel="Simpan Perubahan"
+					target="#user-profile"
+				>
+					<FormField
+						helperText="Nama yang ditampilkan di sistem"
+						label="Nama Tampilan"
+					>
+						<input
+							class="input w-full"
+							name="display_name"
+							type="text"
+							value={user.displayName ?? ""}
+							placeholder="Masukkan nama..."
+							required
+						/>
+					</FormField>
+
+					<FormField label="Username">
+						<input
+							class="input w-full"
+							name="username"
+							type="text"
+							value={user.username}
+							placeholder="Masukkan username..."
+							required
+						/>
+					</FormField>
+
+					<FormField
+						helperText="Biarkan kosong jika tidak ingin mengganti"
+						label="Kata Sandi Baru"
+					>
+						<input
+							class="input w-full"
+							name="password"
+							type="password"
+							autocomplete="new-password"
+							placeholder="Masukkan password..."
+						/>
+					</FormField>
+				</ModalForm>
+			</div>
+		) : (
+			<NotFound label="Profil" />
+		)
+	}
+</Modal>

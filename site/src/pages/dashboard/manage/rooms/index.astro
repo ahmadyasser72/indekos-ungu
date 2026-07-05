@@ -6,7 +6,6 @@ import { actions } from "astro:actions";
 import FilterPopover from "~/components/data/filter-popover.astro";
 import SearchInput from "~/components/data/search-input.astro";
 import Stats from "~/components/data/stats.astro";
-import FormResult from "~/components/form/form-result.astro";
 import ActionsMenu from "~/components/ui/actions-menu.astro";
 import Icon from "~/components/ui/icon.astro";
 import DashboardLayout from "~/layouts/dashboard-layout.astro";
@@ -21,30 +20,28 @@ import {
 	roomQuerySchema,
 } from "./_data";
 
+Astro.locals.actionResults.push(
+	createActionResult(
+		actions.manage.rooms.add,
+		"Tambah kamar",
+		(d) => `Berhasil menambah kamar! (ID: ${d.id})`,
+	),
+	createActionResult(
+		actions.manage.rooms.edit,
+		"Edit kamar",
+		(d) => `Berhasil edit kamar! (ID: ${d.id})`,
+	),
+	createActionResult(
+		actions.manage.rooms._delete,
+		"Hapus kamar",
+		(d) => `Berhasil hapus kamar! (ID: ${d.id})`,
+	),
+);
+
 const params = Astro.locals.parseQuery(roomQuerySchema);
 const rooms = await fetchRooms(params);
 const roomStats = getRoomStats(rooms);
 ---
-
-<FormResult
-	actionResults={[
-		createActionResult(
-			actions.manage.rooms.add,
-			"Tambah kamar",
-			(d) => `Berhasil menambah kamar! (ID: ${d.id})`,
-		),
-		createActionResult(
-			actions.manage.rooms.edit,
-			"Edit kamar",
-			(d) => `Berhasil edit kamar! (ID: ${d.id})`,
-		),
-		createActionResult(
-			actions.manage.rooms._delete,
-			"Hapus kamar",
-			(d) => `Berhasil hapus kamar! (ID: ${d.id})`,
-		),
-	]}
-/>
 
 <DashboardLayout
 	title="Manajemen Kamar"
