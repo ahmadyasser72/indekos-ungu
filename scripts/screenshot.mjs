@@ -44,9 +44,17 @@ try {
 			else el = ".max-w-6xl";
 
 			const elHandle = await page.$(el);
-			if (!elHandle) { console.error("✗ no match:", rel); fail++; continue; }
+			if (!elHandle) {
+				console.error("✗ no match:", rel);
+				fail++;
+				continue;
+			}
 			const box = await elHandle.boundingBox();
-			if (!box) { console.error("✗ no box:", rel); fail++; continue; }
+			if (!box) {
+				console.error("✗ no box:", rel);
+				fail++;
+				continue;
+			}
 
 			const pad = 10;
 			await page.screenshot({
