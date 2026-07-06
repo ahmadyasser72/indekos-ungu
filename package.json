@@ -8,11 +8,11 @@
 		"site"
 	],
 	"scripts": {
-		"docs:build-css": "bunx @tailwindcss/cli -i docs/wireframe-v2/src/style.css -o docs/wireframe-v2/dist/style.css",
+		"check": "pacwich run check",
 		"pretest": "DATABASE_PATH=$(pwd)/test.db.sqlite bun --cwd=packages/database --sequential db:push db:seed",
 		"test": "DATABASE_PATH=$(pwd)/test.db.sqlite bun test --sequential",
 		"dev": "pacwich run dev",
-		"prebuild": "bun run --cwd site prebuild",
+		"prebuild": "bun --cwd=packages/database --sequential db:push db:seed",
 		"build": "pacwich run build @indekos/site",
 		"start": "pacwich run start",
 		"wa:login": "bun --cwd=packages/whatsapp-bot run login",
@@ -20,6 +20,7 @@
 		"scheduler:trigger": "bun --cwd=packages/scheduler run trigger",
 		"format": "prettier . --write",
 		"format:check": "prettier . --check",
+		"docs:build-css": "bunx @tailwindcss/cli -i docs/wireframe-v2/src/style.css -o docs/wireframe-v2/dist/style.css",
 		"docs:dump-diagrams": "bun ./docs/scripts/dump.ts",
 		"docs:export-diagrams": "bun ./docs/scripts/export.ts"
 	},
