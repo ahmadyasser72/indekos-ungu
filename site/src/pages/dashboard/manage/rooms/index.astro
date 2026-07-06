@@ -4,6 +4,8 @@ import { formatCurrency } from "@indekos/utilities/transforms";
 import { actions } from "astro:actions";
 
 import FilterPopover from "~/components/data/filter-popover.astro";
+import { getToolbarProps } from "~/components/data/filter-toolbar.astro";
+import Pagination from "~/components/data/pagination.astro";
 import SearchInput from "~/components/data/search-input.astro";
 import Stats from "~/components/data/stats.astro";
 import ActionsMenu from "~/components/ui/actions-menu.astro";
@@ -11,7 +13,6 @@ import Icon from "~/components/ui/icon.astro";
 import DashboardLayout from "~/layouts/dashboard-layout.astro";
 import { createActionResult } from "~/lib/form-result";
 import { paginateArray } from "~/lib/query";
-import Pagination from "~/components/data/pagination.astro";
 import {
 	fetchRooms,
 	getRoomStats,
@@ -43,11 +44,7 @@ Astro.locals.actionResults.push(
 const params = Astro.locals.parseQuery(roomQuerySchema);
 const allRooms = await fetchRooms(params);
 const roomStats = getRoomStats(allRooms);
-const { items: rooms, ...pagination } = paginateArray(
-	allRooms,
-	params.page,
-	params.pageSize,
-);
+const { items: rooms, ...pagination } = paginateArray(allRooms, params);
 ---
 
 <DashboardLayout
@@ -80,6 +77,7 @@ const { items: rooms, ...pagination } = paginateArray(
 
 	<div
 		class="flex items-center justify-end gap-2"
+		{...getToolbarProps("rooms")}
 	>
 		<FilterPopover
 			name="rooms"
@@ -125,95 +123,97 @@ const { items: rooms, ...pagination } = paginateArray(
 
 	<Stats stats={roomStats} />
 
-	<div
-		class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
-		id="rooms-content-wrapper"
-	>
-		{
-			rooms.map(
-				({ id, roomNumber, roomType, monthlyPrice, isActive, tenantName }) => {
-					const statusKey = !isActive
-						? "inactive"
-						: tenantName
-							? "occupied"
-							: "vacant";
-					const price = formatCurrency(monthlyPrice);
-					return (
-						<div class="card border border-base-300 bg-base-100 shadow-sm transition-all hover:shadow-md">
-							<div class="card-body gap-3 p-5">
-								<div class="flex items-start justify-between">
-									<div class="flex flex-col">
-										<span class="text-xs font-bold text-base-content/50">
-											{roomType}
-										</span>
-										<span class="text-2xl font-bold">{roomNumber}</span>
-									</div>
-									<span
-										class:list={[
-											"badge badge-sm font-bold",
-											ROOM_STATUS_BADGES[statusKey],
-										]}
-									>
-										{ROOM_STATUS_LABELS[statusKey]}
-									</span>
-								</div>
-
-								<div class="my-1 flex flex-col gap-1 border-t border-b border-base-200 py-3">
-									<div class="flex justify-between text-xs">
-										<span class="text-base-content/60">Harga Sewa:</span>
-										<span class="font-mono font-bold">{price}/Bln</span>
-									</div>
-									<div class="mt-1 flex justify-between text-xs">
-										<span class="text-base-content/60">Penghuni:</span>
-										<span class="max-w-30 truncate font-semibold text-base-content">
-											{tenantName || "-"}
-										</span>
-									</div>
-								</div>
-
-								<div class="card-actions flex-row gap-2">
-									<button
-										hx-get={`/dashboard/manage/rooms/modal/detail/${id}`}
-										class="btn flex flex-1 items-center justify-center gap-1 btn-outline btn-primary btn-xs"
-									>
-										<Icon name="lucide:file-text" /> Detail
-									</button>
-									{Astro.locals.user?.allowEdit && (
-										<ActionsMenu
-											id={id}
-											menuClass="w-52"
-											triggerIcon="lucide:chevron-up"
+	<div class="contents" id="rooms-content-wrapper">
+		<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+			{
+				rooms.map(
+					({
+						id,
+						roomNumber,
+						roomType,
+						monthlyPrice,
+						isActive,
+						tenantName,
+					}) => {
+						const statusKey = !isActive
+							? "inactive"
+							: tenantName
+								? "occupied"
+								: "vacant";
+						const price = formatCurrency(monthlyPrice);
+						return (
+							<div class="card border border-base-300 bg-base-100 shadow-sm transition-all hover:shadow-md">
+								<div class="card-body gap-3 p-5">
+									<div class="flex items-start justify-between">
+										<div class="flex flex-col">
+											<span class="text-xs font-bold text-base-content/50">
+												{roomType}
+											</span>
+											<span class="text-2xl font-bold">{roomNumber}</span>
+										</div>
+										<span
+											class:list={[
+												"badge badge-sm font-bold",
+												ROOM_STATUS_BADGES[statusKey],
+											]}
 										>
-											<li>
-												<button
-													hx-get={`/dashboard/manage/rooms/modal/edit/${id}`}
-													class="flex items-center gap-2"
-												>
-													<Icon name="lucide:pencil" /> Edit Kamar
-												</button>
-											</li>
-											<li>
-												<button
-													hx-get={`/dashboard/manage/rooms/modal/delete/${id}`}
-													class="flex items-center gap-2 text-error"
-												>
-													<Icon name="lucide:trash-2" /> Hapus
-												</button>
-											</li>
-										</ActionsMenu>
-									)}
+											{ROOM_STATUS_LABELS[statusKey]}
+										</span>
+									</div>
+
+									<div class="my-1 flex flex-col gap-1 border-t border-b border-base-200 py-3">
+										<div class="flex justify-between text-xs">
+											<span class="text-base-content/60">Harga Sewa:</span>
+											<span class="font-mono font-bold">{price}/Bln</span>
+										</div>
+										<div class="mt-1 flex justify-between text-xs">
+											<span class="text-base-content/60">Penghuni:</span>
+											<span class="max-w-30 truncate font-semibold text-base-content">
+												{tenantName || "-"}
+											</span>
+										</div>
+									</div>
+
+									<div class="card-actions flex-row gap-2">
+										<button
+											hx-get={`/dashboard/manage/rooms/modal/detail/${id}`}
+											class="btn flex flex-1 items-center justify-center gap-1 btn-outline btn-primary btn-xs"
+										>
+											<Icon name="lucide:file-text" /> Detail
+										</button>
+										{Astro.locals.user?.allowEdit && (
+											<ActionsMenu
+												id={id}
+												menuClass="w-52"
+												triggerIcon="lucide:chevron-up"
+											>
+												<li>
+													<button
+														hx-get={`/dashboard/manage/rooms/modal/edit/${id}`}
+														class="flex items-center gap-2"
+													>
+														<Icon name="lucide:pencil" /> Edit Kamar
+													</button>
+												</li>
+												<li>
+													<button
+														hx-get={`/dashboard/manage/rooms/modal/delete/${id}`}
+														class="flex items-center gap-2 text-error"
+													>
+														<Icon name="lucide:trash-2" /> Hapus
+													</button>
+												</li>
+											</ActionsMenu>
+										)}
+									</div>
 								</div>
 							</div>
-						</div>
-					);
-				},
-			)
-		}
-	</div>
+						);
+					},
+				)
+			}
+		</div>
 
-	<Pagination
-		baseUrl="/dashboard/manage/rooms"
-		filterClass="filter-rooms"
-		{...pagination}
-	/>
+		<Pagination name="rooms" {...pagination} />
+	</div>
 </DashboardLayout>

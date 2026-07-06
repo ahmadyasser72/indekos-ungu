@@ -4,13 +4,14 @@ import { formatDate } from "@indekos/utilities/date";
 import { actions } from "astro:actions";
 
 import FilterPopover from "~/components/data/filter-popover.astro";
+import { getToolbarProps } from "~/components/data/filter-toolbar.astro";
+import Pagination from "~/components/data/pagination.astro";
 import SearchInput from "~/components/data/search-input.astro";
 import Icon from "~/components/ui/icon.astro";
 import DashboardLayout from "~/layouts/dashboard-layout.astro";
 import { ROLE_BADGES } from "~/lib/auth";
 import { createActionResult } from "~/lib/form-result";
 import { paginateArray } from "~/lib/query";
-import Pagination from "~/components/data/pagination.astro";
 import { accountsQuerySchema, fetchAccounts } from "./_data";
 
 Astro.locals.actionResults.push(
@@ -33,11 +34,7 @@ Astro.locals.actionResults.push(
 
 const params = Astro.locals.parseQuery(accountsQuerySchema);
 const allAccounts = await fetchAccounts(params);
-const { items: accounts, ...pagination } = paginateArray(
-	allAccounts,
-	params.page,
-	params.pageSize,
-);
+const { items: accounts, ...pagination } = paginateArray(allAccounts, params);
 ---
 
 <DashboardLayout
@@ -60,6 +57,7 @@ const { items: accounts, ...pagination } = paginateArray(
 
 	<div
 		class="flex items-center justify-end gap-2"
+		{...getToolbarProps("accounts")}
 	>
 		<FilterPopover
 			name="accounts"
@@ -95,73 +93,73 @@ const { items: accounts, ...pagination } = paginateArray(
 	</div>
 
 	<div
-		class="overflow-x-auto rounded-box border border-base-300 shadow-sm"
+		class="rounded-box border border-base-300 shadow-sm"
 		id="accounts-content-wrapper"
 	>
-		<table class="table w-full table-sm">
-			<thead>
-				<tr>
-					<th class="w-8">#</th>
-					<th>Username</th>
-					<th>Role</th>
-					<th>Terakhir Akses</th>
-					<th class="text-right">Aksi</th>
-				</tr>
-			</thead>
-			<tbody id="rows">
-				{
-					accounts.map(({ id, username, displayName, role, lastAccessed }) => (
-						<tr>
-							<td class="font-mono">{id}</td>
-							<td class="flex items-center gap-2 font-semibold">
-								<div class="avatar avatar-placeholder">
-									<div class="w-8 rounded-full bg-neutral text-neutral-content">
-										<span class="text-xs uppercase">
-											{username.slice(0, 2)}
+		<div class="overflow-x-auto">
+			<table class="table w-full table-sm">
+				<thead>
+					<tr>
+						<th class="w-8">#</th>
+						<th>Username</th>
+						<th>Role</th>
+						<th>Terakhir Akses</th>
+						<th class="text-right">Aksi</th>
+					</tr>
+				</thead>
+				<tbody id="rows">
+					{
+						accounts.map(
+							({ id, username, displayName, role, lastAccessed }) => (
+								<tr>
+									<td class="font-mono">{id}</td>
+									<td class="flex items-center gap-2 font-semibold">
+										<div class="avatar avatar-placeholder">
+											<div class="w-8 rounded-full bg-neutral text-neutral-content">
+												<span class="text-xs uppercase">
+													{username.slice(0, 2)}
+												</span>
+											</div>
+										</div>
+										@{username} ({displayName})
+									</td>
+									<td>
+										<span
+											class:list={[
+												"badge badge-sm font-bold uppercase",
+												ROLE_BADGES[role],
+											]}
+										>
+											{role}
 										</span>
-									</div>
-								</div>
-								@{username} ({displayName})
-							</td>
-							<td>
-								<span
-									class:list={[
-										"badge badge-sm font-bold uppercase",
-										ROLE_BADGES[role],
-									]}
-								>
-									{role}
-								</span>
-							</td>
-							<td class="text-xs text-base-content/70">
-								{formatDate(lastAccessed)}
-							</td>
-							<td class="text-right">
-								<div class="flex justify-end gap-1.5">
-									<button
-										hx-get={`/dashboard/manage/accounts/modal/edit/${id}`}
-										class="btn btn-outline btn-info btn-xs"
-									>
-										<Icon name="lucide:pencil" /> Edit
-									</button>
-									<button
-										hx-get={`/dashboard/manage/accounts/modal/delete/${id}`}
-										class="btn btn-outline btn-error btn-xs"
-									>
-										<Icon name="lucide:trash-2" /> Hapus
-									</button>
-								</div>
-							</td>
-						</tr>
-					))
-				}
-			</tbody>
-		</table>
+									</td>
+									<td class="text-xs text-base-content/70">
+										{formatDate(lastAccessed)}
+									</td>
+									<td class="text-right">
+										<div class="flex justify-end gap-1.5">
+											<button
+												hx-get={`/dashboard/manage/accounts/modal/edit/${id}`}
+												class="btn btn-outline btn-info btn-xs"
+											>
+												<Icon name="lucide:pencil" /> Edit
+											</button>
+											<button
+												hx-get={`/dashboard/manage/accounts/modal/delete/${id}`}
+												class="btn btn-outline btn-error btn-xs"
+											>
+												<Icon name="lucide:trash-2" /> Hapus
+											</button>
+										</div>
+									</td>
+								</tr>
+							),
+						)
+					}
+				</tbody>
+			</table>
+		</div>
 
-		<Pagination
-			baseUrl="/dashboard/manage/accounts"
-			filterClass="filter-accounts"
-			{...pagination}
-		/>
+		<Pagination name="accounts" {...pagination} />
 	</div>
 </DashboardLayout>

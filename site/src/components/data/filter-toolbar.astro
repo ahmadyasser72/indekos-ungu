@@ -8,17 +8,25 @@ interface Props {
 }
 
 const { name, from, to } = Astro.props;
+
 const filterClass = `filter-${name}`;
-const targetId = `#${name}-content-wrapper`;
+export const getToolbarProps = (name: string) => {
+	const filterClass = `filter-${name}`;
+	const targetId = `#${name}-content-wrapper`;
+
+	return {
+		"hx-include": `.${filterClass}`,
+		"hx-select": targetId,
+		"hx-swap": "outerHTML transition:true",
+		"hx-target": targetId,
+	};
+};
 ---
 
 <div class="card border border-base-300 bg-base-100 shadow-sm">
 	<div
 		class="card-body gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
-		hx-include={`.${filterClass}`}
-		hx-select={targetId}
-		hx-swap="outerHTML transition:true"
-		hx-target={targetId}
+		{...getToolbarProps(name)}
 	>
 		{
 			from != null && to != null && (

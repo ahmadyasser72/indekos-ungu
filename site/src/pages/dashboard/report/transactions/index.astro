@@ -6,6 +6,7 @@ import { actions } from "astro:actions";
 
 import FilterPopover from "~/components/data/filter-popover.astro";
 import FilterToolbar from "~/components/data/filter-toolbar.astro";
+import Pagination from "~/components/data/pagination.astro";
 import SearchInput from "~/components/data/search-input.astro";
 import Stats from "~/components/data/stats.astro";
 import ActionsMenu from "~/components/ui/actions-menu.astro";
@@ -14,7 +15,6 @@ import Icon from "~/components/ui/icon.astro";
 import DashboardLayout from "~/layouts/dashboard-layout.astro";
 import { createActionResult } from "~/lib/form-result";
 import { paginateArray } from "~/lib/query";
-import Pagination from "~/components/data/pagination.astro";
 import {
 	fetchTransactions,
 	getTransactionStats,
@@ -42,11 +42,7 @@ const params = Astro.locals.parseQuery(transactionQuerySchema);
 
 const allInvoices = await fetchTransactions(params);
 const transactionStats = getTransactionStats(allInvoices);
-const { items: invoices, ...pagination } = paginateArray(
-	allInvoices,
-	params.page,
-	params.pageSize,
-);
+const { items: invoices, ...pagination } = paginateArray(allInvoices, params);
 ---
 
 <DashboardLayout
@@ -275,10 +271,6 @@ const { items: invoices, ...pagination } = paginateArray(
 			</table>
 		</div>
 
-		<Pagination
-			baseUrl="/dashboard/report/transactions"
-			filterClass="filter-transactions"
-			{...pagination}
-		/>
+		<Pagination name="transactions" {...pagination} />
 	</div>
 </DashboardLayout>

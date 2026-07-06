@@ -12,18 +12,15 @@ export const periodFields = {
 export const statusSchema = <T extends readonly string[]>(values: T) =>
 	z.enum(values).optional().catch(undefined);
 
-export const pageSchema = z.coerce.number().int().positive().default(1).catch(1);
-export const pageSizeSchema = z
-	.coerce.number()
-	.int()
-	.positive()
-	.max(100)
-	.default(25)
-	.catch(25);
-
 export const paginationFields = {
-	page: pageSchema,
-	pageSize: pageSizeSchema,
+	page: z.coerce.number().int().positive().default(1).catch(1),
+	"page-size": z.coerce
+		.number()
+		.int()
+		.positive()
+		.max(100)
+		.default(10)
+		.catch(10),
 } as const;
 
 export interface PaginationResult<T> {
@@ -36,8 +33,10 @@ export interface PaginationResult<T> {
 
 export function paginateArray<T>(
 	items: T[],
-	page: number,
-	pageSize: number,
+	{
+		page,
+		"page-size": pageSize,
+	}: z.infer<z.ZodObject<typeof paginationFields>>,
 ): PaginationResult<T> {
 	const total = items.length;
 	const totalPages = Math.max(1, Math.ceil(total / pageSize));
