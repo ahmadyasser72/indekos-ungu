@@ -1,10 +1,11 @@
 self.addEventListener("push", (event) => {
-	const { title, body, url = "/dashboard" } = event.data.json();
+	const { title, body, url = "/dashboard", imagePath } = event.data.json();
 
 	event.waitUntil(
 		self.registration.showNotification(title, {
 			body,
 			icon: "/favicon.svg",
+			image: imagePath ? `/api/uploads/${imagePath}` : undefined,
 			data: { url },
 		}),
 	);

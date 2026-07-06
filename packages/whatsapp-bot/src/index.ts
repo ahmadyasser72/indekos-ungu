@@ -55,12 +55,33 @@ export const main = async () => {
 		logger: createLogger("whatsapp-bot"),
 	});
 
+	let lastSendTime = 0;
+	const sendMessage = sock.sendMessage;
+	sock.sendMessage = async (...args) => {
+		const now = Date.now();
+		const elapsed = now - lastSendTime;
+
+		if (elapsed < 1_000) {
+			const wait = 1_000 - elapsed;
+			console.warn("rate limit: waiting %d ms before next send", wait);
+			await Bun.sleep(wait);
+		}
+
+		const out = await sendMessage(...args);
+		lastSendTime = Date.now();
+		return out;
+	};
+
 	sock.ev.on("creds.update", saveCreds);
 
-	sock.ev.on("connection.update", (update) => {
-		const { lastDisconnect, connection } = update;
-		if (connection === "close") {
-			console.error("disconnect error:", lastDisconnect?.error);
+	sock.ev.on("connection.update", ({ connection, lastDisconnect }) => {
+		if (connection === "open") {
+			console.log("WhatsApp connected");
+		} else {
+			console.warn("connection status: %s", connection);
+			if (lastDisconnect?.error) {
+				console.error("disconnect error:", lastDisconnect.error);
+			}
 		}
 	});
 
@@ -71,14 +92,14 @@ export const main = async () => {
 			const jid = message.key.remoteJidAlt!;
 			if (!jid?.endsWith("@s.whatsapp.net")) continue;
 
-			const imageMsg = message.message?.imageMessage;
+			const imageMessage = message.message?.imageMessage;
 			const text = (
 				message.message?.conversation ||
-				imageMsg?.caption ||
+				imageMessage?.caption ||
 				""
 			).trim();
 
-			if (!text && !imageMsg) continue;
+			if (!text && !imageMessage) continue;
 
 			const lower = text.toLowerCase().trim();
 			const phone = jid.replace("@s.whatsapp.net", "");
@@ -114,7 +135,7 @@ export const main = async () => {
 			await db.insert(chatbotMessages).values({
 				tenantId: tenant.id,
 				direction: "incoming",
-				message: text || "📷 [gambar]",
+				message: imageMessage ? ["📷 [gambar]", text].join("\n") : text,
 			});
 
 			// Tenant belum verifikasi — cek konfirmasi "YA"
@@ -144,17 +165,15 @@ export const main = async () => {
 
 			// Build message input — download image if present
 			const messageInput: MessageInput = { text };
-			if (imageMsg) {
+			if (imageMessage) {
 				try {
 					const buffer = await downloadMediaMessage(message, "buffer", {});
-					messageInput.image = { buffer, mimetype: imageMsg.mimetype! };
+					messageInput.image = { buffer, mimetype: imageMessage.mimetype! };
 				} catch (err) {
 					console.error("failed to download image for %s:", jid, err);
 				}
 			}
 
-			// ── Tenant dikenal ──────────────────────────────────────
-			// 1. Active conversation session — proses langsung
 			if (conversationManager.hasActiveSession(jid)) {
 				const reply = await conversationManager.handleMessage(
 					jid,
@@ -173,7 +192,6 @@ export const main = async () => {
 				continue;
 			}
 
-			// 2. Pesan trigger flow interaktif — start session + proses
 			if (lower === "komplain") {
 				conversationManager.startSession(jid, tenant, "komplain");
 
@@ -194,8 +212,11 @@ export const main = async () => {
 				continue;
 			}
 
-			// 3. Fallback — proses langsung
-			const responseText = await processCommand(tenant, text);
+			const responseText = await processCommand(
+				tenant,
+				text,
+				messageInput.image,
+			);
 
 			await db.insert(chatbotMessages).values({
 				tenantId: tenant.id,
@@ -221,6 +242,7 @@ export const main = async () => {
 const processCommand = async (
 	tenant: Tenant,
 	text: string,
+	image?: { buffer: Buffer; mimetype: string },
 ): Promise<string> => {
 	const lower = text.toLowerCase().trim();
 
@@ -236,7 +258,7 @@ const processCommand = async (
 	}
 
 	if (lower === "komplain" || lower.startsWith("komplain ")) {
-		return submitComplaint(tenant, text);
+		return submitComplaint(tenant, text, image);
 	}
 
 	if (lower === "tagihan") {

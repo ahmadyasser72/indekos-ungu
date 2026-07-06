@@ -67,7 +67,7 @@ const subtitle = filterParts.length > 0 ? filterParts.join(" | ") : undefined;
 							<td>{description}</td>
 							<td class="text-center">{COMPLAINT_STATUS_LABELS[status]}</td>
 							<td class="text-center">{formatDate(createdAt)}</td>
-							<td>{resolvedByUserName}</td>
+							<td>{resolvedByUserName ?? "-"}</td>
 							<td class="text-center">
 								{resolvedAt ? formatDate(resolvedAt) : "-"}
 							</td>

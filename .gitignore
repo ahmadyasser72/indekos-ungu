@@ -22,7 +22,7 @@ logs/
 .DS_Store
 .idea/
 *.tsbuildinfo
-db.sqlite
-test.db.sqlite
-site/uploads/
+/db.sqlite
+/test.db.sqlite
+/site/uploads/
 /packages/whatsapp-bot/qr.svg

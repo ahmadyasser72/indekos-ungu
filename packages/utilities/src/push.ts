@@ -6,7 +6,7 @@ import webpush from "web-push";
 
 export const sendPush = async (
 	users: Pick<User, "id">[],
-	data: { title: string; body: string; url?: string },
+	data: { title: string; body: string; url?: string; imagePath?: string },
 ) => {
 	const { VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY } = process.env;
 	if (!VAPID_SUBJECT || !VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY)

@@ -112,11 +112,21 @@ const complaintStats = getComplaintStats(complaints);
 					return (
 						<div
 							class:list={[
-								"card border border-l-4 border-base-200 bg-base-100 shadow-sm transition-all hover:shadow-md",
+								"card card-side border border-l-4 border-base-200 bg-base-100 shadow-sm transition-all hover:shadow-md",
 								COMPLAINT_STATUS_BORDERS[status],
-								{ "opacity-65": !isResolvable },
+								!isResolvable && "opacity-65",
 							]}
 						>
+							{imagePath && (
+								<figure>
+									<img
+										class="object-fit w-36 rounded-l-box"
+										src={`/api/uploads/${imagePath}`}
+										alt="Foto komplain"
+									/>
+								</figure>
+							)}
+
 							<div class="card-body justify-between gap-4 p-5 md:flex-row md:items-center">
 								<div class="flex flex-1 flex-col gap-2">
 									<div class="flex flex-wrap items-center gap-2">
@@ -139,12 +149,10 @@ const complaintStats = getComplaintStats(complaints);
 											{tenantName}
 										</span>
 									</div>
-									<p class="text-base font-bold text-base-content">
+									<p class="inline-flex items-center text-base font-bold text-base-content">
 										{description}
 										{imagePath && (
-											<span class="ml-2 text-lg" title="Disertai foto">
-												📷
-											</span>
+											<Icon class="ml-2" name="lucide:image" size="size-5" />
 										)}
 									</p>
 									{resolveNotes && (
@@ -197,17 +205,22 @@ const complaintStats = getComplaintStats(complaints);
 											class="btn btn-outline btn-sm btn-warning"
 										>
 											<Icon name="lucide:loader" />
-											Proses
+											Tandai Proses
 										</button>
 									)}
-									{isResolvable && (
+									{isResolvable ? (
 										<button
 											hx-get={`/dashboard/manage/complaints/modal/resolve/${id}`}
 											class="btn btn-outline btn-sm btn-success"
 										>
 											<Icon name="lucide:circle-check" />
-											Selesai
+											Tandai Selesai
 										</button>
+									) : (
+										<span class="flex items-center gap-1 text-xs font-bold text-success">
+											<Icon name="lucide:circle-check" />
+											Selesai
+										</span>
 									)}
 								</div>
 							</div>
