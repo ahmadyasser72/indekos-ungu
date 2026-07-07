@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, mock } from "bun:test";
+
 import type { ConversationSession, MessageInput } from "../../types";
 
 const mockCreateComplaint = mock(
@@ -8,7 +9,9 @@ const mockCreateComplaint = mock(
 	}),
 );
 const mockNotifyStaff = mock(async () => {});
-const mockRender = mock((template: string, _data?: any) => `rendered:${template}`);
+const mockRender = mock(
+	(template: string, _data?: any) => `rendered:${template}`,
+);
 
 mock.module("../../../lib/complaint", () => ({
 	createComplaint: mockCreateComplaint,
@@ -89,10 +92,7 @@ describe("komplainFlow", () => {
 
 		it("processes complaint when text provided", async () => {
 			const session = makeSession();
-			const result = await komplainFlow.steps.prompt(
-				text("AC rusak"),
-				session,
-			);
+			const result = await komplainFlow.steps.prompt(text("AC rusak"), session);
 
 			expect(mockCreateComplaint).toHaveBeenCalledWith(
 				session.tenant,
