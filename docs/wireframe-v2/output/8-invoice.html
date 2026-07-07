@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="id" data-theme="wireframe">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+		<title>Wireframe · Invoice</title>
+		<link rel="stylesheet" href="../dist/style.css" />
+	</head>
+	<body class="flex min-h-dvh items-center justify-center bg-base-200 p-4">
+		<div class="w-full max-w-xs">
+			<div class="mb-3 flex items-stretch gap-2 print:hidden">
+				<button class="btn flex-1 btn-outline btn-sm">🖨️ Cetak PNG</button
+				><a class="btn flex-1 btn-primary btn-sm">← Dashboard</a>
+			</div>
+			<div class="invoice-card card bg-base-100 shadow-xl">
+				<div class="card-body p-6">
+					<div class="mb-3 border-b-2 border-base-content/20 pb-3 text-center">
+						<div class="mb-2 flex items-center justify-center">
+							<div
+								class="flex size-14 items-center justify-center rounded-full bg-gray-700 text-xl font-bold text-white"
+							>
+								<svg
+									height="1.5em"
+									viewBox="0 0 24 24"
+									width="1.5em"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path d="M0 0h24v24H0z" fill="none" />
+									<g
+										fill="none"
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+									>
+										<path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+										<path
+											d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
+										/>
+									</g>
+								</svg>
+							</div>
+						</div>
+						<div class="font-serif text-lg font-bold tracking-wider uppercase">
+							Indekos Ungu
+						</div>
+						<hr class="my-1 border-base-content/20" />
+						<div class="font-serif text-xs leading-relaxed opacity-60">
+							Jl. Sejahtera, Komplek Damai, RT 002/RW 006, Kelurahan Mentaos,
+							Kec. Banjarbaru Utara, Kota Banjar Baru, Kalimantan Selatan 70714
+						</div>
+					</div>
+					<hr class="dash-sep" />
+					<div class="grid grid-cols-2 gap-2 text-xs">
+						<div>
+							<div class="opacity-60">Tanggal Dibuat</div>
+							<div class="font-mono font-semibold">
+								<span class="inline-block w-24 skeleton">&nbsp;</span>
+							</div>
+						</div>
+						<div class="text-end">
+							<div class="opacity-60">Invoice</div>
+							<div class="font-mono font-semibold">
+								<span class="inline-block w-28 skeleton">&nbsp;</span>
+							</div>
+						</div>
+					</div>
+					<div class="mt-2 grid grid-cols-2 gap-2 text-xs">
+						<div>
+							<div class="opacity-60">Nama</div>
+							<div class="font-mono font-semibold">
+								<span class="inline-block w-24 skeleton">&nbsp;</span>
+							</div>
+						</div>
+						<div class="text-end">
+							<div class="opacity-60">Kamar</div>
+							<div class="font-mono font-semibold">
+								<span class="inline-block w-10 skeleton">&nbsp;</span>
+							</div>
+						</div>
+					</div>
+					<hr class="dash-sep" />
+					<div class="flex justify-between text-sm">
+						<div>
+							<div>
+								Kamar <span class="inline-block w-12 skeleton">&nbsp;</span>
+								<span class="font-light opacity-80">x1</span>
+							</div>
+							<div class="font-mono text-xs opacity-60">
+								<span class="inline-block w-24 skeleton">&nbsp;</span>
+							</div>
+						</div>
+						<div class="font-mono">
+							<span class="inline-block w-16 skeleton">&nbsp;</span>
+						</div>
+					</div>
+					<div class="flex justify-between py-1 text-base font-bold">
+						<span>TOTAL</span
+						><span class="font-mono"
+							><span class="inline-block w-20 skeleton">&nbsp;</span></span
+						>
+					</div>
+					<hr class="dash-sep" />
+					<div class="mb-3 text-xs">
+						<div>
+							<span class="opacity-60">Pembayaran</span
+							><span class="ml-1 font-mono"
+								><span class="inline-block w-24 skeleton">&nbsp;</span></span
+							>
+						</div>
+					</div>
+					<hr class="dash-sep" />
+					<div class="text-center">
+						<span class="badge badge-lg font-semibold badge-success"
+							>✅ LUNAS</span
+						>
+						<p class="mt-2 font-mono text-xs opacity-60">
+							<span class="inline-block w-28 skeleton">&nbsp;</span>
+						</p>
+					</div>
+					<hr class="dash-sep" />
+					<p class="text-center text-sm font-medium text-success">
+						Pembayaran Anda telah berhasil diproses. Terima kasih!
+					</p>
+					<p class="mt-1 text-center text-xs opacity-30">
+						Simpan struk ini sebagai bukti pembayaran
+					</p>
+					<div class="mt-4 border-t-2 border-dashed border-base-300 pt-3">
+						<div class="text-center">
+							<span class="badge badge-lg font-semibold badge-warning"
+								>⏳ MENUNGGU</span
+							>
+							<p class="mt-2 text-sm font-medium text-warning">
+								Pembayaran Anda belum diterima. Silakan selesaikan pembayaran.
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

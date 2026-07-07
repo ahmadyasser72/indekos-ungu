@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+@source "../*.html";
+@source "../input/*.html";
+@source "../output/*.html";
+
+@plugin "daisyui" {
+	themes: wireframe --default;
+	exclude: rootscrollgutter, properties;
+}
+
+/* ── Hand-drawn sketchy overrides ── */
+@import url("https://fonts.googleapis.com/css2?family=Architects+Daughter&display=swap");
+
+@layer base {
+	* {
+		font-family: "Architects Daughter", cursive !important;
+	}
+	body {
+		@apply bg-base-200;
+	}
+}
+
+@layer components {
+	.card,
+	.btn,
+	.input,
+	.select,
+	.textarea,
+	.badge,
+	.table,
+	.stat,
+	.navbar,
+	.alert,
+	.sidebar,
+	.list,
+	.menu,
+	.modal-box,
+	.dropdown-content,
+	.indicator,
+	.join-item {
+		border-width: 2px !important;
+		border-style: solid !important;
+		border-radius: 255px 15px 225px 15px/15px 225px 15px 255px !important;
+		box-shadow: 2px 3px 5px oklch(0% 0 0 / 0.1);
+		transition: none !important;
+	}
+}
+
+/* ── Skeleton dashed placeholder ── */
+.skeleton {
+	background: transparent !important;
+	border: 1px dashed #666 !important;
+	animation: none !important;
+	border-radius: 255px 15px 225px 15px/15px 225px 15px 255px !important;
+}
+
+/* ── Report table print style ── */
+.report-table td {
+	vertical-align: top;
+}
+
+/* ── Report print layout ── */
+.report-paper {
+	background: #fff !important;
+	max-width: 800px;
+	margin: 0 auto;
+	padding: 48px 56px;
+	border: 3px solid #000 !important;
+	border-radius: 255px 15px 225px 15px/15px 225px 15px 255px !important;
+	box-shadow: 0 4px 32px oklch(0% 0 0 / 0.12);
+}
+
+.kop-border {
+	border-bottom: 3px solid #000;
+	margin-bottom: 1.5rem;
+	padding-bottom: 0.75rem;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	text-align: center;
+}
+
+.kop-alamat {
+	font-size: 0.7rem;
+	line-height: 1.5;
+	opacity: 0.6;
+}
+
+.report-table th {
+	background: oklch(90% 0 0);
+	font-weight: 700;
+}
+
+.dash-sep {
+	border: none;
+	border-top: 2px dashed #000;
+	margin: 0.5rem 0;
+}
+
+.wf-label {
+	font-size: 0.65rem;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	opacity: 0.6;
+}
+
+/* ── Invoice / struk digital ── */
+.card.invoice-card {
+	max-width: 320px;
+	margin: 0 auto;
+	border-radius: 255px 15px 225px 15px/15px 225px 15px 255px !important;
+}

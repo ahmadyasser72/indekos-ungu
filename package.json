@@ -20,7 +20,7 @@
 		"scheduler:trigger": "bun --cwd=packages/scheduler run trigger",
 		"format": "prettier . --write",
 		"format:check": "prettier . --check",
-		"docs:build-css": "bunx tailwindcss --minify --input ./docs/wireframes/tailwind.css --output ./docs/wireframes/style.css",
+		"docs:build-css": "bunx @tailwindcss/cli -i docs/wireframe-v2/src/style.css -o docs/wireframe-v2/dist/style.css",
 		"docs:dump-diagrams": "bun ./docs/scripts/dump.ts",
 		"docs:export-diagrams": "bun ./docs/scripts/export.ts"
 	},
@@ -31,6 +31,7 @@
 		"@xeonlink/prettier-plugin-organize-attributes": "1.1.0",
 		"daisyui": "5.6.3",
 		"pacwich": "0.2.1",
+		"puppeteer-core": "25.2.1",
 		"prettier": "3.9.1",
 		"prettier-plugin-astro": "0.14.1",
 		"prettier-plugin-tailwindcss": "0.7.4",

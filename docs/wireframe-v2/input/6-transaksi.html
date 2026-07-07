@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="id" data-theme="wireframe">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+		<title>Wireframe · Transaksi</title>
+		<link rel="stylesheet" href="../dist/style.css" />
+	</head>
+	<body class="min-h-dvh bg-base-200">
+		<div class="mx-auto max-w-6xl p-4">
+			<div class="mb-4 flex items-start justify-between">
+				<div>
+					<h1 class="mb-1 text-2xl font-bold">💳 Transaksi</h1>
+					<p class="text-sm opacity-60">Daftar transaksi pembayaran</p>
+				</div>
+				<div class="flex items-center gap-2">
+					<button class="btn btn-outline btn-sm">📄 PDF</button>
+				</div>
+			</div>
+			<div class="card mb-4 border border-base-300 bg-base-100 shadow-sm">
+				<div class="p-4">
+					<div class="flex flex-wrap items-end gap-4">
+						<div class="flex items-center gap-2">
+							<label class="wf-label">📅 Pilih Periode</label>
+							<input
+								type="month"
+								class="input w-36 input-sm"
+								value="2026-01"
+								disabled
+							/>
+							<span class="text-sm">Sampai:</span>
+							<input
+								type="month"
+								class="input w-36 input-sm"
+								value="2026-03"
+								disabled
+							/>
+						</div>
+						<div class="ml-auto flex items-center gap-2">
+							<button class="btn btn-sm">🔽 Filter</button>
+							<label class="input input-sm"
+								>🔍
+								<input type="search" placeholder="Cari transaksi…" class="grow"
+							/></label>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div
+				class="stats mb-4 w-full stats-vertical border border-base-300 shadow-sm sm:stats-horizontal"
+			>
+				<div class="stat">
+					<div class="stat-title">Total Pemasukan</div>
+					<div class="stat-value text-xl">
+						<span class="inline-block w-8 skeleton">&nbsp;</span>
+					</div>
+				</div>
+				<div class="stat">
+					<div class="stat-title">Sudah Terbayar</div>
+					<div class="stat-value text-xl">
+						<span class="inline-block w-6 skeleton">&nbsp;</span>
+					</div>
+				</div>
+				<div class="stat">
+					<div class="stat-title">Pembayaran Tertunggak</div>
+					<div class="stat-value text-xl">
+						<span class="inline-block w-6 skeleton">&nbsp;</span>
+					</div>
+				</div>
+			</div>
+			<div class="overflow-x-auto border border-base-300 shadow-sm">
+				<table class="table table-sm">
+					<thead>
+						<tr>
+							<th>Tanggal</th>
+							<th>Penghuni</th>
+							<th>Kamar</th>
+							<th>Tagihan</th>
+							<th>Dibayar</th>
+							<th>Sisa</th>
+							<th>Status</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><span class="inline-block w-14 skeleton">&nbsp;</span></td>
+							<td><span class="inline-block w-20 skeleton">&nbsp;</span></td>
+							<td><span class="inline-block w-8 skeleton">&nbsp;</span></td>
+							<td><span class="inline-block w-14 skeleton">&nbsp;</span></td>
+							<td><span class="inline-block w-14 skeleton">&nbsp;</span></td>
+							<td><span class="inline-block w-12 skeleton">&nbsp;</span></td>
+							<td><span class="badge w-14 skeleton badge-sm">&nbsp;</span></td>
+							<td class="text-right">
+								<span class="inline-block w-8 skeleton">&nbsp;</span>
+							</td>
+						</tr>
+						<tr>
+							<td><span class="inline-block w-14 skeleton">&nbsp;</span></td>
+							<td><span class="inline-block w-24 skeleton">&nbsp;</span></td>
+							<td><span class="inline-block w-8 skeleton">&nbsp;</span></td>
+							<td><span class="inline-block w-14 skeleton">&nbsp;</span></td>
+							<td><span class="inline-block w-14 skeleton">&nbsp;</span></td>
+							<td><span class="inline-block w-12 skeleton">&nbsp;</span></td>
+							<td><span class="badge w-12 skeleton badge-sm">&nbsp;</span></td>
+							<td class="text-right">
+								<span class="inline-block w-8 skeleton">&nbsp;</span>
+							</td>
+						</tr>
+						<tr>
+							<td><span class="inline-block w-14 skeleton">&nbsp;</span></td>
+							<td><span class="inline-block w-18 skeleton">&nbsp;</span></td>
+							<td><span class="inline-block w-8 skeleton">&nbsp;</span></td>
+							<td><span class="inline-block w-14 skeleton">&nbsp;</span></td>
+							<td><span class="inline-block w-14 skeleton">&nbsp;</span></td>
+							<td><span class="inline-block w-12 skeleton">&nbsp;</span></td>
+							<td><span class="badge w-16 skeleton badge-sm">&nbsp;</span></td>
+							<td class="text-right">
+								<span class="inline-block w-8 skeleton">&nbsp;</span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="mt-4 flex items-center justify-between">
+				<span class="text-sm opacity-60"
+					>Menampilkan 1-3 dari
+					<span class="inline-block w-6 skeleton">&nbsp;</span></span
+				>
+				<div class="join">
+					<button class="btn join-item btn-sm">«</button>
+					<button class="btn btn-active join-item btn-sm">1</button>
+					<button class="btn join-item btn-sm">2</button>
+					<button class="btn join-item btn-sm">3</button>
+					<button class="btn join-item btn-sm">»</button>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

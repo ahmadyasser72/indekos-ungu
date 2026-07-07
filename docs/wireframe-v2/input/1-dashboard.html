@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="id" data-theme="wireframe">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+		<title>Wireframe · Dashboard</title>
+		<link rel="stylesheet" href="../dist/style.css" />
+	</head>
+	<body class="bg-base-200 p-4">
+		<div class="mx-auto max-w-6xl">
+			<h1 class="mb-1 text-2xl font-bold">📊 Dashboard</h1>
+			<p class="mb-4 text-sm opacity-60">
+				Ringkasan operasional dan kondisi indekos saat ini
+			</p>
+
+			<div
+				class="stats mb-6 w-full stats-vertical border border-base-300 shadow-sm sm:stats-horizontal"
+			>
+				<div class="stat">
+					<div class="stat-title">Total Kamar</div>
+					<div class="stat-value">
+						<span class="inline-block w-8 skeleton">&nbsp;</span> Kamar
+					</div>
+					<div class="stat-desc">
+						<span class="inline-block h-3 w-6 skeleton">&nbsp;</span> Terisi,
+						<span class="inline-block h-3 w-6 skeleton">&nbsp;</span> Kosong
+					</div>
+				</div>
+				<div class="stat">
+					<div class="stat-title">Penghuni Aktif</div>
+					<div class="stat-value">
+						<span class="inline-block w-8 skeleton">&nbsp;</span> Orang
+					</div>
+					<div class="stat-desc">
+						<span class="inline-block h-3 w-6 skeleton">&nbsp;</span> sewa
+						berakhir bulan ini
+					</div>
+				</div>
+				<div class="stat">
+					<div class="stat-title">Tagihan Belum Bayar</div>
+					<div class="stat-value">
+						<span class="inline-block w-8 skeleton">&nbsp;</span>
+					</div>
+					<div class="stat-desc">
+						<span class="inline-block h-3 w-6 skeleton">&nbsp;</span> tagihan
+						belum lunas
+					</div>
+				</div>
+				<div class="stat">
+					<div class="stat-title">Komplain Terbuka</div>
+					<div class="stat-value">
+						<span class="inline-block w-6 skeleton">&nbsp;</span> Komplain
+					</div>
+					<div class="stat-desc">
+						<span class="inline-block h-3 w-6 skeleton">&nbsp;</span> perlu
+						tindakan segera
+					</div>
+				</div>
+			</div>
+
+			<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+				<div class="card border border-base-300 bg-base-100 shadow-sm">
+					<div class="card-body p-6">
+						<div class="mb-4 flex items-center justify-between">
+							<h2 class="card-title text-lg font-bold">
+								<svg
+									class="size-5 text-primary"
+									xmlns="http://www.w3.org/2000/svg"
+									width="20"
+									height="20"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path
+										d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"
+									/>
+									<polyline points="14 2 14 8 20 8" />
+								</svg>
+								Tagihan Mendekati Jatuh Tempo
+							</h2>
+							<button class="btn btn-outline btn-primary btn-xs">
+								Lihat Semua
+							</button>
+						</div>
+						<div class="overflow-x-auto">
+							<table class="table w-full table-sm">
+								<thead>
+									<tr>
+										<th>Penghuni</th>
+										<th>Kamar</th>
+										<th>Nominal</th>
+										<th>Jatuh Tempo</th>
+										<th>Status</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>
+											<span class="inline-block h-3 w-24 skeleton">&nbsp;</span>
+										</td>
+										<td>
+											<span class="badge font-mono badge-sm"
+												><span class="inline-block h-2 w-6 skeleton"
+													>&nbsp;</span
+												></span
+											>
+										</td>
+										<td class="font-mono">
+											<span class="inline-block h-3 w-12 skeleton">&nbsp;</span>
+										</td>
+										<td class="font-mono">
+											<span class="inline-block h-3 w-14 skeleton">&nbsp;</span>
+										</td>
+										<td>
+											<span class="badge badge-sm"
+												><span class="inline-block h-2 w-10 skeleton"
+													>&nbsp;</span
+												></span
+											>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<span class="inline-block h-3 w-20 skeleton">&nbsp;</span>
+										</td>
+										<td>
+											<span class="badge font-mono badge-sm"
+												><span class="inline-block h-2 w-6 skeleton"
+													>&nbsp;</span
+												></span
+											>
+										</td>
+										<td class="font-mono">
+											<span class="inline-block h-3 w-16 skeleton">&nbsp;</span>
+										</td>
+										<td class="font-mono">
+											<span class="inline-block h-3 w-14 skeleton">&nbsp;</span>
+										</td>
+										<td>
+											<span class="badge badge-sm"
+												><span class="inline-block h-2 w-10 skeleton"
+													>&nbsp;</span
+												></span
+											>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<span class="inline-block h-3 w-28 skeleton">&nbsp;</span>
+										</td>
+										<td>
+											<span class="badge font-mono badge-sm"
+												><span class="inline-block h-2 w-6 skeleton"
+													>&nbsp;</span
+												></span
+											>
+										</td>
+										<td class="font-mono">
+											<span class="inline-block h-3 w-14 skeleton">&nbsp;</span>
+										</td>
+										<td class="font-mono">
+											<span class="inline-block h-3 w-14 skeleton">&nbsp;</span>
+										</td>
+										<td>
+											<span class="badge badge-sm"
+												><span class="inline-block h-2 w-10 skeleton"
+													>&nbsp;</span
+												></span
+											>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<span class="inline-block h-3 w-24 skeleton">&nbsp;</span>
+										</td>
+										<td>
+											<span class="badge font-mono badge-sm"
+												><span class="inline-block h-2 w-6 skeleton"
+													>&nbsp;</span
+												></span
+											>
+										</td>
+										<td class="font-mono">
+											<span class="inline-block h-3 w-16 skeleton">&nbsp;</span>
+										</td>
+										<td class="font-mono">
+											<span class="inline-block h-3 w-14 skeleton">&nbsp;</span>
+										</td>
+										<td>
+											<span class="badge badge-sm"
+												><span class="inline-block h-2 w-10 skeleton"
+													>&nbsp;</span
+												></span
+											>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<span class="inline-block h-3 w-20 skeleton">&nbsp;</span>
+										</td>
+										<td>
+											<span class="badge font-mono badge-sm"
+												><span class="inline-block h-2 w-6 skeleton"
+													>&nbsp;</span
+												></span
+											>
+										</td>
+										<td class="font-mono">
+											<span class="inline-block h-3 w-12 skeleton">&nbsp;</span>
+										</td>
+										<td class="font-mono">
+											<span class="inline-block h-3 w-14 skeleton">&nbsp;</span>
+										</td>
+										<td>
+											<span class="badge badge-sm"
+												><span class="inline-block h-2 w-10 skeleton"
+													>&nbsp;</span
+												></span
+											>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+
+				<div class="card border border-base-300 bg-base-100 shadow-sm">
+					<div class="card-body p-6">
+						<div class="mb-4 flex items-center justify-between">
+							<h2 class="card-title text-lg font-bold">
+								<svg
+									class="size-5 text-error"
+									xmlns="http://www.w3.org/2000/svg"
+									width="20"
+									height="20"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<circle cx="12" cy="12" r="10" />
+									<line x1="12" y1="8" x2="12" y2="12" />
+									<line x1="12" y1="16" x2="12.01" y2="16" />
+								</svg>
+								Komplain Terbaru
+							</h2>
+							<button class="btn btn-outline btn-primary btn-xs">
+								Lihat Komplain
+							</button>
+						</div>
+						<div class="divide-y divide-base-200">
+							<div
+								class="flex items-start justify-between rounded-lg px-2 py-3.5 transition-colors first:pt-0 last:pb-0 hover:bg-base-200/20"
+							>
+								<div class="flex flex-col gap-1">
+									<span class="text-sm font-bold"
+										><span class="inline-block h-3 w-52 skeleton"
+											>&nbsp;</span
+										></span
+									>
+									<div
+										class="flex flex-wrap items-center gap-2 text-xs text-base-content/60"
+									>
+										<span class="badge badge-ghost badge-sm"
+											><span class="inline-block h-2 w-6 skeleton"
+												>&nbsp;</span
+											></span
+										><span>&bull;</span
+										><span
+											><span class="inline-block h-2 w-16 skeleton"
+												>&nbsp;</span
+											></span
+										><span>&bull;</span
+										><span
+											><span class="inline-block h-2 w-12 skeleton"
+												>&nbsp;</span
+											></span
+										>
+									</div>
+								</div>
+								<span class="badge badge-sm"
+									><span class="inline-block h-2 w-8 skeleton"
+										>&nbsp;</span
+									></span
+								>
+							</div>
+							<div
+								class="flex items-start justify-between rounded-lg px-2 py-3.5 transition-colors hover:bg-base-200/20"
+							>
+								<div class="flex flex-col gap-1">
+									<span class="text-sm font-bold"
+										><span class="inline-block h-3 w-48 skeleton"
+											>&nbsp;</span
+										></span
+									>
+									<div
+										class="flex flex-wrap items-center gap-2 text-xs text-base-content/60"
+									>
+										<span class="badge badge-ghost badge-sm"
+											><span class="inline-block h-2 w-6 skeleton"
+												>&nbsp;</span
+											></span
+										><span>&bull;</span
+										><span
+											><span class="inline-block h-2 w-20 skeleton"
+												>&nbsp;</span
+											></span
+										><span>&bull;</span
+										><span
+											><span class="inline-block h-2 w-14 skeleton"
+												>&nbsp;</span
+											></span
+										>
+									</div>
+								</div>
+								<span class="badge badge-sm"
+									><span class="inline-block h-2 w-10 skeleton"
+										>&nbsp;</span
+									></span
+								>
+							</div>
+							<div
+								class="flex items-start justify-between rounded-lg px-2 py-3.5 transition-colors last:pb-0 hover:bg-base-200/20"
+							>
+								<div class="flex flex-col gap-1">
+									<span class="text-sm font-bold"
+										><span class="inline-block h-3 w-52 skeleton"
+											>&nbsp;</span
+										></span
+									>
+									<div
+										class="flex flex-wrap items-center gap-2 text-xs text-base-content/60"
+									>
+										<span class="badge badge-ghost badge-sm"
+											><span class="inline-block h-2 w-6 skeleton"
+												>&nbsp;</span
+											></span
+										><span>&bull;</span
+										><span
+											><span class="inline-block h-2 w-14 skeleton"
+												>&nbsp;</span
+											></span
+										><span>&bull;</span
+										><span
+											><span class="inline-block h-2 w-12 skeleton"
+												>&nbsp;</span
+											></span
+										>
+									</div>
+								</div>
+								<span class="badge badge-sm"
+									><span class="inline-block h-2 w-8 skeleton"
+										>&nbsp;</span
+									></span
+								>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
