@@ -17,7 +17,10 @@ export const saveComplaintImage = async (
 	mimetype: string,
 	complaintId: number,
 ) => {
-	const ext = mimetype.split("/")[1] ?? "jpg";
+	const ALLOWED_IMAGE_EXT = new Set(["jpeg", "jpg", "png", "gif", "webp"]);
+	const rawExt = path.basename(mimetype.split("/")[1] ?? "").toLowerCase();
+	const ext = ALLOWED_IMAGE_EXT.has(rawExt) ? rawExt : "jpg";
+
 	const filename = `complaints/${complaintId}.${ext}`;
 	const filePath = path.join(UPLOADS_DIR, filename);
 

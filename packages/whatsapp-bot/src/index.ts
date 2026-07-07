@@ -8,7 +8,12 @@ import {
 } from "@indekos/database/schema";
 import { createLogger } from "@indekos/utilities/logger";
 
-import { downloadMediaMessage, makeWASocket } from "baileys";
+import {
+	DisconnectReason,
+	downloadMediaMessage,
+	makeWASocket,
+	type WAMessage,
+} from "baileys";
 
 import { useSqliteAuthState } from "./auth";
 import { checkBills } from "./commands/check-bills";
@@ -72,25 +77,51 @@ export const main = async () => {
 		return out;
 	};
 
+	const replyAndLog = async (
+		jid: string,
+		tenantId: number,
+		message: string,
+		quoted?: WAMessage,
+	) => {
+		await db.insert(chatbotMessages).values({
+			tenantId,
+			message,
+			direction: "outgoing",
+		});
+
+		await sock.sendMessage(jid, { text: message }, { quoted });
+	};
+
 	sock.ev.on("creds.update", saveCreds);
 
 	sock.ev.on("connection.update", ({ connection, lastDisconnect }) => {
 		if (connection === "open") {
 			console.log("WhatsApp connected");
-		} else {
-			console.warn("connection status: %s", connection);
-			if (lastDisconnect?.error) {
-				console.error("disconnect error:", lastDisconnect.error);
-			}
+			return;
+		}
+
+		console.warn("connection status: %s", connection);
+		if (lastDisconnect?.error) {
+			console.error("disconnect error:", lastDisconnect.error);
+		}
+
+		// Reconnect unless logged out
+		if (
+			connection === "close" &&
+			(lastDisconnect?.error as any)?.output?.statusCode !==
+				DisconnectReason.loggedOut
+		) {
+			console.log("reconnecting...");
+			main(); // re-runs full setup (new socket, re-attaches listeners)
 		}
 	});
 
 	sock.ev.on("messages.upsert", async ({ messages }) => {
-		for (const message of messages) {
-			if (message.key.fromMe) continue;
+		const handleMessage = async (message: WAMessage) => {
+			if (message.key.fromMe) return;
 
-			const jid = message.key.remoteJidAlt!;
-			if (!jid?.endsWith("@s.whatsapp.net")) continue;
+			const jid = message.key.remoteJidAlt ?? message.key.remoteJid;
+			if (!jid || !jid?.endsWith("@s.whatsapp.net")) return;
 
 			const imageMessage = message.message?.imageMessage;
 			const text = (
@@ -99,7 +130,7 @@ export const main = async () => {
 				""
 			).trim();
 
-			if (!text && !imageMessage) continue;
+			if (!text && !imageMessage) return;
 
 			const lower = text.toLowerCase().trim();
 			const phone = jid.replace("@s.whatsapp.net", "");
@@ -109,13 +140,9 @@ export const main = async () => {
 
 			if (!tenant) {
 				const cooldownUntil = unknownCooldowns.get(jid);
-				if (cooldownUntil && Date.now() < cooldownUntil) {
-					continue;
-				}
+				if (cooldownUntil && Date.now() < cooldownUntil) return;
 
-				await sock.sendMessage(jid, {
-					text: render("unknown-number", {}),
-				});
+				await sock.sendMessage(jid, { text: render("unknown-number", {}) });
 
 				unknownCooldowns.set(jid, Date.now() + 30_000);
 
@@ -129,7 +156,7 @@ export const main = async () => {
 					),
 				});
 
-				continue;
+				return;
 			}
 
 			await db.insert(chatbotMessages).values({
@@ -146,28 +173,37 @@ export const main = async () => {
 						.set({ isVerified: true })
 						.where(eq(tenants.id, tenant.id));
 
-					await sock.sendMessage(
+					await replyAndLog(
 						jid,
-						{
-							text: render("verification-success", {
-								fullName: tenant.fullName,
-							}),
-						},
-						{ quoted: message },
+						tenant.id,
+						render("verification-success", { fullName: tenant.fullName }),
+						message,
 					);
 				} else {
-					await sock.sendMessage(jid, {
-						text: render("verification-prompt", { fullName: tenant.fullName }),
-					});
+					await replyAndLog(
+						jid,
+						tenant.id,
+						render("verification-prompt", { fullName: tenant.fullName }),
+						message,
+					);
 				}
-				continue;
+
+				return;
 			}
 
 			// Build message input — download image if present
 			const messageInput: MessageInput = { text };
 			if (imageMessage) {
 				try {
-					const buffer = await downloadMediaMessage(message, "buffer", {});
+					const buffer = await downloadMediaMessage(
+						message,
+						"buffer",
+						{},
+						{
+							reuploadRequest: (message) => sock.updateMediaMessage(message),
+							logger: sock.logger,
+						},
+					);
 					messageInput.image = {
 						buffer,
 						mimetype: imageMessage.mimetype ?? "image/jpeg",
@@ -182,17 +218,9 @@ export const main = async () => {
 					jid,
 					messageInput,
 				);
+				if (reply) await replyAndLog(jid, tenant.id, reply, message);
 
-				if (reply) {
-					await db.insert(chatbotMessages).values({
-						tenantId: tenant.id,
-						direction: "outgoing",
-						message: reply,
-					});
-
-					await sock.sendMessage(jid, { text: reply }, { quoted: message });
-				}
-				continue;
+				return;
 			}
 
 			if (lower === "komplain") {
@@ -202,17 +230,9 @@ export const main = async () => {
 					jid,
 					messageInput,
 				);
+				if (reply) await replyAndLog(jid, tenant.id, reply, message);
 
-				if (reply) {
-					await db.insert(chatbotMessages).values({
-						tenantId: tenant.id,
-						direction: "outgoing",
-						message: reply,
-					});
-
-					await sock.sendMessage(jid, { text: reply }, { quoted: message });
-				}
-				continue;
+				return;
 			}
 
 			const responseText = await processCommand(
@@ -221,13 +241,20 @@ export const main = async () => {
 				messageInput.image,
 			);
 
-			await db.insert(chatbotMessages).values({
-				tenantId: tenant.id,
-				direction: "outgoing",
-				message: responseText,
-			});
+			await replyAndLog(jid, tenant.id, responseText, message);
+		};
 
-			await sock.sendMessage(jid, { text: responseText }, { quoted: message });
+		for (const message of messages) {
+			try {
+				await handleMessage(message);
+			} catch (error) {
+				console.error(
+					"failed to process message %s from %s:",
+					message.key.id,
+					message.key.remoteJidAlt ?? message.key.remoteJid,
+					error,
+				);
+			}
 		}
 	});
 
