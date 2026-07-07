@@ -1,8 +1,15 @@
-import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { db } from "@indekos/database";
 import { tenants, type Tenant } from "@indekos/database/schema";
 
+import { afterAll, beforeAll, describe, expect, it, mock } from "bun:test";
+
 import { submitComplaint } from "../submit-complaint";
+
+const mockSendPush = mock(() => Promise.resolve({ sent: 0 }));
+
+mock.module("@indekos/utilities/push", () => ({
+	sendPush: mockSendPush,
+}));
 
 let testTenant: Tenant;
 
@@ -43,6 +50,8 @@ describe("submitComplaint", () => {
 		expect(allComplaints).toHaveLength(1);
 		expect(allComplaints[0].description).toBe("AC kamar tidak dingin");
 		expect(allComplaints[0].status).toBe("open");
+
+		expect(mockSendPush).toHaveBeenCalledTimes(1);
 	});
 
 	it("returns help text when description too short", async () => {
