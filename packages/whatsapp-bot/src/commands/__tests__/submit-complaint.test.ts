@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it, mock } from "bun:test";
 import { db } from "@indekos/database";
-import { tenants, type Tenant } from "@indekos/database/schema";
+import { tenants, users, type Tenant } from "@indekos/database/schema";
 
 import { submitComplaint } from "../submit-complaint";
 
@@ -14,6 +14,13 @@ let testTenant: Tenant;
 
 beforeAll(async () => {
 	db.run("BEGIN");
+
+	await db.insert(users).values({
+		username: "test-staff",
+		displayName: "Test Staff",
+		role: "staff",
+		passwordHash: "x",
+	});
 
 	const [tenant] = await db
 		.insert(tenants)
