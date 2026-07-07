@@ -5,11 +5,13 @@ import { actions } from "astro:actions";
 
 import FilterPopover from "~/components/data/filter-popover.astro";
 import FilterToolbar from "~/components/data/filter-toolbar.astro";
+import Pagination from "~/components/data/pagination.astro";
 import SearchInput from "~/components/data/search-input.astro";
 import Stats from "~/components/data/stats.astro";
 import Icon from "~/components/ui/icon.astro";
 import DashboardLayout from "~/layouts/dashboard-layout.astro";
 import { createActionResult } from "~/lib/form-result";
+import { paginateArray } from "~/lib/query";
 import {
 	COMPLAINT_STATUS_BADGES,
 	COMPLAINT_STATUS_BORDERS,
@@ -33,8 +35,12 @@ Astro.locals.actionResults.push(
 );
 
 const params = Astro.locals.parseQuery(complaintQuerySchema);
-const complaints = await fetchComplaints(params);
-const complaintStats = getComplaintStats(complaints);
+const allComplaints = await fetchComplaints(params);
+const complaintStats = getComplaintStats(allComplaints);
+const { items: complaints, ...pagination } = paginateArray(
+	allComplaints,
+	params,
+);
 ---
 
 <DashboardLayout
@@ -91,129 +97,136 @@ const complaintStats = getComplaintStats(complaints);
 
 	<Stats stats={complaintStats} />
 
-	<div class="flex flex-col gap-4" id="complaints-content-wrapper">
-		{
-			complaints.map(
-				({
-					id,
-					description,
-					status,
-					createdAt,
-					tenantName,
-					roomNumber,
-					resolvedByUserName,
-					resolveNotes,
-					processedAt,
-					resolvedAt,
-				}) => {
-					const isOpen = status === "open";
-					const isResolvable = status !== "resolved";
-					return (
-						<div
-							class:list={[
-								"card border border-l-4 border-base-200 bg-base-100 shadow-sm transition-all hover:shadow-md",
-								COMPLAINT_STATUS_BORDERS[status],
-								{ "opacity-65": !isResolvable },
-							]}
-						>
-							<div class="card-body justify-between gap-4 p-5 md:flex-row md:items-center">
-								<div class="flex flex-1 flex-col gap-2">
-									<div class="flex flex-wrap items-center gap-2">
-										<span class="text-mono text-xs font-bold text-base-content/40">
-											KMP-{id}
-										</span>
-										<span
-											class:list={[
-												"badge font-bold",
-												COMPLAINT_STATUS_BADGES[status],
-											]}
-										>
-											{COMPLAINT_STATUS_LABELS[status]}
-										</span>
-										<span class="badge font-mono font-bold badge-neutral">
-											{roomNumber || "-"}
-										</span>
-										<span class="text-xs text-base-content/50">&bull;</span>
-										<span class="text-xs font-semibold text-base-content/60">
-											{tenantName}
-										</span>
-									</div>
-									<p class="text-base font-bold text-base-content">
-										{description}
-									</p>
-									{resolveNotes && (
-										<div class="mt-2 max-w-xl rounded border border-success/20 bg-success/5 p-2.5 text-xs">
-											<span class="mb-0.5 block font-bold text-success">
-												Catatan Penyelesaian:
+	<div class="contents" id="complaints-content-wrapper">
+		<div class="flex flex-col gap-4">
+			{
+				complaints.map(
+					({
+						id,
+						description,
+						status,
+						createdAt,
+						tenantName,
+						roomNumber,
+						resolvedByUserName,
+						resolveNotes,
+						processedAt,
+						resolvedAt,
+					}) => {
+						const isOpen = status === "open";
+						const isResolvable = status !== "resolved";
+						return (
+							<div
+								class:list={[
+									"card border border-l-4 border-base-200 bg-base-100 shadow-sm transition-all hover:shadow-md",
+									COMPLAINT_STATUS_BORDERS[status],
+									{ "opacity-65": !isResolvable },
+								]}
+							>
+								<div class="card-body justify-between gap-4 p-5 md:flex-row md:items-center">
+									<div class="flex flex-1 flex-col gap-2">
+										<div class="flex flex-wrap items-center gap-2">
+											<span class="text-mono text-xs font-bold text-base-content/40">
+												KMP-{id}
 											</span>
-											<p class="wrap-break-word whitespace-pre-wrap text-base-content/85">
-												{resolveNotes}
-											</p>
+											<span
+												class:list={[
+													"badge font-bold",
+													COMPLAINT_STATUS_BADGES[status],
+												]}
+											>
+												{COMPLAINT_STATUS_LABELS[status]}
+											</span>
+											<span class="badge font-mono font-bold badge-neutral">
+												{roomNumber || "-"}
+											</span>
+											<span class="text-xs text-base-content/50">&bull;</span>
+											<span class="text-xs font-semibold text-base-content/60">
+												{tenantName}
+											</span>
 										</div>
-									)}
-									<div class="mt-1 flex items-center gap-2 text-xs text-base-content/50">
-										<Icon name="lucide:calendar" size="size-3.5" />
-										<span>Dilaporkan pada: {formatDate(createdAt)}</span>
-										{resolvedByUserName && (
-											<>
-												<span>&bull;</span>
-												<span class="flex items-center gap-1 font-semibold text-success">
-													<Icon name="lucide:circle-check" />
-													Ditangani oleh: {resolvedByUserName}
+										<p class="text-base font-bold text-base-content">
+											{description}
+										</p>
+										{resolveNotes && (
+											<div class="mt-2 max-w-xl rounded border border-success/20 bg-success/5 p-2.5 text-xs">
+												<span class="mb-0.5 block font-bold text-success">
+													Catatan Penyelesaian:
 												</span>
-											</>
+												<p class="wrap-break-word whitespace-pre-wrap text-base-content/85">
+													{resolveNotes}
+												</p>
+											</div>
 										)}
-										{processedAt && (
-											<>
-												<span>&bull;</span>
-												<span class="flex items-center gap-1 font-semibold text-warning">
-													<Icon name="lucide:loader" size="size-3.5" />
-													Diproses: {formatDate(processedAt)}
-												</span>
-											</>
+										<div class="mt-1 flex items-center gap-2 text-xs text-base-content/50">
+											<Icon name="lucide:calendar" size="size-3.5" />
+											<span>Dilaporkan pada: {formatDate(createdAt)}</span>
+											{resolvedByUserName && (
+												<>
+													<span>&bull;</span>
+													<span class="flex items-center gap-1 font-semibold text-success">
+														<Icon name="lucide:circle-check" />
+														Ditangani oleh: {resolvedByUserName}
+													</span>
+												</>
+											)}
+											{processedAt && (
+												<>
+													<span>&bull;</span>
+													<span class="flex items-center gap-1 font-semibold text-warning">
+														<Icon name="lucide:loader" size="size-3.5" />
+														Diproses: {formatDate(processedAt)}
+													</span>
+												</>
+											)}
+											{resolvedAt && (
+												<>
+													<span>&bull;</span>
+													<span class="flex items-center gap-1">
+														<Icon
+															name="lucide:calendar-check"
+															size="size-3.5"
+														/>
+														Selesai: {formatDate(resolvedAt)}
+													</span>
+												</>
+											)}
+										</div>
+									</div>
+
+									<div class="flex shrink-0 items-center gap-2 self-end md:self-center">
+										{isOpen && (
+											<button
+												hx-get={`/dashboard/manage/complaints/modal/process/${id}`}
+												class="btn btn-outline btn-sm btn-warning"
+											>
+												<Icon name="lucide:loader" />
+												Tandai Proses
+											</button>
 										)}
-										{resolvedAt && (
-											<>
-												<span>&bull;</span>
-												<span class="flex items-center gap-1">
-													<Icon name="lucide:calendar-check" size="size-3.5" />
-													Selesai: {formatDate(resolvedAt)}
-												</span>
-											</>
+										{isResolvable ? (
+											<button
+												hx-get={`/dashboard/manage/complaints/modal/resolve/${id}`}
+												class="btn btn-outline btn-sm btn-success"
+											>
+												<Icon name="lucide:circle-check" />
+												Tandai Selesai
+											</button>
+										) : (
+											<span class="flex items-center gap-1 text-xs font-bold text-success">
+												<Icon name="lucide:circle-check" />
+												Selesai
+											</span>
 										)}
 									</div>
-								</div>
-
-								<div class="flex shrink-0 items-center gap-2 self-end md:self-center">
-									{isOpen && (
-										<button
-											hx-get={`/dashboard/manage/complaints/modal/process/${id}`}
-											class="btn btn-outline btn-sm btn-warning"
-										>
-											<Icon name="lucide:loader" />
-											Tandai Proses
-										</button>
-									)}
-									{isResolvable ? (
-										<button
-											hx-get={`/dashboard/manage/complaints/modal/resolve/${id}`}
-											class="btn btn-outline btn-sm btn-success"
-										>
-											<Icon name="lucide:circle-check" />
-											Tandai Selesai
-										</button>
-									) : (
-										<span class="flex items-center gap-1 text-xs font-bold text-success">
-											<Icon name="lucide:circle-check" />
-											Selesai
-										</span>
-									)}
 								</div>
 							</div>
-						</div>
-					);
-				},
-			)
-		}
+						);
+					},
+				)
+			}
+		</div>
+
+		<Pagination name="complaints" {...pagination} />
 	</div>
 </DashboardLayout>

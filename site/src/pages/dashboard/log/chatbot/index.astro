@@ -3,10 +3,12 @@ import { formatDate } from "@indekos/utilities/date";
 
 import FilterPopover from "~/components/data/filter-popover.astro";
 import FilterToolbar from "~/components/data/filter-toolbar.astro";
+import Pagination from "~/components/data/pagination.astro";
 import SearchInput from "~/components/data/search-input.astro";
 import Stats from "~/components/data/stats.astro";
 import Icon from "~/components/ui/icon.astro";
 import DashboardLayout from "~/layouts/dashboard-layout.astro";
+import { paginateArray } from "~/lib/query";
 import {
 	chatbotQuerySchema,
 	DIRECTION_BADGES,
@@ -18,8 +20,12 @@ import {
 
 const params = Astro.locals.parseQuery(chatbotQuerySchema);
 
-const chatbotLogs = await fetchChatbotLogs(params);
-const chatbotStats = getChatbotStats(chatbotLogs);
+const allChatbotLogs = await fetchChatbotLogs(params);
+const chatbotStats = getChatbotStats(allChatbotLogs);
+const { items: chatbotLogs, ...pagination } = paginateArray(
+	allChatbotLogs,
+	params,
+);
 ---
 
 <DashboardLayout
@@ -73,75 +79,79 @@ const chatbotStats = getChatbotStats(chatbotLogs);
 	<Stats stats={chatbotStats} />
 
 	<div
-		class="overflow-x-auto rounded-box border border-base-300 shadow-sm"
+		class="rounded-box border border-base-300 shadow-sm"
 		id="chatbot-content-wrapper"
 	>
-		<table class="table w-full table-sm">
-			<thead>
-				<tr>
-					<th class="w-48">Terkirim</th>
-					<th class="w-44">Penghuni</th>
-					<th class="w-32">Arah</th>
-					<th class="w-24 text-right">Aksi</th>
-				</tr>
-			</thead>
-			<tbody id="chatbot-table-body">
-				{
-					chatbotLogs.map(
-						({ id, tenantId, sentAt, tenantName, roomNumber, direction }) => (
-							<tr>
-								<td class="font-mono whitespace-nowrap">
-									{formatDate(sentAt, "DD MMM YYYY HH:mm:ss")}
-								</td>
-								<td>
-									{tenantName}
-									<span class="badge font-mono badge-xs badge-neutral">
-										{roomNumber}
-									</span>
-								</td>
-								<td>
-									<span
-										class:list={[
-											"badge flex items-center gap-1 badge-sm font-bold",
-											DIRECTION_BADGES[direction],
-										]}
-									>
-										<Icon name={DIRECTION_ICONS[direction]} size="size-3" />
-										{DIRECTION_LABELS[direction]}
-									</span>
-								</td>
-								<td class="text-right">
-									<div class="flex justify-end gap-1.5">
-										<button
-											hx-get={`/dashboard/manage/tenants/modal/chat/${tenantId}`}
-											class="btn btn-square btn-ghost btn-xs"
-											title="Chat"
-											hx-vals={JSON.stringify({ message: id })}
+		<div class="overflow-x-auto">
+			<table class="table w-full table-sm">
+				<thead>
+					<tr>
+						<th class="w-48">Terkirim</th>
+						<th class="w-44">Penghuni</th>
+						<th class="w-32">Arah</th>
+						<th class="w-24 text-right">Aksi</th>
+					</tr>
+				</thead>
+				<tbody id="chatbot-table-body">
+					{
+						chatbotLogs.map(
+							({ id, tenantId, sentAt, tenantName, roomNumber, direction }) => (
+								<tr>
+									<td class="font-mono whitespace-nowrap">
+										{formatDate(sentAt, "DD MMM YYYY HH:mm:ss")}
+									</td>
+									<td>
+										{tenantName}
+										<span class="badge font-mono badge-xs badge-neutral">
+											{roomNumber}
+										</span>
+									</td>
+									<td>
+										<span
+											class:list={[
+												"badge flex items-center gap-1 badge-sm font-bold",
+												DIRECTION_BADGES[direction],
+											]}
 										>
-											<Icon name="lucide:message-square" />
-										</button>
-										<button
-											hx-get={`/dashboard/log/chatbot/modal/view-message/${id}`}
-											class="btn btn-square btn-ghost btn-xs"
-											title="Lihat pesan"
-										>
-											<Icon name="lucide:eye" />
-										</button>
-										{Astro.locals.user?.allowEdit && (
+											<Icon name={DIRECTION_ICONS[direction]} size="size-3" />
+											{DIRECTION_LABELS[direction]}
+										</span>
+									</td>
+									<td class="text-right">
+										<div class="flex justify-end gap-1.5">
 											<button
-												hx-get={`/dashboard/log/chatbot/modal/delete/${id}`}
-												class="btn btn-square btn-ghost text-error btn-xs"
+												hx-get={`/dashboard/manage/tenants/modal/chat/${tenantId}`}
+												class="btn btn-square btn-ghost btn-xs"
+												title="Chat"
+												hx-vals={JSON.stringify({ message: id })}
 											>
-												<Icon name="lucide:x" />
+												<Icon name="lucide:message-square" />
 											</button>
-										)}
-									</div>
-								</td>
-							</tr>
-						),
-					)
-				}
-			</tbody>
-		</table>
+											<button
+												hx-get={`/dashboard/log/chatbot/modal/view-message/${id}`}
+												class="btn btn-square btn-ghost btn-xs"
+												title="Lihat pesan"
+											>
+												<Icon name="lucide:eye" />
+											</button>
+											{Astro.locals.user?.allowEdit && (
+												<button
+													hx-get={`/dashboard/log/chatbot/modal/delete/${id}`}
+													class="btn btn-square btn-ghost text-error btn-xs"
+												>
+													<Icon name="lucide:x" />
+												</button>
+											)}
+										</div>
+									</td>
+								</tr>
+							),
+						)
+					}
+				</tbody>
+			</table>
+		</div>
+
+		<Pagination name="chatbot" {...pagination} />
 	</div>
 </DashboardLayout>

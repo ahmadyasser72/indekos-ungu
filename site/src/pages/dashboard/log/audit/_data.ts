@@ -5,7 +5,7 @@ import { z } from "astro/zod";
 import { countBy, uniqBy } from "es-toolkit";
 
 import type { Stat } from "~/components/data/stats.astro";
-import { periodFields, querySchema, statusSchema } from "~/lib/query";
+import { periodFields, querySchema, statusSchema, paginationFields } from "~/lib/query";
 
 export { AUDIT_ACTIONS };
 
@@ -50,6 +50,7 @@ export const auditQuerySchema = z.object({
 	...periodFields,
 	action: statusSchema(AUDIT_ACTIONS),
 	show_system: z.stringbool().catch(false),
+	...paginationFields,
 });
 
 export const ACTION_BADGES = {

@@ -6,12 +6,13 @@ import { z } from "astro/zod";
 import { countBy, uniqBy } from "es-toolkit";
 
 import type { Stat } from "~/components/data/stats.astro";
-import { periodFields, querySchema, statusSchema } from "~/lib/query";
+import { periodFields, querySchema, statusSchema, paginationFields } from "~/lib/query";
 
 export const chatbotQuerySchema = z.object({
 	query: querySchema,
 	direction: statusSchema(CHATBOT_DIRECTIONS),
 	...periodFields,
+	...paginationFields,
 });
 
 export const fetchChatbotLogs = async (

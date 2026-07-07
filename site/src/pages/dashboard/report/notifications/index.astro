@@ -6,11 +6,13 @@ import { actions } from "astro:actions";
 
 import FilterPopover from "~/components/data/filter-popover.astro";
 import FilterToolbar from "~/components/data/filter-toolbar.astro";
+import Pagination from "~/components/data/pagination.astro";
 import SearchInput from "~/components/data/search-input.astro";
 import Stats from "~/components/data/stats.astro";
 import Alert from "~/components/ui/alert.astro";
 import Icon from "~/components/ui/icon.astro";
 import DashboardLayout from "~/layouts/dashboard-layout.astro";
+import { paginateArray } from "~/lib/query";
 import {
 	fetchNotifications,
 	getNotificationStats,
@@ -29,8 +31,12 @@ Astro.locals.actionResults.push({
 
 const params = Astro.locals.parseQuery(notificationQuerySchema);
 
-const notifications = await fetchNotifications(params);
-const notificationStats = getNotificationStats(notifications);
+const allNotifications = await fetchNotifications(params);
+const notificationStats = getNotificationStats(allNotifications);
+const { items: notifications, ...pagination } = paginateArray(
+	allNotifications,
+	params,
+);
 ---
 
 <DashboardLayout
@@ -91,71 +97,77 @@ const notificationStats = getNotificationStats(notifications);
 	<Stats stats={notificationStats} />
 
 	<div
-		class="overflow-x-auto rounded-box border border-base-300 shadow-sm"
+		class="rounded-box border border-base-300 shadow-sm"
 		id="notifications-content-wrapper"
 	>
-		<table class="table w-full table-sm">
-			<thead>
-				<tr>
-					<th>Dibuat</th>
-					<th>Dikirim</th>
-					<th>Penghuni</th>
-					<th>Invoice</th>
-					<th>Tipe</th>
-					<th>Status</th>
-				</tr>
-			</thead>
-			<tbody id="notifications-table-body">
-				{
-					notifications.map(
-						({
-							createdAt,
-							sentAt,
-							tenantName,
-							roomNumber,
-							invoiceNumber,
-							type,
-							status,
-						}) => (
-							<tr>
-								<td class="font-mono text-xs">
-									{formatDate(createdAt, "DD MMM YYYY HH:mm")}
-								</td>
-								<td class="font-mono text-xs">
-									{sentAt ? formatDate(sentAt, "DD MMM YYYY HH:mm") : "-"}
-								</td>
-								<td class="flex items-center gap-2 text-sm font-semibold">
-									{tenantName}
-									<span class="badge font-mono badge-xs badge-neutral">
-										{roomNumber}
-									</span>
-								</td>
-								<td class="font-mono text-xs font-semibold">{invoiceNumber}</td>
-								<td>
-									<span
-										class:list={[
-											"badge badge-sm font-bold",
-											NOTIFICATION_TYPE_BADGES[type],
-										]}
-									>
-										{NOTIFICATION_TYPE_LABELS[type]}
-									</span>
-								</td>
-								<td>
-									<span
-										class:list={[
-											"badge badge-sm font-bold",
-											NOTIFICATION_STATUS_BADGES[status],
-										]}
-									>
-										{NOTIFICATION_STATUS_LABELS[status]}
-									</span>
-								</td>
-							</tr>
-						),
-					)
-				}
-			</tbody>
-		</table>
+		<div class="overflow-x-auto">
+			<table class="table w-full table-sm">
+				<thead>
+					<tr>
+						<th>Dibuat</th>
+						<th>Dikirim</th>
+						<th>Penghuni</th>
+						<th>Invoice</th>
+						<th>Tipe</th>
+						<th>Status</th>
+					</tr>
+				</thead>
+				<tbody id="notifications-table-body">
+					{
+						notifications.map(
+							({
+								createdAt,
+								sentAt,
+								tenantName,
+								roomNumber,
+								invoiceNumber,
+								type,
+								status,
+							}) => (
+								<tr>
+									<td class="font-mono text-xs">
+										{formatDate(createdAt, "DD MMM YYYY HH:mm")}
+									</td>
+									<td class="font-mono text-xs">
+										{sentAt ? formatDate(sentAt, "DD MMM YYYY HH:mm") : "-"}
+									</td>
+									<td class="flex items-center gap-2 text-sm font-semibold">
+										{tenantName}
+										<span class="badge font-mono badge-xs badge-neutral">
+											{roomNumber}
+										</span>
+									</td>
+									<td class="font-mono text-xs font-semibold">
+										{invoiceNumber}
+									</td>
+									<td>
+										<span
+											class:list={[
+												"badge badge-sm font-bold",
+												NOTIFICATION_TYPE_BADGES[type],
+											]}
+										>
+											{NOTIFICATION_TYPE_LABELS[type]}
+										</span>
+									</td>
+									<td>
+										<span
+											class:list={[
+												"badge badge-sm font-bold",
+												NOTIFICATION_STATUS_BADGES[status],
+											]}
+										>
+											{NOTIFICATION_STATUS_LABELS[status]}
+										</span>
+									</td>
+								</tr>
+							),
+						)
+					}
+				</tbody>
+			</table>
+		</div>
+
+		<Pagination name="notifications" {...pagination} />
 	</div>
 </DashboardLayout>

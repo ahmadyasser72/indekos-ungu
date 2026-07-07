@@ -10,7 +10,7 @@ import { z } from "astro/zod";
 import { groupBy, sumBy } from "es-toolkit";
 
 import type { Stat } from "~/components/data/stats.astro";
-import { periodFields, querySchema, statusSchema } from "~/lib/query";
+import { periodFields, querySchema, statusSchema, paginationFields } from "~/lib/query";
 
 export { INVOICE_STATUS };
 
@@ -91,6 +91,7 @@ export const transactionQuerySchema = z.object({
 	query: querySchema,
 	...periodFields,
 	status: statusSchema(INVOICE_STATUS),
+	...paginationFields,
 });
 
 export const INVOICE_STATUS_BADGES = {

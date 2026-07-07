@@ -4,12 +4,15 @@ import { formatDate } from "@indekos/utilities/date";
 import { actions } from "astro:actions";
 
 import FilterPopover from "~/components/data/filter-popover.astro";
+import { getToolbarProps } from "~/components/data/filter-toolbar.astro";
+import Pagination from "~/components/data/pagination.astro";
 import SearchInput from "~/components/data/search-input.astro";
 import Stats from "~/components/data/stats.astro";
 import ActionsMenu from "~/components/ui/actions-menu.astro";
 import Icon from "~/components/ui/icon.astro";
 import DashboardLayout from "~/layouts/dashboard-layout.astro";
 import { createActionResult } from "~/lib/form-result";
+import { paginateArray } from "~/lib/query";
 import {
 	fetchTenants,
 	getTenantsStats,
@@ -46,8 +49,9 @@ Astro.locals.actionResults.push(
 );
 
 const params = Astro.locals.parseQuery(tenantsQuerySchema);
-const tenants = await fetchTenants(params);
-const tenantsStats = getTenantsStats(tenants);
+const allTenants = await fetchTenants(params);
+const tenantsStats = getTenantsStats(allTenants);
+const { items: tenants, ...pagination } = paginateArray(allTenants, params);
 ---
 
 <DashboardLayout
@@ -80,10 +84,7 @@ const tenantsStats = getTenantsStats(tenants);
 
 	<div
 		class="flex items-center justify-end gap-2"
-		hx-include=".filter-tenants"
-		hx-select="#tenants-content-wrapper"
-		hx-swap="outerHTML transition:true"
-		hx-target="#tenants-content-wrapper"
+		{...getToolbarProps("tenants")}
 	>
 		<FilterPopover
 			name="tenants"
@@ -116,179 +117,185 @@ const tenantsStats = getTenantsStats(tenants);
 	<Stats stats={tenantsStats} />
 
 	<div
-		class="overflow-x-auto rounded-box border border-base-300 shadow-sm"
+		class="rounded-box border border-base-300 shadow-sm"
 		id="tenants-content-wrapper"
 	>
-		<table class="table w-full table-sm">
-			<thead>
-				<tr>
-					<th>Nama Penghuni</th>
-					<th>No. HP</th>
-					<th>Kamar</th>
-					<th>Awal Sewa</th>
-					<th>Akhir Sewa</th>
-					<th>Status</th>
-					<th class="text-right">Aksi</th>
-				</tr>
-			</thead>
-			<tbody id="tenants-rows">
-				{
-					tenants.map(
-						({
-							id,
-							fullName,
-							phoneNumber,
-							roomNumber,
-							startDate,
-							endDate,
-							isActive,
-							isVerified,
-						}) => {
-							const status = isActive ? "Aktif" : "Selesai";
-							return (
-								<tr class:list={[!isVerified && "opacity-60"]}>
-									<td class="font-semibold">
-										<div class="flex items-center gap-3">
-											<div class="avatar avatar-placeholder">
-												<div class="w-9 rounded-full bg-neutral text-neutral-content">
-													<span class="text-xs font-bold">
-														{fullName.slice(0, 2)}
+		<div class="overflow-x-auto">
+			<table class="table w-full table-sm">
+				<thead>
+					<tr>
+						<th>Nama Penghuni</th>
+						<th>No. HP</th>
+						<th>Kamar</th>
+						<th>Awal Sewa</th>
+						<th>Akhir Sewa</th>
+						<th>Status</th>
+						<th class="text-right">Aksi</th>
+					</tr>
+				</thead>
+				<tbody id="tenants-rows">
+					{
+						tenants.map(
+							({
+								id,
+								fullName,
+								phoneNumber,
+								roomNumber,
+								startDate,
+								endDate,
+								isActive,
+								isVerified,
+							}) => {
+								const status = isActive ? "Aktif" : "Selesai";
+								return (
+									<tr class:list={[!isVerified && "opacity-60"]}>
+										<td class="font-semibold">
+											<div class="flex items-center gap-3">
+												<div class="avatar avatar-placeholder">
+													<div class="w-9 rounded-full bg-neutral text-neutral-content">
+														<span class="text-xs font-bold">
+															{fullName.slice(0, 2)}
+														</span>
+													</div>
+												</div>
+												<div class="flex flex-col">
+													<span class="font-semibold">
+														{fullName}
+														{!isVerified && (
+															<span class="ml-1 badge align-middle badge-xs badge-warning">
+																Belum Verifikasi
+															</span>
+														)}
 													</span>
 												</div>
 											</div>
-											<div class="flex flex-col">
-												<span class="font-semibold">
-													{fullName}
-													{!isVerified && (
-														<span class="ml-1 badge align-middle badge-xs badge-warning">
-															Belum Verifikasi
-														</span>
-													)}
+										</td>
+										<td>
+											<a
+												class="btn flex items-center gap-1 btn-outline btn-success btn-xs"
+												href={`https://wa.me/${phoneNumber}`}
+												target="_blank"
+											>
+												<Icon name="lucide:phone-call" size="size-3.5" />+
+												{phoneNumber}
+											</a>
+										</td>
+										<td class="text-center">
+											{isActive ? (
+												<span class="badge font-mono badge-neutral">
+													{roomNumber}
 												</span>
-											</div>
-										</div>
-									</td>
-									<td>
-										<a
-											class="btn flex items-center gap-1 btn-outline btn-success btn-xs"
-											href={`https://wa.me/${phoneNumber}`}
-											target="_blank"
-										>
-											<Icon name="lucide:phone-call" size="size-3.5" />+
-											{phoneNumber}
-										</a>
-									</td>
-									<td class="text-center">
-										{isActive ? (
-											<span class="badge font-mono badge-neutral">
-												{roomNumber}
+											) : (
+												<span class="text-xs text-base-content/30 italic">
+													-
+												</span>
+											)}
+										</td>
+										<td class="font-mono text-xs text-base-content/70">
+											{formatDate(startDate)}
+										</td>
+										<td class="font-mono text-xs text-base-content/70">
+											{formatDate(endDate)}
+										</td>
+										<td>
+											<span
+												class:list={[
+													"badge badge-sm font-bold",
+													TENANT_STATUS_BADGES[status],
+												]}
+											>
+												{status}
 											</span>
-										) : (
-											<span class="text-xs text-base-content/30 italic">-</span>
-										)}
-									</td>
-									<td class="font-mono text-xs text-base-content/70">
-										{formatDate(startDate)}
-									</td>
-									<td class="font-mono text-xs text-base-content/70">
-										{formatDate(endDate)}
-									</td>
-									<td>
-										<span
-											class:list={[
-												"badge badge-sm font-bold",
-												TENANT_STATUS_BADGES[status],
-											]}
-										>
-											{status}
-										</span>
-									</td>
-									<td class="text-right">
-										<div class="flex justify-end gap-1.5">
-											<button
-												hx-get={`/dashboard/manage/tenants/modal/chat/${id}`}
-												class="btn flex items-center gap-1 btn-outline btn-primary btn-xs"
-											>
-												<Icon name="lucide:message-square" /> Chat
-											</button>
+										</td>
+										<td class="text-right">
+											<div class="flex justify-end gap-1.5">
+												<button
+													hx-get={`/dashboard/manage/tenants/modal/chat/${id}`}
+													class="btn flex items-center gap-1 btn-outline btn-primary btn-xs"
+												>
+													<Icon name="lucide:message-square" /> Chat
+												</button>
 
-											<button
-												hx-get={`/dashboard/manage/tenants/modal/detail/${id}`}
-												class="btn flex items-center gap-1 btn-outline btn-primary btn-xs"
-											>
-												<Icon name="lucide:file-text" /> Detail
-											</button>
+												<button
+													hx-get={`/dashboard/manage/tenants/modal/detail/${id}`}
+													class="btn flex items-center gap-1 btn-outline btn-primary btn-xs"
+												>
+													<Icon name="lucide:file-text" /> Detail
+												</button>
 
-											{Astro.locals.user?.allowEdit &&
-												(isActive ? (
-													<ActionsMenu
-														id={id}
-														menuClass="w-52"
-														triggerLabel="Aksi"
-													>
-														<li>
-															<button
-																hx-get={`/dashboard/manage/tenants/modal/edit/${id}`}
-															>
-																<Icon name="lucide:pencil" />
-																Edit
-															</button>
-														</li>
-														<li>
-															<button
-																hx-get={`/dashboard/manage/tenants/modal/move/${id}`}
-															>
-																<Icon name="lucide:arrow-right-circle" />
-																Pindah Kamar
-															</button>
-														</li>
-														<li>
-															<button
-																hx-get={
-																	"/dashboard/manage/tenants/modal/terminate/" +
-																	id
-																}
-																class="text-error"
-															>
-																<Icon name="lucide:x" /> Berhenti Menginap
-															</button>
-														</li>
-													</ActionsMenu>
-												) : (
-													<ActionsMenu
-														id={id}
-														menuClass="w-52"
-														triggerLabel="Aksi"
-													>
-														<li>
-															<button
-																hx-get={`/dashboard/manage/tenants/modal/edit/${id}`}
-															>
-																<Icon name="lucide:pencil" />
-																Edit
-															</button>
-														</li>
-														<li>
-															<button
-																hx-get={
-																	"/dashboard/manage/tenants/modal/register/" +
-																	id
-																}
-																class="text-success"
-															>
-																<Icon name="lucide:plus" /> Sewa Baru
-															</button>
-														</li>
-													</ActionsMenu>
-												))}
-										</div>
-									</td>
-								</tr>
-							);
-						},
-					)
-				}
-			</tbody>
-		</table>
+												{Astro.locals.user?.allowEdit &&
+													(isActive ? (
+														<ActionsMenu
+															id={id}
+															menuClass="w-52"
+															triggerLabel="Aksi"
+														>
+															<li>
+																<button
+																	hx-get={`/dashboard/manage/tenants/modal/edit/${id}`}
+																>
+																	<Icon name="lucide:pencil" />
+																	Edit
+																</button>
+															</li>
+															<li>
+																<button
+																	hx-get={`/dashboard/manage/tenants/modal/move/${id}`}
+																>
+																	<Icon name="lucide:arrow-right-circle" />
+																	Pindah Kamar
+																</button>
+															</li>
+															<li>
+																<button
+																	hx-get={
+																		"/dashboard/manage/tenants/modal/terminate/" +
+																		id
+																	}
+																	class="text-error"
+																>
+																	<Icon name="lucide:x" /> Berhenti Menginap
+																</button>
+															</li>
+														</ActionsMenu>
+													) : (
+														<ActionsMenu
+															id={id}
+															menuClass="w-52"
+															triggerLabel="Aksi"
+														>
+															<li>
+																<button
+																	hx-get={`/dashboard/manage/tenants/modal/edit/${id}`}
+																>
+																	<Icon name="lucide:pencil" />
+																	Edit
+																</button>
+															</li>
+															<li>
+																<button
+																	hx-get={
+																		"/dashboard/manage/tenants/modal/register/" +
+																		id
+																	}
+																	class="text-success"
+																>
+																	<Icon name="lucide:plus" /> Sewa Baru
+																</button>
+															</li>
+														</ActionsMenu>
+													))}
+											</div>
+										</td>
+									</tr>
+								);
+							},
+						)
+					}
+				</tbody>
+			</table>
+		</div>
+
+		<Pagination name="tenants" {...pagination} />
 	</div>
 </DashboardLayout>

@@ -2,11 +2,12 @@ import { db, USER_ROLES } from "@indekos/database";
 
 import { z } from "astro/zod";
 
-import { querySchema, statusSchema } from "~/lib/query";
+import { querySchema, statusSchema, paginationFields } from "~/lib/query";
 
 export const accountsQuerySchema = z.object({
 	query: querySchema,
 	role: statusSchema(USER_ROLES),
+	...paginationFields,
 });
 
 export const fetchAccounts = async (

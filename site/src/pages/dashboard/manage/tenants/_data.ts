@@ -4,7 +4,7 @@ import { z } from "astro/zod";
 import { countBy } from "es-toolkit";
 
 import type { Stat } from "~/components/data/stats.astro";
-import { querySchema, statusSchema } from "~/lib/query";
+import { querySchema, statusSchema, paginationFields } from "~/lib/query";
 
 export const TENANT_STATUS = ["active", "completed"] as const;
 
@@ -42,6 +42,7 @@ export const fetchTenants = async (
 export const tenantsQuerySchema = z.object({
 	query: querySchema,
 	status: statusSchema(TENANT_STATUS),
+	...paginationFields,
 });
 
 // Keys are derived display values (not from DB schema)

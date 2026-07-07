@@ -1,0 +1,114 @@
+---
+import type { PaginationResult } from "~/lib/query";
+import { getToolbarProps } from "./filter-toolbar.astro";
+
+export interface Props extends Omit<PaginationResult<unknown>, "items"> {
+	name: string;
+}
+
+const { name, page, totalPages, total, pageSize } = Astro.props;
+
+const start = total === 0 ? 0 : (page - 1) * pageSize + 1;
+const end = Math.min(page * pageSize, total);
+
+const pages: number[] = [];
+const startPage = Math.max(1, page - 2);
+const endPage = Math.min(totalPages, page + 2);
+for (let i = startPage; i <= endPage; i++) {
+	pages.push(i);
+}
+
+const hxVals = (p: number) => JSON.stringify({ page: p, "page-size": pageSize });
+---
+
+{
+	total > 0 && (
+		<div
+			class="flex items-center justify-center gap-4 border-t border-base-200 p-4 max-sm:flex-col sm:justify-end"
+			{...getToolbarProps(name)}
+		>
+			<span class="text-sm text-base-content/60">
+				{start}–{end} dari {total}
+			</span>
+
+			<div class="join">
+				{page > 1 && (
+					<a
+						hx-get
+						class="btn join-item btn-sm"
+						href={`?page=${page - 1}&page-size=${pageSize}`}
+						hx-vals={hxVals(page - 1)}
+					>
+						«
+					</a>
+				)}
+
+				{startPage > 1 && (
+					<a
+						hx-get
+						class="btn join-item btn-sm"
+						href={`?page=1&page-size=${pageSize}`}
+						hx-vals={hxVals(1)}
+					>
+						1
+					</a>
+				)}
+				{startPage > 2 && (
+					<span class="btn btn-disabled join-item btn-sm">…</span>
+				)}
+
+				{pages.map((value) => (
+					<a
+						hx-get
+						href={`?page=${value}&page-size=${pageSize}`}
+						hx-vals={hxVals(value)}
+						class:list={[
+							"btn join-item btn-sm",
+							value === page && "btn-active",
+						]}
+					>
+						{value}
+					</a>
+				))}
+
+				{endPage < totalPages - 1 && (
+					<span class="btn btn-disabled join-item btn-sm">…</span>
+				)}
+				{endPage < totalPages && (
+					<a
+						hx-get
+						class="btn join-item btn-sm"
+						href={`?page=${totalPages}&page-size=${pageSize}`}
+						hx-vals={hxVals(totalPages)}
+					>
+						{totalPages}
+					</a>
+				)}
+
+				{page < totalPages && (
+					<a
+						hx-get
+						class="btn join-item btn-sm"
+						href={`?page=${page + 1}&page-size=${pageSize}`}
+						hx-vals={hxVals(page + 1)}
+					>
+						»
+					</a>
+				)}
+			</div>
+
+			<select
+				hx-get
+				class="select w-max select-sm sm:max-w-28"
+				name="page-size"
+				hx-vals={hxVals(1)}
+			>
+				{[10, 25, 50, 100].map((size) => (
+					<option value={size} selected={size === pageSize}>
+						{size} / page
+					</option>
+				))}
+			</select>
+		</div>
+	)
+}

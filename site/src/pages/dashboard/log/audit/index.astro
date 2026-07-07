@@ -5,10 +5,12 @@ import { actions } from "astro:actions";
 
 import FilterPopover from "~/components/data/filter-popover.astro";
 import FilterToolbar from "~/components/data/filter-toolbar.astro";
+import Pagination from "~/components/data/pagination.astro";
 import SearchInput from "~/components/data/search-input.astro";
 import Stats from "~/components/data/stats.astro";
 import Icon from "~/components/ui/icon.astro";
 import DashboardLayout from "~/layouts/dashboard-layout.astro";
+import { paginateArray } from "~/lib/query";
 import {
 	ACTION_BADGES,
 	AUDIT_ACTIONS,
@@ -26,8 +28,9 @@ Astro.locals.actionResults.push({
 
 const params = Astro.locals.parseQuery(auditQuerySchema);
 
-const auditLogs = await fetchAuditLogs(params);
-const auditStats = getAuditStats(auditLogs);
+const allAuditLogs = await fetchAuditLogs(params);
+const auditStats = getAuditStats(allAuditLogs);
+const { items: auditLogs, ...pagination } = paginateArray(allAuditLogs, params);
 ---
 
 <DashboardLayout
@@ -79,75 +82,79 @@ const auditStats = getAuditStats(auditLogs);
 	<Stats stats={auditStats} />
 
 	<div
-		class="overflow-x-auto rounded-box border border-base-300 shadow-sm"
+		class="rounded-box border border-base-300 shadow-sm"
 		id="audit-content-wrapper"
 	>
-		<table class="table w-full table-sm">
-			<thead>
-				<tr>
-					<th class="w-48">Waktu Kejadian</th>
-					<th>Pengguna</th>
-					<th class="w-32">Jenis Aksi</th>
-					<th>Tabel Target</th>
-					<th>ID Record</th>
-					<th class="w-28">Detail</th>
-					<th class="w-16 text-right">Aksi</th>
-				</tr>
-			</thead>
-			<tbody>
-				{
-					auditLogs.map(
-						({
-							id,
-							createdAt,
-							displayName,
-							action,
-							tableName,
-							recordId,
-							details,
-						}) => (
-							<tr>
-								<td class="font-mono">
-									{formatDate(createdAt, "DD MMM YYYY HH:mm:ss")}
-								</td>
-								<td>
-									<div class="flex items-center gap-1.5">
-										<Icon class="text-base-content/40" name="lucide:user" />
-										{displayName}
-									</div>
-								</td>
-								<td>
-									<span
-										class:list={[
-											"badge badge-xs font-bold",
-											ACTION_BADGES[action],
-										]}
-									>
-										{action}
-									</span>
-								</td>
-								<td class="font-mono">{tableName}</td>
-								<td class="font-mono">
-									<span class="rounded border border-base-300 bg-base-200 px-2 py-0.5 font-bold">
-										{recordId}
-									</span>
-								</td>
-								<DetailColumn {details} />
-								<td class="text-right">
-									{Astro.locals.user?.allowEdit && (
-										<button
-											hx-get={`/dashboard/log/audit/modal/delete/${id}`}
-											class="btn btn-square btn-ghost text-error btn-xs"
+		<div class="overflow-x-auto">
+			<table class="table w-full table-sm">
+				<thead>
+					<tr>
+						<th class="w-48">Waktu Kejadian</th>
+						<th>Pengguna</th>
+						<th class="w-32">Jenis Aksi</th>
+						<th>Tabel Target</th>
+						<th>ID Record</th>
+						<th class="w-28">Detail</th>
+						<th class="w-16 text-right">Aksi</th>
+					</tr>
+				</thead>
+				<tbody>
+					{
+						auditLogs.map(
+							({
+								id,
+								createdAt,
+								displayName,
+								action,
+								tableName,
+								recordId,
+								details,
+							}) => (
+								<tr>
+									<td class="font-mono">
+										{formatDate(createdAt, "DD MMM YYYY HH:mm:ss")}
+									</td>
+									<td>
+										<div class="flex items-center gap-1.5">
+											<Icon class="text-base-content/40" name="lucide:user" />
+											{displayName}
+										</div>
+									</td>
+									<td>
+										<span
+											class:list={[
+												"badge badge-xs font-bold",
+												ACTION_BADGES[action],
+											]}
 										>
-											<Icon name="lucide:x" />
-										</button>
-									)}
-								</td>
-							</tr>
-						),
-					)
-				}
-			</tbody>
-		</table>
+											{action}
+										</span>
+									</td>
+									<td class="font-mono">{tableName}</td>
+									<td class="font-mono">
+										<span class="rounded border border-base-300 bg-base-200 px-2 py-0.5 font-bold">
+											{recordId}
+										</span>
+									</td>
+									<DetailColumn {details} />
+									<td class="text-right">
+										{Astro.locals.user?.allowEdit && (
+											<button
+												hx-get={`/dashboard/log/audit/modal/delete/${id}`}
+												class="btn btn-square btn-ghost text-error btn-xs"
+											>
+												<Icon name="lucide:x" />
+											</button>
+										)}
+									</td>
+								</tr>
+							),
+						)
+					}
+				</tbody>
+			</table>
+		</div>
+
+		<Pagination name="audit" {...pagination} />
 	</div>
 </DashboardLayout>

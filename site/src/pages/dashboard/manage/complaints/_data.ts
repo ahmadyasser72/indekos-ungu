@@ -5,7 +5,7 @@ import { z } from "astro/zod";
 import { countBy } from "es-toolkit";
 
 import type { Stat } from "~/components/data/stats.astro";
-import { periodFields, querySchema, statusSchema } from "~/lib/query";
+import { periodFields, querySchema, statusSchema, paginationFields } from "~/lib/query";
 
 export const fetchComplaints = async (
 	params: z.infer<typeof complaintQuerySchema>,
@@ -77,6 +77,7 @@ export const complaintQuerySchema = z.object({
 	query: querySchema,
 	status: statusSchema(COMPLAINT_STATUS),
 	...periodFields,
+	...paginationFields,
 });
 
 export const COMPLAINT_STATUS_BADGES = {

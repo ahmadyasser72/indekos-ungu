@@ -5,7 +5,7 @@ import { z } from "astro/zod";
 import { countBy } from "es-toolkit";
 
 import type { Stat } from "~/components/data/stats.astro";
-import { querySchema, statusSchema } from "~/lib/query";
+import { querySchema, statusSchema, paginationFields } from "~/lib/query";
 
 export const ROOM_STATUS = ["occupied", "vacant", "inactive"] as const;
 
@@ -88,6 +88,7 @@ export const roomQuerySchema = z.object({
 	query: querySchema,
 	status: statusSchema(ROOM_STATUS),
 	type: statusSchema(ROOM_TYPES),
+	...paginationFields,
 });
 
 export const ROOM_TYPE_LABELS = {

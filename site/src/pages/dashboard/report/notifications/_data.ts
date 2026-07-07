@@ -6,13 +6,14 @@ import { z } from "astro/zod";
 import { countBy } from "es-toolkit";
 
 import type { Stat } from "~/components/data/stats.astro";
-import { periodFields, querySchema, statusSchema } from "~/lib/query";
+import { periodFields, querySchema, statusSchema, paginationFields } from "~/lib/query";
 
 export const notificationQuerySchema = z.object({
 	query: querySchema,
 	...periodFields,
 	type: statusSchema(NOTIFICATION_TYPES),
 	status: statusSchema(NOTIFICATION_STATUS),
+	...paginationFields,
 });
 
 export const fetchNotifications = async (
