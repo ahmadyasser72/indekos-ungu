@@ -1,7 +1,6 @@
+import { afterAll, beforeAll, describe, expect, it, mock } from "bun:test";
 import { db } from "@indekos/database";
 import { tenants, type Tenant } from "@indekos/database/schema";
-
-import { afterAll, beforeAll, describe, expect, it, mock } from "bun:test";
 
 import { submitComplaint } from "../submit-complaint";
 

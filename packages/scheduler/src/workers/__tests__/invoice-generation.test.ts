@@ -1,12 +1,3 @@
-import { db } from "@indekos/database";
-import {
-	leases,
-	rooms,
-	tenants,
-	users,
-	type User,
-} from "@indekos/database/schema";
-
 import {
 	afterAll,
 	beforeAll,
@@ -16,6 +7,14 @@ import {
 	it,
 	mock,
 } from "bun:test";
+import { db } from "@indekos/database";
+import {
+	leases,
+	rooms,
+	tenants,
+	users,
+	type User,
+} from "@indekos/database/schema";
 
 import { runInvoiceGeneration } from "../invoice-generation";
 
