@@ -72,7 +72,7 @@ export const notifyStaffNewComplaint = async (
 		await sendPush(users, {
 			title: `Komplain Baru dari ${tenant.fullName}`,
 			body: complaint.description,
-			url: "/dashboard/complaints",
+			url: "/dashboard/manage/complaints",
 			imagePath: complaint.imagePath ?? undefined,
 		});
 	} catch (err) {
