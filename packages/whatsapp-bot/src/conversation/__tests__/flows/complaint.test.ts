@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, mock } from "bun:test";
 
+import { complaintFlow } from "../../flows/complaint";
 import type { ConversationSession, MessageInput } from "../../types";
 
 const mockCreateComplaint = mock(
@@ -22,9 +23,6 @@ mock.module("../../../template", () => ({
 	render: mockRender,
 }));
 
-// dynamic import after mock setup
-const { komplainFlow } = await import("../../flows/komplain");
-
 const makeSession = (
 	overrides?: Partial<ConversationSession>,
 ): ConversationSession => ({
@@ -35,6 +33,15 @@ const makeSession = (
 		phoneNumber: "123",
 		originRegion: "Jakarta",
 		isVerified: true,
+		lease: {
+			room: {
+				id: 1,
+				roomNumber: "101",
+				roomType: "standard",
+				monthlyPrice: 1000000,
+				isActive: true,
+			},
+		},
 	},
 	flow: "komplain",
 	step: "prompt",
@@ -59,7 +66,7 @@ describe("komplainFlow", () => {
 	describe("prompt step", () => {
 		it('cancels on "batal"', async () => {
 			const session = makeSession();
-			const result = await komplainFlow.steps.prompt(text("batal"), session);
+			const result = await complaintFlow.steps.prompt(text("batal"), session);
 
 			expect(result.reply).toBe("❌ Komplain dibatalkan.");
 			expect(result.next).toBeNull();
@@ -68,7 +75,7 @@ describe("komplainFlow", () => {
 
 		it('cancels on "komplain batal" (strips prefix)', async () => {
 			const session = makeSession();
-			const result = await komplainFlow.steps.prompt(
+			const result = await complaintFlow.steps.prompt(
 				text("komplain batal"),
 				session,
 			);
@@ -79,7 +86,7 @@ describe("komplainFlow", () => {
 
 		it("processes complaint when image provided without text", async () => {
 			const session = makeSession();
-			const result = await komplainFlow.steps.prompt(withImage(), session);
+			const result = await complaintFlow.steps.prompt(withImage(), session);
 
 			expect(mockCreateComplaint).toHaveBeenCalledWith(
 				session.tenant,
@@ -92,7 +99,10 @@ describe("komplainFlow", () => {
 
 		it("processes complaint when text provided", async () => {
 			const session = makeSession();
-			const result = await komplainFlow.steps.prompt(text("AC rusak"), session);
+			const result = await complaintFlow.steps.prompt(
+				text("AC rusak"),
+				session,
+			);
 
 			expect(mockCreateComplaint).toHaveBeenCalledWith(
 				session.tenant,
@@ -105,7 +115,7 @@ describe("komplainFlow", () => {
 
 		it("strips 'komplain ' prefix from text", async () => {
 			const session = makeSession();
-			await komplainFlow.steps.prompt(text("komplain AC rusak"), session);
+			await complaintFlow.steps.prompt(text("komplain AC rusak"), session);
 
 			expect(mockCreateComplaint).toHaveBeenCalledWith(
 				session.tenant,
@@ -114,9 +124,30 @@ describe("komplainFlow", () => {
 			);
 		});
 
+		it("returns no-lease message when tenant has no active lease", async () => {
+			const session = makeSession({
+				tenant: {
+					id: 1,
+					fullName: "Test",
+					phoneNumber: "123",
+					originRegion: "Jakarta",
+					isVerified: true,
+					lease: null,
+				},
+			});
+			const result = await complaintFlow.steps.prompt(
+				text("komplain AC rusak"),
+				session,
+			);
+
+			expect(result.reply).toContain("no-lease-complaint");
+			expect(result.next).toBeNull();
+			expect(mockCreateComplaint).not.toHaveBeenCalled();
+		});
+
 		it("transitions to collect step when no text and no image", async () => {
 			const session = makeSession();
-			const result = await komplainFlow.steps.prompt(text(""), session);
+			const result = await complaintFlow.steps.prompt(text(""), session);
 
 			expect(result.reply).toBe("rendered:complaint-prompt");
 			expect(result.next).toBe("collect");
@@ -127,15 +158,37 @@ describe("komplainFlow", () => {
 	describe("collect step", () => {
 		it('cancels on "batal"', async () => {
 			const session = makeSession({ step: "collect" });
-			const result = await komplainFlow.steps.collect(text("batal"), session);
+			const result = await complaintFlow.steps.collect(text("batal"), session);
 
 			expect(result.reply).toBe("❌ Komplain dibatalkan.");
 			expect(result.next).toBeNull();
 		});
 
+		it("returns no-lease message when tenant has no active lease", async () => {
+			const session = makeSession({
+				step: "collect",
+				tenant: {
+					id: 1,
+					fullName: "Test",
+					phoneNumber: "123",
+					originRegion: "Jakarta",
+					isVerified: true,
+					lease: null,
+				},
+			});
+			const result = await complaintFlow.steps.collect(
+				text("AC rusak"),
+				session,
+			);
+
+			expect(result.reply).toContain("no-lease-complaint");
+			expect(result.next).toBeNull();
+			expect(mockCreateComplaint).not.toHaveBeenCalled();
+		});
+
 		it("validates minimum text length when no image", async () => {
 			const session = makeSession({ step: "collect" });
-			const result = await komplainFlow.steps.collect(text("ab"), session);
+			const result = await complaintFlow.steps.collect(text("ab"), session);
 
 			expect(result.reply).toContain("min 5 karakter");
 			expect(result.next).toBeNull();
@@ -143,7 +196,7 @@ describe("komplainFlow", () => {
 
 		it("processes complaint with valid text and notifies staff", async () => {
 			const session = makeSession({ step: "collect" });
-			const result = await komplainFlow.steps.collect(
+			const result = await complaintFlow.steps.collect(
 				text("AC kamar tidak dingin"),
 				session,
 			);

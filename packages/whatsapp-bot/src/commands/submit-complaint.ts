@@ -1,9 +1,13 @@
-import type { Tenant } from "@indekos/database/schema";
-
+import type { ConversationSession } from "../conversation/types";
 import { submitComplaintResponse } from "../lib/complaint";
+import { render } from "../template";
 
-export const submitComplaint = (
-	tenant: Tenant,
+export const submitComplaint = async (
+	tenant: ConversationSession["tenant"],
 	text: string,
 	image?: { buffer: Buffer; mimetype: string },
-): Promise<string> => submitComplaintResponse(tenant, text, image);
+): Promise<string> => {
+	if (!tenant.lease) return render("no-lease-complaint", {});
+
+	return submitComplaintResponse(tenant, text, image);
+};

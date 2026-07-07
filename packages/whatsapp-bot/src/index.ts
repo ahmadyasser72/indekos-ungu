@@ -4,7 +4,6 @@ import {
 	auditLogs,
 	chatbotMessages,
 	tenants,
-	type Tenant,
 } from "@indekos/database/schema";
 import { createLogger } from "@indekos/utilities/logger";
 
@@ -23,9 +22,9 @@ import { listComplaints } from "./commands/list-complaints";
 import { paymentHistory } from "./commands/payment-history";
 import { submitComplaint } from "./commands/submit-complaint";
 import { tenantInfo } from "./commands/tenant-info";
-import { komplainFlow } from "./conversation/flows/komplain";
+import { complaintFlow } from "./conversation/flows/complaint";
 import { ConversationManager } from "./conversation/manager";
-import type { MessageInput } from "./conversation/types";
+import type { ConversationSession, MessageInput } from "./conversation/types";
 import {
 	pollInProgressComplaints,
 	pollResolvedComplaints,
@@ -36,7 +35,7 @@ import { render } from "./template";
 const unknownCooldowns = new Map<string, number>();
 
 const conversationManager = new ConversationManager();
-conversationManager.registerFlow(komplainFlow);
+conversationManager.registerFlow(complaintFlow);
 
 export const main = async () => {
 	const botUser = await db.query.users.findFirst({
@@ -136,6 +135,12 @@ export const main = async () => {
 			const phone = jid.replace("@s.whatsapp.net", "");
 			const tenant = await db.query.tenants.findFirst({
 				where: { phoneNumber: phone },
+				with: {
+					lease: {
+						columns: {},
+						with: { room: true },
+					},
+				},
 			});
 
 			if (!tenant) {
@@ -224,7 +229,7 @@ export const main = async () => {
 			}
 
 			if (lower === "komplain") {
-				conversationManager.startSession(jid, tenant, "komplain");
+				conversationManager.startSession(jid, tenant, "complaint");
 
 				const reply = await conversationManager.handleMessage(
 					jid,
@@ -270,7 +275,7 @@ export const main = async () => {
 };
 
 const processCommand = async (
-	tenant: Tenant,
+	tenant: ConversationSession["tenant"],
 	text: string,
 	image?: { buffer: Buffer; mimetype: string },
 ): Promise<string> => {

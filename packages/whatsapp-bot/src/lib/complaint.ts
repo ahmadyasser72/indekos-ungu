@@ -1,15 +1,12 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { db, eq } from "@indekos/database";
-import {
-	complaints,
-	type Complaint,
-	type Tenant,
-} from "@indekos/database/schema";
+import { complaints, type Complaint } from "@indekos/database/schema";
 import { UPLOADS_DIR } from "@indekos/utilities/database";
 import { formatDate } from "@indekos/utilities/date";
 import { sendPush } from "@indekos/utilities/push";
 
+import type { ActiveTenant, MessageInput } from "../conversation/types";
 import { render } from "../template";
 
 export const saveComplaintImage = async (
@@ -31,9 +28,9 @@ export const saveComplaintImage = async (
 };
 
 export const createComplaint = async (
-	tenant: Tenant,
+	tenant: ActiveTenant,
 	description: string,
-	image?: { buffer: Buffer; mimetype: string },
+	image?: MessageInput["image"],
 ) => {
 	const [newComplaint] = await db
 		.insert(complaints)
@@ -62,7 +59,7 @@ export const createComplaint = async (
 };
 
 export const notifyStaffNewComplaint = async (
-	tenant: Tenant,
+	tenant: ActiveTenant,
 	complaint: Pick<Complaint, "description" | "imagePath">,
 ) => {
 	try {
@@ -84,7 +81,7 @@ export const notifyStaffNewComplaint = async (
 };
 
 export const submitComplaintResponse = async (
-	tenant: Tenant,
+	tenant: ActiveTenant,
 	text: string,
 	image?: { buffer: Buffer; mimetype: string },
 ) => {

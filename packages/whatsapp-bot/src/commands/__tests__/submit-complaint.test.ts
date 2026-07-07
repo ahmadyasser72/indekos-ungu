@@ -1,7 +1,9 @@
-import { afterAll, beforeAll, describe, expect, it, mock } from "bun:test";
 import { db } from "@indekos/database";
-import { tenants, users, type Tenant } from "@indekos/database/schema";
+import { tenants, users } from "@indekos/database/schema";
 
+import { afterAll, beforeAll, describe, expect, it, mock } from "bun:test";
+
+import type { ActiveTenant } from "../../conversation/types";
 import { submitComplaint } from "../submit-complaint";
 
 const mockSendPush = mock(() => Promise.resolve({ sent: 0 }));
@@ -10,7 +12,7 @@ mock.module("@indekos/utilities/push", () => ({
 	sendPush: mockSendPush,
 }));
 
-let testTenant: Tenant;
+let testTenant: ActiveTenant;
 
 beforeAll(async () => {
 	db.run("BEGIN");
@@ -30,9 +32,21 @@ beforeAll(async () => {
 		})
 		.returning({ id: tenants.id });
 
-	testTenant = (await db.query.tenants.findFirst({
+	const dbTenant = await db.query.tenants.findFirst({
 		where: { id: tenant.id },
-	}))!;
+	});
+	testTenant = {
+		...dbTenant!,
+		lease: {
+			room: {
+				id: 1,
+				roomNumber: "101",
+				roomType: "standard",
+				monthlyPrice: 1000000,
+				isActive: true,
+			},
+		},
+	};
 });
 
 afterAll(() => {
@@ -71,6 +85,22 @@ describe("submitComplaint", () => {
 		const result = await submitComplaint(testTenant, "komplain ");
 
 		expect(result).toContain("Ajukan Komplain");
+	});
+
+	it("returns no-lease message when tenant has no active lease", async () => {
+		const result = await submitComplaint(
+			{
+				id: 999,
+				fullName: "No Lease",
+				phoneNumber: "123",
+				originRegion: null,
+				isVerified: true,
+				lease: null,
+			},
+			"komplain AC rusak",
+		);
+
+		expect(result).toContain("belum punya sewa kamar aktif");
 	});
 
 	it("does not insert complaint for invalid input", async () => {

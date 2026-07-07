@@ -1,8 +1,16 @@
-import type { Tenant } from "@indekos/database/schema";
+import type { Room, Tenant } from "@indekos/database/schema";
+
+export interface ActiveTenant extends Tenant {
+	lease: { room: Room };
+}
+
+export interface InactiveTenant extends Tenant {
+	lease: null;
+}
 
 export interface ConversationSession {
 	jid: string;
-	tenant: Tenant;
+	tenant: ActiveTenant | InactiveTenant;
 	flow: string;
 	step: string;
 	lastActivity: number;

@@ -1,5 +1,3 @@
-import type { Tenant } from "@indekos/database/schema";
-
 import type { ConversationSession, FlowDef, MessageInput } from "./types";
 
 const SESSION_TIMEOUT_MS = 5 * 60 * 1_000; // 5 menit inactivity
@@ -31,7 +29,11 @@ export class ConversationManager {
 	}
 
 	/** Start new session for a JID. */
-	startSession(jid: string, tenant: Tenant, flowName: string): void {
+	startSession(
+		jid: string,
+		tenant: ConversationSession["tenant"],
+		flowName: string,
+	): void {
 		const flow = this.flows.get(flowName);
 		if (!flow) throw new Error(`Flow '${flowName}' not registered`);
 
@@ -42,7 +44,7 @@ export class ConversationManager {
 			step: flow.initialStep,
 			lastActivity: Date.now(),
 			data: {},
-		});
+    });
 
 		if (!this.cleanupTimer) this.startCleanup();
 	}

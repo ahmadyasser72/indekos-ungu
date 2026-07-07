@@ -9,6 +9,7 @@ const mockTenant = {
 	phoneNumber: "123",
 	originRegion: "Jakarta",
 	isVerified: true,
+	lease: null,
 };
 
 const multiStepFlow: FlowDef = {
