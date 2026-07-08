@@ -6,7 +6,7 @@ import {
 } from "@indekos/database/schema";
 import { sendPush } from "@indekos/utilities/push";
 
-import { defineAction } from "astro:actions";
+import { ActionError, defineAction } from "astro:actions";
 import { z } from "astro/zod";
 
 export const subscribe = defineAction({
@@ -17,6 +17,13 @@ export const subscribe = defineAction({
 	}),
 	handler: async (input, context) => {
 		const user = context.locals.user!;
+
+		if (user.role === "admin") {
+			throw new ActionError({
+				code: "FORBIDDEN",
+				message: "Notifikasi tidak tersedia untuk akun admin.",
+			});
+		}
 
 		await db.insert(pushSubscriptions).values({
 			userId: user.id,
@@ -34,8 +41,6 @@ export const subscribe = defineAction({
 				endpoint: input.endpoint,
 			}),
 		});
-
-		return { success: true };
 	},
 });
 
@@ -56,8 +61,6 @@ export const unsubscribe = defineAction({
 				endpoint,
 			}),
 		});
-
-		return { success: true };
 	},
 });
 
@@ -81,7 +84,5 @@ export const test = defineAction({
 				user.id,
 			),
 		});
-
-		return { sent: result.sent };
 	},
 });

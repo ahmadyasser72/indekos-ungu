@@ -1,7 +1,8 @@
 ---
 import Icon from "~/components/ui/icon.astro";
 
-const pushActive = !!(await Astro.session?.get("pushEndpoint"));
+const pushEndpoint = await Astro.session?.get("pushEndpoint");
+const pushActive = !!pushEndpoint;
 ---
 
 <button
@@ -113,8 +114,9 @@ const pushActive = !!(await Astro.session?.get("pushEndpoint"));
 					subscription = null;
 					showClientSideToast(
 						"error",
-						"Gagal mendaftarkan notifikasi browser.",
+						"Gagal mendaftarkan notifikasi browser. " + error.message,
 					);
+					return error;
 				}
 			};
 
@@ -127,7 +129,7 @@ const pushActive = !!(await Astro.session?.get("pushEndpoint"));
 				if (error) {
 					console.error("Failed to remove subscription:", error);
 					showClientSideToast("error", "Gagal menghapus notifikasi browser.");
-					return;
+					return error;
 				}
 
 				await subscription.unsubscribe();
@@ -138,16 +140,19 @@ const pushActive = !!(await Astro.session?.get("pushEndpoint"));
 				pushToggle.disabled = true;
 
 				const subscribed = pushToggle.dataset.active === "true";
-				await (subscribed ? unsubscribe : subscribe)();
-				syncLocalSubscription(subscription);
-				await htmx.ajax("get", document.URL, {
-					select: "#notification-popover > li",
-					selectOOB: "#notification-popover-button",
-					target: "#notification-popover",
-					headers: {
-						"push-endpoint": localStorage.getItem("subscriptionEndpoint") ?? "",
-					},
-				});
+				const error = await (subscribed ? unsubscribe : subscribe)();
+				if (!error) {
+					syncLocalSubscription(subscription);
+					await htmx.ajax("get", document.URL, {
+						select: "#notification-popover > li",
+						selectOOB: "#notification-popover-button",
+						target: "#notification-popover",
+						headers: {
+							"push-endpoint":
+								localStorage.getItem("subscriptionEndpoint") ?? "",
+						},
+					});
+				}
 
 				pushToggle.disabled = false;
 			});
