@@ -129,7 +129,7 @@ const auditStats = getAuditStats(auditLogs);
 								<td class="font-mono">{tableName}</td>
 								<td class="font-mono">
 									<span class="rounded border border-base-300 bg-base-200 px-2 py-0.5 font-bold">
-										{recordId}
+										{recordId ?? "-"}
 									</span>
 								</td>
 								<DetailColumn {details} />

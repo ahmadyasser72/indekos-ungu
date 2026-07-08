@@ -36,7 +36,7 @@ const targetId = `#${name}-content-wrapper`;
 						Pilih Periode:
 					</span>
 					<input
-						hx-get
+						hx-get={Astro.url.pathname}
 						class={`input input-sm ${filterClass} w-full sm:w-40`}
 						name="from"
 						type="month"
@@ -46,7 +46,7 @@ const targetId = `#${name}-content-wrapper`;
 						Sampai:
 					</span>
 					<input
-						hx-get
+						hx-get={Astro.url.pathname}
 						class={`input input-sm ${filterClass} w-full sm:w-40`}
 						name="to"
 						type="month"
@@ -56,6 +56,7 @@ const targetId = `#${name}-content-wrapper`;
 				</div>
 			)
 		}
+
 		<div class="flex gap-2">
 			<slot name="actions" />
 		</div>

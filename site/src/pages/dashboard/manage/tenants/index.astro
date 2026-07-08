@@ -244,10 +244,7 @@ const tenantsStats = getTenantsStats(tenants);
 														</li>
 														<li>
 															<button
-																hx-get={
-																	"/dashboard/manage/tenants/modal/terminate/" +
-																	id
-																}
+																hx-get={`/dashboard/manage/tenants/modal/terminate/${id}`}
 																class="text-error"
 															>
 																<Icon name="lucide:x" /> Berhenti Menginap
@@ -270,10 +267,7 @@ const tenantsStats = getTenantsStats(tenants);
 														</li>
 														<li>
 															<button
-																hx-get={
-																	"/dashboard/manage/tenants/modal/register/" +
-																	id
-																}
+																hx-get={`/dashboard/manage/tenants/modal/register/${id}`}
 																class="text-success"
 															>
 																<Icon name="lucide:plus" /> Sewa Baru

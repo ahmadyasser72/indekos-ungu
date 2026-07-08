@@ -47,15 +47,16 @@ const { name, groups, checkbox } = Astro.props;
 				{group.title && <li class="menu-title">{group.title}</li>}
 				<div class="filter mx-2 mb-4 gap-y-1">
 					<input
-						hx-get
+						hx-get={Astro.url.pathname}
 						class={`filter-reset btn btn-sm filter-${name}`}
 						name={group.name}
 						type="radio"
 						value="reset"
 					/>
+
 					{group.options.map((opt) => (
 						<input
-							hx-get
+							hx-get={Astro.url.pathname}
 							class={`btn btn-sm filter-${name}`}
 							name={group.name}
 							type="radio"
@@ -73,13 +74,14 @@ const { name, groups, checkbox } = Astro.props;
 		checkbox && (
 			<label class="label-sm mx-2 label">
 				<input
-					hx-get
+					hx-get={Astro.url.pathname}
 					class={`checkbox checkbox-sm filter-${name}`}
 					name={checkbox.name}
 					type="checkbox"
-					value={checkbox.value ?? "1"}
+					value={checkbox.value}
 					checked={checkbox.checked}
 				/>
+
 				{checkbox.label}
 			</label>
 		)

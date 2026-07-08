@@ -22,7 +22,7 @@ const [recentNotifications, allNotifications] = pushActive
 ---
 
 <div
-	hx-get
+	hx-get="/dashboard/empty"
 	hx-trigger="load delay:30s"
 	class="indicator"
 	id="notification-popover-button"
@@ -50,7 +50,7 @@ const [recentNotifications, allNotifications] = pushActive
 	</button>
 </div>
 <div
-	hx-get
+	hx-get="/dashboard/empty"
 	hx-trigger="intersect"
 	class="dropdown dropdown-end mt-2 w-80 rounded-box bg-base-100 shadow-xl"
 	id="notification-popover"

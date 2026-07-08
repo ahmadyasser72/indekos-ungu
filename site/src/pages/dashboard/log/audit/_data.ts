@@ -25,8 +25,8 @@ export const fetchAuditLogs = async (
 				],
 			}),
 			createdAt: { gte: startDate, lte: endDate },
+			user: { role: params.show_system ? "system" : { ne: "system" } },
 			...(params.action && { action: params.action }),
-			...(!params.show_system && { user: { role: { ne: "system" } } }),
 		},
 		with: {
 			user: {

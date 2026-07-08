@@ -29,7 +29,10 @@ if (params.from) {
 const subtitle = filterParts.length > 0 ? filterParts.join(" | ") : undefined;
 ---
 
-<ReportLayout title="Laporan Aktivitas Pengguna" subtitle={subtitle}>
+<ReportLayout
+	title={`Laporan Aktivitas ${params.show_system ? "Sistem" : "Pengguna"}`}
+	subtitle={subtitle}
+>
 	<ReportStats stats={auditStats} />
 
 	<table>
@@ -58,10 +61,17 @@ const subtitle = filterParts.length > 0 ? filterParts.join(" | ") : undefined;
 							<td class="text-center font-bold uppercase" rowspan="2">
 								{row.action}
 							</td>
-							<td class="font-mono text-[10px]">{row.tableName}</td>
-							<td class="text-center font-mono text-[10px]">
-								{row.recordId ?? "-"}
+							<td
+								class="font-mono text-[10px]"
+								colspan={!row.recordId ? "2" : undefined}
+							>
+								{row.tableName}
 							</td>
+							{row.recordId && (
+								<td class="text-center font-mono text-[10px]">
+									{row.recordId}
+								</td>
+							)}
 						</tr>
 						<tr>
 							<td colspan="2">{row.details?.description ?? "-"}</td>

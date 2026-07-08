@@ -3,7 +3,7 @@ import IconLoader from "~/components/ui/icon-loader.astro";
 
 interface Props {
 	formId: string;
-	btnId: string;
+	buttonId: string;
 	label?: string;
 	submitClass?: string;
 	cancelLabel?: string;
@@ -11,7 +11,7 @@ interface Props {
 
 const {
 	formId,
-	btnId,
+	buttonId,
 	label = "Simpan",
 	submitClass = "btn-primary",
 	cancelLabel = "Batal",
@@ -22,7 +22,7 @@ const {
 	<button class="btn btn-outline btn-sm">{cancelLabel}</button>
 	<button
 		class={`btn ${submitClass} btn-sm`}
-		id={btnId}
+		id={buttonId}
 		type="submit"
 		form={formId}
 	>

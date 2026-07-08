@@ -13,7 +13,7 @@ const { filterClass, value, placeholder } = Astro.props;
 <label class="input w-full input-sm sm:max-w-xs">
 	<Icon name="lucide:search" />
 	<input
-		hx-get
+		hx-get={Astro.url.pathname}
 		hx-trigger="input changed delay:300ms"
 		class={filterClass}
 		name="query"

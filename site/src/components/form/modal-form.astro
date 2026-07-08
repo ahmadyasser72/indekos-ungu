@@ -26,7 +26,7 @@ const {
 	hx-post={action}
 	class={hidden ? "hidden" : "flex flex-col gap-4"}
 	id={`${modalId}_form`}
-	hx-indicator={`#${modalId}_btn`}
+	hx-indicator={`#${modalId}_button`}
 	hx-on--after-request={`event.detail.successful && ${modalId}_modal.close()`}
 	hx-select-oob={`${target}, #form_error`}
 	hx-swap="none transition:true"
@@ -38,7 +38,7 @@ const {
 <p class="text-sm text-error" id="form_error"></p>
 <div class="modal-action">
 	<ModalActions
-		btnId={`${modalId}_btn`}
+		buttonId={`${modalId}_button`}
 		cancelLabel={cancelLabel}
 		formId={`${modalId}_form`}
 		label={submitLabel}
