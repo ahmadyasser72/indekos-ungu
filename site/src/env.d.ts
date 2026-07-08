@@ -1,10 +1,13 @@
 declare namespace App {
 	interface SessionData {
-		user: {
-			id: number;
+		user: Pick<
+			import("@indekos/database/schema").User,
+			"id" | "role" | "lastAccessed"
+		> & {
 			name: string;
-			role: import("@indekos/database/schema").User["role"];
 		};
+
+		pushEndpoint: string;
 	}
 
 	interface Locals {

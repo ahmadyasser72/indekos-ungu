@@ -4,6 +4,8 @@ declare global {
 		title: string,
 		description?: string,
 	) => void;
+
+	var htmx: typeof import("htmx.org").default;
 }
 
 export {};

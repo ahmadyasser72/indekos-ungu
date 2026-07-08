@@ -27,6 +27,8 @@ const { title } = Astro.props;
 
 	import htmx from "htmx.org";
 
+	window.htmx = htmx;
+
 	htmx.config.responseHandling = [
 		{ code: "[23]..", swap: true },
 		{ code: "40[01]", swap: true, error: true },

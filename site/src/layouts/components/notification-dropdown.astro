@@ -1,23 +1,48 @@
 ---
 import Icon from "~/components/ui/icon.astro";
+
+const pushActive = !!(await Astro.session?.get("pushEndpoint"));
 ---
 
-<button class="btn btn-square btn-ghost" popovertarget="notification-popover">
-	<Icon name="lucide:bell" size="size-5" />
+<button
+	class="btn btn-square btn-ghost"
+	id="notification-popover-button"
+	popovertarget="notification-popover"
+>
+	<Icon
+		name={pushActive ? "lucide:bell-ring" : "lucide:bell-off"}
+		size="size-5"
+	/>
 </button>
 <ul
+	hx-get
+	hx-trigger="intersect"
 	class="menu dropdown dropdown-end dropdown-bottom mt-2 w-64 menu-sm bg-base-100 p-2 shadow-sm"
 	id="notification-popover"
+	hx-headers="js:{ 'push-endpoint': localStorage.subscriptionEndpoint ?? '' }"
+	hx-select="#notification-popover > li"
 	popover
 	style="position-anchor:--user-anchor"
 >
-	<li>
-		<button class="btn btn-primary btn-sm" id="push-toggle">
-			Aktifkan Notifikasi
+	<li class="htmx-indicator">
+		<button class="btn btn-sm" disabled>
+			<Icon name="svg-spinners:90-ring-with-bg" /> Loading
 		</button>
 	</li>
-	<li>
-		<button class="btn btn-sm" id="push-test"> Kirim Test Notifikasi </button>
+
+	<li class="htmx-indicator-replace">
+		<button
+			id="push-toggle"
+			data-active={pushActive}
+			class:list={["btn btn-sm", pushActive ? "btn-error" : "btn-primary"]}
+		>
+			{pushActive ? "Nonaktifkan Notifikasi" : "Aktifkan Notifikasi"}
+		</button>
+	</li>
+	<li class="htmx-indicator-replace">
+		<button class="btn btn-sm" id="push-test" disabled={!pushActive}>
+			Kirim Test Notifikasi
+		</button>
 	</li>
 </ul>
 
@@ -39,38 +64,30 @@ import Icon from "~/components/ui/icon.astro";
 		},
 	);
 
-	(async () => {
-		const pushToggle = document.getElementById("push-toggle");
-		const pushTest = document.getElementById("push-test");
-		if (
-			!(pushToggle instanceof HTMLButtonElement) ||
-			!(pushTest instanceof HTMLButtonElement)
-		)
-			return;
+	htmx.onLoad(async (node) => {
+		if (!(node instanceof HTMLElement)) return;
 
-		const updateToggle = (subscription: PushSubscription | null) => {
-			const subscribed = !!subscription;
-			pushToggle.textContent = subscribed
-				? "Nonaktifkan Notifikasi"
-				: "Aktifkan Notifikasi";
+		const pushToggle = node.querySelector<HTMLButtonElement>("#push-toggle");
+		const pushTest = node.querySelector<HTMLButtonElement>("#push-test");
 
-			pushToggle.classList.toggle("btn-error", subscribed);
-			pushToggle.classList.toggle("btn-primary", !subscribed);
-
-			pushTest.disabled = !subscribed;
+		const syncLocalSubscription = (subscription: PushSubscription | null) => {
+			if (subscription?.endpoint)
+				localStorage.setItem("subscriptionEndpoint", subscription.endpoint);
+			else localStorage.removeItem("subscriptionEndpoint");
 		};
 
 		if (!sw) {
-			updateToggle(null);
-			pushToggle.addEventListener("click", () => {
+			syncLocalSubscription(null);
+			pushToggle?.addEventListener("click", () => {
 				showClientSideToast("error", "Browser tidak mendukung.");
 			});
+
 			return;
 		}
 
-		{
+		if (pushToggle) {
 			let subscription = await sw.pushManager.getSubscription();
-			updateToggle(subscription);
+			syncLocalSubscription(subscription);
 
 			const subscribe = async () => {
 				const permission =
@@ -120,26 +137,36 @@ import Icon from "~/components/ui/icon.astro";
 			pushToggle.addEventListener("click", async () => {
 				pushToggle.disabled = true;
 
-				const subscribed = !!subscription;
+				const subscribed = pushToggle.dataset.active === "true";
 				await (subscribed ? unsubscribe : subscribe)();
-				updateToggle(subscription);
+				syncLocalSubscription(subscription);
+				await htmx.ajax("get", document.URL, {
+					select: "#notification-popover > li",
+					selectOOB: "#notification-popover-button",
+					target: "#notification-popover",
+					headers: {
+						"push-endpoint": localStorage.getItem("subscriptionEndpoint") ?? "",
+					},
+				});
 
 				pushToggle.disabled = false;
 			});
 		}
 
-		pushTest.addEventListener("click", async () => {
-			pushTest.disabled = true;
+		if (pushTest) {
+			pushTest.addEventListener("click", async () => {
+				pushTest.disabled = true;
 
-			const { error } = await actions.push.test();
-			if (error) {
-				console.error("Failed to send test notification:", error.message);
-				showClientSideToast("error", "Gagal kirim test notifikasi.");
-			} else {
-				showClientSideToast("info", "Notifikasi test dikirim!");
-			}
+				const { error } = await actions.push.test();
+				if (error) {
+					console.error("Failed to send test notification:", error.message);
+					showClientSideToast("error", "Gagal kirim test notifikasi.");
+				} else {
+					showClientSideToast("info", "Notifikasi test dikirim!");
+				}
 
-			pushTest.disabled = false;
-		});
-	})();
+				pushTest.disabled = false;
+			});
+		}
+	});
 </script>

@@ -1,10 +1,14 @@
-import { db, eq } from "@indekos/database";
-import { auditDetail, users } from "@indekos/database/schema";
+import { and, db, eq } from "@indekos/database";
+import {
+	auditDetail,
+	pushSubscriptions,
+	users,
+} from "@indekos/database/schema";
 import { hashPassword, verifyPassword } from "@indekos/utilities/password";
 
 import { ActionError, defineAction } from "astro:actions";
 import { z } from "astro/zod";
-import { omit, toCamelCaseKeys } from "es-toolkit";
+import { omit, pick, toCamelCaseKeys } from "es-toolkit";
 
 export const updateProfile = defineAction({
 	accept: "form",
@@ -96,6 +100,19 @@ export const logout = defineAction({
 	accept: "form",
 	input: z.object({}),
 	handler: async (_, context) => {
+		const user = await context.session?.get("user");
+		const endpoint = await context.session?.get("pushEndpoint");
+		if (user && endpoint) {
+			await db
+				.delete(pushSubscriptions)
+				.where(
+					and(
+						eq(pushSubscriptions.endpoint, endpoint),
+						eq(pushSubscriptions.userId, user.id),
+					),
+				);
+		}
+
 		context.session?.destroy();
 	},
 });
@@ -114,23 +131,19 @@ export const login = defineAction({
 				message: "Username atau password tidak sesuai.",
 			});
 
-		await Promise.all([
-			context.session?.set("user", {
-				id: user.id,
-				name: user.displayName ?? user.username,
-				role: user.role,
-			}),
-			db
-				.update(users)
-				.set({ lastAccessed: new Date() })
-				.where(eq(users.id, user.id)),
-		]);
-
-		context.locals.user = {
-			id: user.id,
+		const now = new Date();
+		await db
+			.update(users)
+			.set({ lastAccessed: now })
+			.where(eq(users.id, user.id));
+		const data: App.Locals["user"] = {
+			...pick(user, ["id", "role"]),
 			name: user.displayName ?? user.username,
-			role: user.role,
+			lastAccessed: now,
 		};
+
+		context.session?.set("user", data);
+		context.locals.user = data;
 
 		await context.locals.logAudit(
 			"LOGIN",

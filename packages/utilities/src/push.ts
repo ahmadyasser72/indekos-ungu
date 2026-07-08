@@ -4,6 +4,8 @@ import { pushSubscriptions, type User } from "@indekos/database/schema";
 import { groupBy, mapValues } from "es-toolkit";
 import webpush from "web-push";
 
+import dayjs from "./date";
+
 export const sendPush = async (
 	users: Pick<User, "id">[],
 	data: { title: string; body: string; url?: string; imagePath?: string },
@@ -13,7 +15,14 @@ export const sendPush = async (
 		throw new Error("VAPID_* is not set");
 
 	const subscriptions = await db.query.pushSubscriptions.findMany({
-		where: { user: { id: { in: users.map(({ id }) => id) } } },
+		where: {
+			user: {
+				id: { in: users.map(({ id }) => id) },
+				lastAccessed: {
+					gte: dayjs().startOf("day").subtract(1, "day").toDate(),
+				},
+			},
+		},
 	});
 
 	if (subscriptions.length === 0) return { sent: 0 };

@@ -1,4 +1,6 @@
-import { db } from "@indekos/database";
+import { db, eq } from "@indekos/database";
+import { users } from "@indekos/database/schema";
+import dayjs from "@indekos/utilities/date";
 
 import { getActionContext } from "astro:actions";
 import { defineMiddleware } from "astro:middleware";
@@ -57,7 +59,20 @@ export const onRequest = defineMiddleware(async (context, next) => {
 	};
 
 	const user = await context.session?.get("user");
-	if (user) context.locals.user = { ...user, allowEdit: user.role !== "owner" };
+	if (user) {
+		if (user.lastAccessed && dayjs().diff(user.lastAccessed, "minutes") > 5) {
+			const now = new Date();
+			await db
+				.update(users)
+				.set({ lastAccessed: now })
+				.where(eq(users.id, user.id));
+
+			user.lastAccessed = now;
+		}
+
+		context.session?.set("user", user);
+		context.locals.user = { ...user, allowEdit: user.role !== "owner" };
+	}
 
 	const { action } = getActionContext(context);
 	if (
@@ -77,6 +92,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 				id: user?.id ?? 0,
 				name: user?.displayName ?? user?.username ?? "Staff",
 				role: user?.role ?? "staff",
+				lastAccessed: null,
 			};
 
 			return next();
@@ -102,6 +118,16 @@ export const onRequest = defineMiddleware(async (context, next) => {
 			details,
 		);
 	context.locals.actionResults = [];
+
+	const pushEndpointHeader = context.request.headers.get("push-endpoint");
+	if (pushEndpointHeader && context.locals.user) {
+		const pushActive = await db.query.pushSubscriptions.findFirst({
+			columns: { id: true },
+			where: { userId: context.locals.user.id, endpoint: pushEndpointHeader },
+		});
+
+		if (pushActive) context.session?.set("pushEndpoint", pushEndpointHeader);
+	}
 
 	const response = await next();
 	if (persistQuery.size > 0) {

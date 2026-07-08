@@ -24,6 +24,7 @@ export const subscribe = defineAction({
 			authKey: input.keys.auth,
 			p256dhKey: input.keys.p256dh,
 		});
+		context.session?.set("pushEndpoint", input.endpoint);
 
 		await db.insert(auditLogs).values({
 			userId: user.id,
@@ -45,6 +46,7 @@ export const unsubscribe = defineAction({
 		await db
 			.delete(pushSubscriptions)
 			.where(eq(pushSubscriptions.endpoint, endpoint));
+		context.session?.delete("pushEndpoint");
 
 		await db.insert(auditLogs).values({
 			userId: context.locals.user!.id,
