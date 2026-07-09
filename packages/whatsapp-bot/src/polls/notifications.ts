@@ -128,8 +128,8 @@ export const pollNotifications = async (sock: WASocket, botUserId: number) => {
 				tableName: "notifications",
 				details: auditDetail.notification(botAction, "whatsapp", tenant.id),
 			});
-		} catch (err) {
-			console.error("Send notification failed:", err);
+		} catch (error) {
+			console.error("Send notification failed:", error);
 			await db
 				.update(notifications)
 				.set({ status: "failed" })

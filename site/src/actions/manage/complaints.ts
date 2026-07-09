@@ -11,12 +11,15 @@ export const process = defineAction({
 		id: z.coerce.number(),
 	}),
 	handler: async ({ id }, context) => {
+		const log = context.locals.logger.child({
+			module: "actions:manage:complaints:process",
+		});
 		const complaint = await db.query.complaints.findFirst({
 			columns: { id: true, status: true },
 			where: { id },
 		});
 		if (!complaint?.id) {
-			console.error("complaints.process: complaint not found", { id });
+			log.error({ complaintId: id }, "complaint not found");
 			throw new ActionError({
 				code: "BAD_REQUEST",
 				message: "Komplain tidak ditemukan.",
@@ -29,6 +32,11 @@ export const process = defineAction({
 				message: "Hanya komplain dengan status 'Terbuka' yang dapat diproses.",
 			});
 		}
+
+		log.info(
+			{ complaintId: id },
+			"attempting to mark complaint as in progress",
+		);
 
 		const [updated] = await db
 			.update(complaints)
@@ -47,6 +55,7 @@ export const process = defineAction({
 			),
 		);
 
+		log.info("complaint marked as in progress");
 		return updated;
 	},
 });
@@ -61,20 +70,23 @@ export const resolve = defineAction({
 			.transform((s) => s?.trim() ?? null),
 	}),
 	handler: async ({ id, resolveNotes }, context) => {
+		const log = context.locals.logger.child({
+			module: "actions:manage:complaints:resolve",
+		});
 		const complaint = await db.query.complaints.findFirst({
 			columns: { id: true, status: true, resolveNotes: true, resolvedBy: true },
 			where: { id },
 		});
 
 		if (!complaint?.id) {
-			console.error("complaints.resolve: complaint not found", {
-				id,
-			});
+			log.error({ complaintId: id }, "complaint not found");
 			throw new ActionError({
 				code: "BAD_REQUEST",
 				message: "Komplain tidak ditemukan.",
 			});
 		}
+
+		log.info({ complaintId: id }, "attempting to resolve complaint");
 
 		const [updated] = await db
 			.update(complaints)
@@ -101,6 +113,7 @@ export const resolve = defineAction({
 			),
 		);
 
+		log.info("complaint resolved");
 		return updated;
 	},
 });

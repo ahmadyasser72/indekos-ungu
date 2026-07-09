@@ -1,6 +1,7 @@
 import { db, eq } from "@indekos/database";
 import { users } from "@indekos/database/schema";
 import dayjs from "@indekos/utilities/date";
+import { createLogger } from "@indekos/utilities/logger";
 
 import { getActionContext } from "astro:actions";
 import { defineMiddleware } from "astro:middleware";
@@ -9,7 +10,16 @@ import { z } from "astro/zod";
 import { logAudit } from "~/lib/audit-log";
 import { getPuppeteerToken } from "~/lib/pdf";
 
+const baseLogger = createLogger("site-middleware");
+
 export const onRequest = defineMiddleware(async (context, next) => {
+	const requestLogger = baseLogger.child({
+		path: context.url.pathname,
+		method: context.request.method,
+	});
+
+	context.locals.logger = requestLogger;
+
 	const persistQuery = new URLSearchParams();
 	context.locals.parseQuery = (schema) => {
 		const querySchema = z
@@ -18,12 +28,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 				[...searchParams.entries()].reduce<Record<string, string | string[]>>(
 					(acc, [key, value]) => {
 						if (!value) return acc;
-
-						// if (!(key in acc))
 						acc[key] = value;
-						// else if (Array.isArray(acc[key])) acc[key].push(value);
-						// else acc[key] = [acc[key], value];
-
 						return acc;
 					},
 					{},
@@ -33,41 +38,60 @@ export const onRequest = defineMiddleware(async (context, next) => {
 				for (const [key, value] of Object.entries(query)) {
 					if (value === "reset" || value.includes("reset")) delete query[key];
 				}
-
 				return query;
 			});
 
 		const rawQuery = context.url.searchParams;
 		const hxCurrentUrl = context.request.headers.get("hx-current-url")!;
-		const query = querySchema.parse(
-			new URLSearchParams({
-				...(hxCurrentUrl &&
-					Object.fromEntries(new URL(hxCurrentUrl).searchParams.entries())),
-				...Object.fromEntries(rawQuery.entries()),
-			}),
-		);
 
-		const parsed = schema.parse(query);
-		for (const key of Object.keys(schema.shape)) {
-			const value = parsed[key];
-			if (!value || typeof value !== "string") continue;
+		try {
+			const query = querySchema.parse(
+				new URLSearchParams({
+					...(hxCurrentUrl &&
+						Object.fromEntries(new URL(hxCurrentUrl).searchParams.entries())),
+					...Object.fromEntries(rawQuery.entries()),
+				}),
+			);
 
-			persistQuery.set(key, value);
+			const parsed = schema.parse(query);
+			for (const key of Object.keys(schema.shape)) {
+				const value = parsed[key];
+				if (!value || typeof value !== "string") continue;
+				persistQuery.set(key, value);
+			}
+			return parsed;
+		} catch (error) {
+			requestLogger.warn(
+				{ error, hxCurrentUrl },
+				"middleware: query validation exception",
+			);
+
+			throw error;
 		}
-
-		return parsed;
 	};
 
 	const user = await context.session?.get("user");
 	if (user) {
+		context.locals.logger = requestLogger.child({
+			userId: user.id,
+			userRole: user.role,
+		});
+
 		if (user.lastAccessed && dayjs().diff(user.lastAccessed, "minutes") > 5) {
 			const now = new Date();
-			await db
-				.update(users)
-				.set({ lastAccessed: now })
-				.where(eq(users.id, user.id));
+			try {
+				await db
+					.update(users)
+					.set({ lastAccessed: now })
+					.where(eq(users.id, user.id));
 
-			user.lastAccessed = now;
+				user.lastAccessed = now;
+			} catch (error) {
+				context.locals.logger.error(
+					{ error },
+					"middleware: failed updating user lastAccessed timestamp",
+				);
+			}
 		}
 
 		context.session?.set("user", user);
@@ -83,6 +107,12 @@ export const onRequest = defineMiddleware(async (context, next) => {
 		const puppeteerToken = context.request.headers.get("x-puppeteer");
 		if (puppeteerToken && puppeteerToken === getPuppeteerToken()) {
 			const userId = context.url.searchParams.get("user");
+
+			context.locals.logger.info(
+				{ puppeteerTargetUserId: userId },
+				"middleware: verified puppeteer token hook signature",
+			);
+
 			const user = await db.query.users.findFirst({
 				columns: { id: true, username: true, displayName: true, role: true },
 				where: { id: userId ? Number(userId) : undefined, role: "staff" },
@@ -99,10 +129,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
 		}
 
 		if (!user) {
-			console.warn("middleware: unauthenticated access", {
-				path: context.url.pathname,
-			});
-
+			context.locals.logger.warn(
+				"middleware: unauthenticated gate blocking access, redirecting to login",
+			);
 			return context.redirect(new URL("/login", context.url).pathname);
 		}
 	}

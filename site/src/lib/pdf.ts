@@ -1,25 +1,43 @@
 import fs from "node:fs";
+import { createLogger } from "@indekos/utilities/logger";
 
 import type { APIRoute } from "astro";
 import { CHROMIUM_PATH } from "astro:env/server";
 import type { Browser } from "puppeteer-core";
 import puppeteer from "puppeteer-core";
 
+const logger = createLogger("site-puppeteer");
+
 let browserInstance: Browser | null = null;
 const getBrowser = async () => {
-	if (browserInstance?.connected) return browserInstance;
+	if (browserInstance?.connected) {
+		logger.debug("browser: reusing existing instance");
+		return browserInstance;
+	}
 
-	if (!fs.existsSync(CHROMIUM_PATH))
+	if (!fs.existsSync(CHROMIUM_PATH)) {
+		logger.fatal(
+			{ path: CHROMIUM_PATH },
+			"browser: initialization aborted. Chromium binary missing",
+		);
 		throw new Error(`Chromium not found at ${CHROMIUM_PATH}`);
+	}
+
+	const startTime = performance.now();
 
 	browserInstance = await puppeteer.launch({
 		executablePath: CHROMIUM_PATH,
 		args: ["--no-sandbox", "--headless=new"],
 	});
-	console.log("pdf: browser launched");
+
+	const duration = performance.now() - startTime;
+	logger.info(
+		{ durationMs: Math.round(duration) },
+		"browser: launched successfully",
+	);
 
 	browserInstance.on("disconnected", () => {
-		console.log("pdf: browser disconnected");
+		logger.warn("browser: process disconnected unexpectedly or shut down");
 		browserInstance = null;
 	});
 	return browserInstance;
@@ -27,11 +45,9 @@ const getBrowser = async () => {
 
 let pdfToken: string | null = null;
 export const getPuppeteerToken = () => {
-	// Dev: HMR resets modules constantly, pakai token tetap biar middleware cocok
 	if (import.meta.env.DEV) return "dev-pdf-token";
 
 	if (!pdfToken) {
-		// 48-char hex — practically unguessable
 		const bytes = new Uint8Array(24);
 		crypto.getRandomValues(bytes);
 		pdfToken = Array.from(bytes, (byte) =>
@@ -43,7 +59,16 @@ export const getPuppeteerToken = () => {
 };
 
 const generatePDF = async (url: string) => {
-	const browser = await getBrowser();
+	const startTime = performance.now();
+
+	let browser: Browser;
+	try {
+		browser = await getBrowser();
+	} catch (error) {
+		logger.error({ error, url }, "pdf: failed to acquire browser process");
+		throw error;
+	}
+
 	const page = await browser.newPage();
 	await page.setExtraHTTPHeaders({ "x-puppeteer": getPuppeteerToken() });
 
@@ -56,14 +81,21 @@ const generatePDF = async (url: string) => {
 			preferCSSPageSize: true,
 		});
 
-		console.log("pdf: generated successfully", { url });
+		const duration = performance.now() - startTime;
+
+		logger.info(
+			{ url, durationMs: Math.round(duration), sizeBytes: pdf.length },
+			"pdf: generated successfully",
+		);
 		return Buffer.from(pdf);
-	} catch (err) {
-		console.error("pdf: generation failed", {
-			url,
-			error: err instanceof Error ? err.message : err,
-		});
-		throw err;
+	} catch (error) {
+		const duration = performance.now() - startTime;
+
+		logger.error(
+			{ url, durationMs: Math.round(duration), error },
+			"pdf: generation failed",
+		);
+		throw error;
 	} finally {
 		await page.close();
 	}
@@ -74,23 +106,45 @@ export const makeDownloadHandler = (
 	filename: string | ((url: URL) => string) = "laporan",
 ): APIRoute => {
 	return async ({ url, locals }) => {
+		const userId = locals.user?.id;
+
+		if (!userId) {
+			logger.error(
+				{ url: url.pathname },
+				"download-handler: unauthorized endpoint access attempt",
+			);
+			return new Response("Unauthorized", { status: 401 });
+		}
+
 		const search = url.searchParams;
-		search.set("user", locals.user!.id.toString());
+		search.set("user", userId.toString());
 
 		const renderPath = typeof path === "function" ? path(url) : path;
 		const pageUrl = `${url.origin}${renderPath}?${search.toString()}`;
 
-		const pdf = await generatePDF(pageUrl);
-		const baseName = typeof filename === "function" ? filename(url) : filename;
-		const dateStr = new Date().toISOString().slice(0, 10);
-		const safeName = `${baseName}_${dateStr}`.replace(/[^a-zA-Z0-9_\-]/g, "_");
+		try {
+			const pdf = await generatePDF(pageUrl);
+			const baseName =
+				typeof filename === "function" ? filename(url) : filename;
+			const dateStr = new Date().toISOString().slice(0, 10);
+			const safeName = `${baseName}_${dateStr}`.replace(
+				/[^a-zA-Z0-9_\-]/g,
+				"_",
+			);
 
-		return new Response(pdf, {
-			headers: {
-				"Content-Type": "application/pdf",
-				"Content-Disposition": `attachment; filename="${safeName}.pdf"`,
-				"Content-Length": pdf.length.toString(),
-			},
-		});
+			return new Response(pdf, {
+				headers: {
+					"Content-Type": "application/pdf",
+					"Content-Disposition": `attachment; filename="${safeName}.pdf"`,
+					"Content-Length": pdf.length.toString(),
+				},
+			});
+		} catch (error) {
+			logger.error(
+				{ userId, pageUrl, error },
+				"download-handler: internal route execution exception",
+			);
+			return new Response("Failed to generate report", { status: 500 });
+		}
 	};
 };

@@ -10,7 +10,7 @@ import { parseInvoiceNumber } from "@indekos/utilities/transforms";
 
 import type { APIRoute } from "astro";
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
 	const formData = await request.formData();
 	const params = Object.fromEntries(formData.entries());
 
@@ -23,8 +23,20 @@ export const POST: APIRoute = async ({ request }) => {
 		resultCode,
 	} = params;
 
+	// Create a request-scoped child logger extending the middleware logger instance
+	const requestLogger = locals.logger.child({
+		module: "api:duitku-callback",
+		orderId: merchantOrderId || "MISSING",
+		ref: reference || "MISSING",
+	});
+
+	requestLogger.info("callback: received payload");
+
 	if (!merchantCode || !amount || !merchantOrderId || !signature) {
-		console.error("Missing required parameters");
+		requestLogger.error(
+			{ receivedKeys: Object.keys(params) },
+			"callback: missing required parameters",
+		);
 		return new Response(null, { status: 400 });
 	}
 
@@ -40,15 +52,21 @@ export const POST: APIRoute = async ({ request }) => {
 			apiKey,
 		)
 	) {
-		console.error("Invalid signature");
+		requestLogger.error(
+			{ amount: parsedAmount },
+			"callback: invalid signature",
+		);
 		return new Response(null, { status: 400 });
 	}
 
 	const invoiceId = parseInvoiceNumber(merchantOrderId);
 	if (Number.isNaN(invoiceId)) {
-		console.error("Invalid merchantOrderId format:", merchantOrderId);
-		return new Response(null, { status: 200 }); // Return 200 so Duitku doesn't retry
+		requestLogger.warn("callback: invalid merchantOrderId format");
+		return new Response(null, { status: 200 });
 	}
+
+	// Append the database invoice identifier to the child logger context
+	const log = requestLogger.child({ invoiceId });
 
 	const invoice = await db.query.invoices.findFirst({
 		where: { id: invoiceId },
@@ -56,12 +74,12 @@ export const POST: APIRoute = async ({ request }) => {
 	});
 
 	if (!invoice) {
-		console.error("Invoice not found:", invoiceId);
-		return new Response(null, { status: 200 }); // Acknowledge to Duitku
+		log.warn("callback: invoice not found in database");
+		return new Response(null, { status: 200 });
 	}
 
 	if (invoice.callbackPayload) {
-		console.log("Duplicate callback, skipping (invoice #%d)", invoiceId);
+		log.info("callback: duplicate callback received, skipping processing");
 		return new Response(null, { status: 200 });
 	}
 
@@ -70,7 +88,6 @@ export const POST: APIRoute = async ({ request }) => {
 
 		try {
 			db.transaction((tx) => {
-				// Update invoice
 				tx.update(invoices)
 					.set({
 						status: "paid",
@@ -80,7 +97,6 @@ export const POST: APIRoute = async ({ request }) => {
 					.where(eq(invoices.id, invoiceId))
 					.run();
 
-				// Buat notification untuk tenant → bot akan polling
 				tx.insert(notifications)
 					.values({
 						tenantId: invoice.lease!.tenantId,
@@ -90,7 +106,6 @@ export const POST: APIRoute = async ({ request }) => {
 					})
 					.run();
 
-				// Catat audit log
 				tx.insert(auditLogs)
 					.values({
 						action: "UPDATE",
@@ -105,13 +120,13 @@ export const POST: APIRoute = async ({ request }) => {
 					.run();
 			});
 
-			console.log("Invoice #%d marked as paid", invoiceId);
-		} catch (err) {
-			console.error("Failed to update invoice:", err);
+			log.info("callback: invoice successfully marked as paid");
+		} catch (error) {
+			log.error({ error }, "callback: failed to execute database transaction");
 			return new Response(null, { status: 500 });
 		}
 	} else {
-		console.log("Non-success resultCode:", resultCode);
+		log.info({ resultCode }, "callback: non-success resultCode received");
 	}
 
 	return new Response(null, { status: 200 });

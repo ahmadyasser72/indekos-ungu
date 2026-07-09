@@ -26,6 +26,9 @@ export const add = defineAction({
 		end_date: z.string().optional(),
 	}),
 	handler: async (input, context) => {
+		const log = context.locals.logger.child({
+			module: "actions:manage:tenants:add",
+		});
 		const phoneNumber = normalizePhone(input.phone_number);
 
 		const samePhone = await db.query.tenants.findFirst({
@@ -33,81 +36,93 @@ export const add = defineAction({
 			where: { phoneNumber },
 		});
 		if (samePhone?.id) {
-			console.error("tenants.add: phone already registered", { phoneNumber });
+			log.error({ phoneNumber }, "phone already registered");
 			throw new ActionError({
 				code: "BAD_REQUEST",
 				message: "Nomor HP sudah terdaftar.",
 			});
 		}
 
-		// Run in a transaction synchronously for SQLite sync driver
-		const insertedTenant = db.transaction((tx) => {
-			const activeLease = tx.query.leases
-				.findFirst({
-					columns: { id: true },
-					where: { roomId: input.room_id, isActive: true },
-				})
-				.sync();
-
-			if (activeLease?.id) {
-				console.error("tenants.add: room already occupied", {
-					room_id: input.room_id,
-				});
-				throw new ActionError({
-					code: "BAD_REQUEST",
-					message: "Kamar sudah terisi.",
-				});
-			}
-
-			const [inserted] = tx
-				.insert(tenants)
-				.values({
-					fullName: input.full_name,
-					phoneNumber: phoneNumber,
-					originRegion: input.origin_region || null,
-					isVerified: false,
-				})
-				.returning({ id: tenants.id })
-				.all();
-
-			if (!inserted) {
-				console.error("tenants.add: failed to insert tenant");
-				throw new ActionError({
-					code: "INTERNAL_SERVER_ERROR",
-					message: "Gagal menyimpan data penghuni baru.",
-				});
-			}
-
-			tx.insert(leases)
-				.values({
-					tenantId: inserted.id,
-					roomId: input.room_id,
-					startDate: new Date(input.start_date),
-					endDate: input.end_date ? new Date(input.end_date) : null,
-					isActive: true,
-				})
-				.run();
-
-			return inserted;
-		});
-
-		await context.locals.logAudit(
-			"CREATE",
-			"tenants",
-			insertedTenant.id,
-			auditDetail.create(
-				`Mendaftarkan tenant ${input.full_name} (${input.phone_number}) di kamar ID ${input.room_id}`,
-				toCamelCaseKeys(input),
-			),
+		log.info(
+			{ fullName: input.full_name, roomId: input.room_id },
+			"attempting to add tenant with active lease",
 		);
 
-		await db.insert(notifications).values({
-			tenantId: insertedTenant.id,
-			type: "welcome",
-			status: "pending",
-		});
+		try {
+			// Run in a transaction synchronously for SQLite sync driver
+			const insertedTenant = db.transaction((tx) => {
+				const activeLease = tx.query.leases
+					.findFirst({
+						columns: { id: true },
+						where: { roomId: input.room_id, isActive: true },
+					})
+					.sync();
 
-		return insertedTenant;
+				if (activeLease?.id) {
+					log.error({ roomId: input.room_id }, "room already occupied");
+					throw new ActionError({
+						code: "BAD_REQUEST",
+						message: "Kamar sudah ditempati.",
+					});
+				}
+
+				const [inserted] = tx
+					.insert(tenants)
+					.values({
+						fullName: input.full_name,
+						phoneNumber: phoneNumber,
+						originRegion: input.origin_region || null,
+						isVerified: false,
+					})
+					.returning({ id: tenants.id })
+					.all();
+
+				if (!inserted) {
+					console.error("tenants.add: failed to insert tenant");
+					throw new ActionError({
+						code: "INTERNAL_SERVER_ERROR",
+						message: "Gagal menyimpan data penghuni baru.",
+					});
+				}
+
+				tx.insert(leases)
+					.values({
+						tenantId: inserted.id,
+						roomId: input.room_id,
+						startDate: new Date(input.start_date),
+						endDate: input.end_date ? new Date(input.end_date) : null,
+						isActive: true,
+					})
+					.run();
+
+				return inserted;
+			});
+
+			await context.locals.logAudit(
+				"CREATE",
+				"tenants",
+				insertedTenant.id,
+				auditDetail.create(
+					`Mendaftarkan tenant ${input.full_name} (${input.phone_number}) di kamar ID ${input.room_id}`,
+					toCamelCaseKeys(input),
+				),
+			);
+
+			await db.insert(notifications).values({
+				tenantId: insertedTenant.id,
+				type: "welcome",
+				status: "pending",
+			});
+
+			log.info(
+				{ tenantId: insertedTenant.id },
+				"tenant and lease created successfully",
+			);
+			return insertedTenant;
+		} catch (error) {
+			log.error({ error, phoneNumber }, "failed to add tenant");
+			throw error;
+		}
 	},
 });
 
@@ -115,37 +130,49 @@ export const terminate = defineAction({
 	accept: "form",
 	input: z.object({ id: z.coerce.number() }),
 	handler: async ({ id }, context) => {
+		const log = context.locals.logger.child({
+			module: "actions:manage:tenants:terminate",
+		});
 		const activeLease = await db.query.leases.findFirst({
 			columns: { id: true, startDate: true, endDate: true, isActive: true },
 			where: { tenantId: id, isActive: true },
 		});
 		if (!activeLease?.id) {
-			console.error("tenants.terminate: no active lease", {
-				tenantId: id,
-			});
+			log.error({ tenantId: id }, "no active lease found");
 			throw new ActionError({
 				code: "BAD_REQUEST",
 				message: "Penghuni tidak memiliki kontrak sewa aktif.",
 			});
 		}
 
-		await db
-			.update(leases)
-			.set({ isActive: false, endDate: new Date() })
-			.where(eq(leases.id, activeLease.id));
-
-		await context.locals.logAudit(
-			"UPDATE",
-			"leases",
-			activeLease.id,
-			auditDetail.update(
-				`Mengakhiri kontrak sewa tenant ID ${id}`,
-				activeLease,
-				{ ...activeLease, isActive: false, endDate: new Date() },
-			),
+		log.info(
+			{ tenantId: id, leaseId: activeLease.id },
+			"attempting to terminate lease",
 		);
 
-		return { id };
+		try {
+			await db
+				.update(leases)
+				.set({ isActive: false, endDate: new Date() })
+				.where(eq(leases.id, activeLease.id));
+
+			await context.locals.logAudit(
+				"UPDATE",
+				"leases",
+				activeLease.id,
+				auditDetail.update(
+					`Mengakhiri kontrak sewa tenant ID ${id}`,
+					activeLease,
+					{ ...activeLease, isActive: false, endDate: new Date() },
+				),
+			);
+
+			log.info("lease terminated successfully");
+			return { id };
+		} catch (error) {
+			log.error({ error, tenantId: id }, "failed to terminate lease");
+			throw error;
+		}
 	},
 });
 
@@ -162,6 +189,9 @@ export const edit = defineAction({
 			.catch(null),
 	}),
 	handler: async (input, context) => {
+		const log = context.locals.logger.child({
+			module: "actions:manage:tenants:edit",
+		});
 		const target = await db.query.tenants.findFirst({
 			columns: {
 				id: true,
@@ -172,7 +202,7 @@ export const edit = defineAction({
 			where: { id: input.id },
 		});
 		if (!target) {
-			console.error("tenants.edit: tenant not found", { id: input.id });
+			log.error({ tenantId: input.id }, "tenant not found");
 			throw new ActionError({
 				code: "BAD_REQUEST",
 				message: "Penghuni tidak ditemukan.",
@@ -186,46 +216,54 @@ export const edit = defineAction({
 			where: { phoneNumber, id: { ne: input.id } },
 		});
 		if (samePhone?.id) {
-			console.error("tenants.edit: phone already registered", { phoneNumber });
+			log.error({ phoneNumber }, "phone already registered");
 			throw new ActionError({
 				code: "BAD_REQUEST",
 				message: "Nomor HP sudah terdaftar.",
 			});
 		}
 
-		const phoneChanged = phoneNumber !== target.phoneNumber;
+		log.info({ tenantId: input.id }, "attempting to update tenant");
 
-		const [updated] = await db
-			.update(tenants)
-			.set({
-				fullName: input.full_name,
-				phoneNumber,
-				originRegion: input.origin_region ?? null,
-				...(phoneChanged && { isVerified: false }),
-			})
-			.where(eq(tenants.id, input.id))
-			.returning({ id: tenants.id });
+		try {
+			const phoneChanged = phoneNumber !== target.phoneNumber;
 
-		if (phoneChanged) {
-			await db.insert(notifications).values({
-				tenantId: updated.id,
-				type: "phone_change",
-				status: "pending",
-			});
+			const [updated] = await db
+				.update(tenants)
+				.set({
+					fullName: input.full_name,
+					phoneNumber,
+					originRegion: input.origin_region ?? null,
+					...(phoneChanged && { isVerified: false }),
+				})
+				.where(eq(tenants.id, input.id))
+				.returning({ id: tenants.id });
+
+			if (phoneChanged) {
+				await db.insert(notifications).values({
+					tenantId: updated.id,
+					type: "phone_change",
+					status: "pending",
+				});
+			}
+
+			const description = phoneChanged
+				? `Mengubah data penghuni ${input.full_name} (${phoneNumber}); nomor diubah, reset verifikasi`
+				: `Mengubah data penghuni ${input.full_name} (${phoneNumber})`;
+
+			await context.locals.logAudit(
+				"UPDATE",
+				"tenants",
+				updated.id,
+				auditDetail.update(description, target, toCamelCaseKeys(input)),
+			);
+
+			log.info("tenant updated successfully");
+			return updated;
+		} catch (error) {
+			log.error({ error, tenantId: input.id }, "failed to update tenant");
+			throw error;
 		}
-
-		const description = phoneChanged
-			? `Mengubah data penghuni ${input.full_name} (${phoneNumber}); nomor diubah, reset verifikasi`
-			: `Mengubah data penghuni ${input.full_name} (${phoneNumber})`;
-
-		await context.locals.logAudit(
-			"UPDATE",
-			"tenants",
-			updated.id,
-			auditDetail.update(description, target, toCamelCaseKeys(input)),
-		);
-
-		return updated;
 	},
 });
 
@@ -238,12 +276,15 @@ export const register = defineAction({
 		end_date: z.string().optional(),
 	}),
 	handler: async (input, context) => {
+		const log = context.locals.logger.child({
+			module: "actions:manage:tenants:register",
+		});
 		const target = await db.query.tenants.findFirst({
 			columns: { id: true, fullName: true },
 			where: { id: input.id },
 		});
 		if (!target) {
-			console.error("tenants.register: tenant not found", { id: input.id });
+			log.error({ tenantId: input.id }, "tenant not found");
 			throw new ActionError({
 				code: "BAD_REQUEST",
 				message: "Penghuni tidak ditemukan.",
@@ -255,14 +296,17 @@ export const register = defineAction({
 			where: { tenantId: input.id, isActive: true },
 		});
 		if (activeLease) {
-			console.error("tenants.register: tenant already has active lease", {
-				tenantId: input.id,
-			});
+			log.error({ tenantId: input.id }, "tenant already has active lease");
 			throw new ActionError({
 				code: "BAD_REQUEST",
 				message: "Penghuni masih memiliki kontrak sewa aktif.",
 			});
 		}
+
+		log.info(
+			{ tenantId: input.id, roomId: input.room_id },
+			"attempting to re-register tenant with new lease",
+		);
 
 		db.transaction((tx) => {
 			const roomTaken = tx.query.leases
@@ -273,9 +317,7 @@ export const register = defineAction({
 				.sync();
 
 			if (roomTaken) {
-				console.error("tenants.register: room already occupied", {
-					room_id: input.room_id,
-				});
+				log.error({ roomId: input.room_id }, "room already occupied");
 				throw new ActionError({
 					code: "BAD_REQUEST",
 					message: "Kamar sudah terisi.",
@@ -303,6 +345,7 @@ export const register = defineAction({
 			),
 		);
 
+		log.info({ tenantId: input.id }, "tenant re-registered successfully");
 		return { id: input.id };
 	},
 });

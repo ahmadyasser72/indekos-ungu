@@ -8,7 +8,6 @@ import { auditDetail, invoices, notifications } from "@indekos/database/schema";
 
 import { ActionError, defineAction } from "astro:actions";
 import { z } from "astro/zod";
-import { isError } from "es-toolkit/predicate";
 
 export const generatePaymentLink = defineAction({
 	accept: "form",
@@ -16,31 +15,45 @@ export const generatePaymentLink = defineAction({
 		invoice_id: z.coerce.number(),
 	}),
 	handler: async (input, context) => {
+		const log = context.locals.logger.child({
+			module: "actions:manage:invoices:generatePaymentLink",
+		});
+
 		try {
-			return await createPaymentLink(
+			log.info(
+				{ invoiceId: input.invoice_id },
+				"attempting to generate payment link",
+			);
+
+			const result = await createPaymentLink(
 				input.invoice_id,
 				context.url.origin,
 				context.locals.user?.id,
+				{ logger: log },
 			);
-		} catch (err) {
-			if (err instanceof InvoicePaymentError) {
+
+			log.info({ invoiceId: input.invoice_id }, "payment link generated");
+			return result;
+		} catch (error) {
+			if (error instanceof InvoicePaymentError) {
+				log.error(
+					{ error, invoiceId: input.invoice_id },
+					"invoice payment error",
+				);
 				throw new ActionError({
 					code: "BAD_REQUEST",
-					message: err.message,
+					message: error.message,
 				});
 			}
-			if (err instanceof DuitkuError) {
+			if (error instanceof DuitkuError) {
+				log.error({ error, invoiceId: input.invoice_id }, "duitku error");
 				throw new ActionError({
 					code: "BAD_REQUEST",
-					message: `Duitku: ${err.message}`,
+					message: `Duitku: ${error.message}`,
 				});
 			}
-			if (isError(err)) {
-				throw new ActionError({
-					code: "BAD_REQUEST",
-					message: err.message,
-				});
-			}
+
+			log.error({ error, invoiceId: input.invoice_id }, "unknown error");
 			throw new ActionError({
 				code: "INTERNAL_SERVER_ERROR",
 				message: "Gagal membuat link pembayaran.",
@@ -55,6 +68,9 @@ export const markAsPaid = defineAction({
 		invoice_id: z.coerce.number(),
 	}),
 	handler: async (input, context) => {
+		const log = context.locals.logger.child({
+			module: "actions:manage:invoices:markAsPaid",
+		});
 		const invoiceId = input.invoice_id;
 
 		const invoice = await db.query.invoices.findFirst({
@@ -63,7 +79,7 @@ export const markAsPaid = defineAction({
 		});
 
 		if (!invoice) {
-			console.error("invoices.markAsPaid: invoice not found", { invoiceId });
+			log.error({ invoiceId }, "invoice not found");
 			throw new ActionError({
 				code: "NOT_FOUND",
 				message: "Invoice tidak ditemukan.",
@@ -71,12 +87,14 @@ export const markAsPaid = defineAction({
 		}
 
 		if (invoice.status === "paid") {
-			console.error("invoices.markAsPaid: already paid", { invoiceId });
+			log.error({ invoiceId }, "invoice already paid");
 			throw new ActionError({
 				code: "BAD_REQUEST",
 				message: "Invoice sudah lunas.",
 			});
 		}
+
+		log.info({ invoiceId }, "attempting to mark invoice as paid");
 
 		await db
 			.update(invoices)
@@ -103,6 +121,7 @@ export const markAsPaid = defineAction({
 			),
 		);
 
+		log.info({ invoiceId }, "invoice marked as paid");
 		return { success: true };
 	},
 });

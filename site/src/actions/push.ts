@@ -17,6 +17,9 @@ export const subscribe = defineAction({
 		keys: z.object({ auth: z.string(), p256dh: z.string() }),
 	}),
 	handler: async (input, context) => {
+		const log = context.locals.logger.child({
+			module: "actions:push:subscribe",
+		});
 		const user = context.locals.user!;
 
 		if (user.role === "admin") {
@@ -26,22 +29,34 @@ export const subscribe = defineAction({
 			});
 		}
 
-		await db.insert(pushSubscriptions).values({
-			userId: user.id,
-			endpoint: input.endpoint,
-			authKey: input.keys.auth,
-			p256dhKey: input.keys.p256dh,
-		});
-		context.session?.set("pushEndpoint", input.endpoint);
+		log.info({ userId: user.id }, "subscribing to push notifications");
 
-		await db.insert(auditLogs).values({
-			userId: user.id,
-			action: "CREATE",
-			tableName: "push_subscriptions",
-			details: auditDetail.create("Mengaktifkan notifikasi", {
+		try {
+			await db.insert(pushSubscriptions).values({
+				userId: user.id,
 				endpoint: input.endpoint,
-			}),
-		});
+				authKey: input.keys.auth,
+				p256dhKey: input.keys.p256dh,
+			});
+			context.session?.set("pushEndpoint", input.endpoint);
+
+			await db.insert(auditLogs).values({
+				userId: user.id,
+				action: "CREATE",
+				tableName: "push_subscriptions",
+				details: auditDetail.create("Mengaktifkan notifikasi", {
+					endpoint: input.endpoint,
+				}),
+			});
+
+			log.info("push subscription created successfully");
+		} catch (error) {
+			log.error(
+				{ error, userId: user.id },
+				"failed to create push subscription",
+			);
+			throw error;
+		}
 	},
 });
 
@@ -49,6 +64,14 @@ export const unsubscribe = defineAction({
 	accept: "json",
 	input: z.object({ endpoint: z.url() }),
 	handler: async ({ endpoint }, context) => {
+		const log = context.locals.logger.child({
+			module: "actions:push:unsubscribe",
+		});
+		log.info(
+			{ userId: context.locals.user!.id },
+			"unsubscribing from push notifications",
+		);
+
 		await db
 			.delete(pushSubscriptions)
 			.where(eq(pushSubscriptions.endpoint, endpoint));
@@ -62,6 +85,8 @@ export const unsubscribe = defineAction({
 				endpoint,
 			}),
 		});
+
+		log.info("push subscription removed successfully");
 	},
 });
 
@@ -85,19 +110,40 @@ export const deleteHistory = defineAction({
 export const test = defineAction({
 	accept: "json",
 	handler: async (_, context) => {
+		const log = context.locals.logger.child({ module: "actions:push:test" });
 		const user = context.locals.user!;
 		const endpoint = await context.session?.get("pushEndpoint");
 
-		await sendPush([endpoint!], {
-			title: "Test Notifikasi",
-			body: "Notifikasi berhasil dikirim! 🎉",
-		});
+		log.info({ userId: user.id }, "sending test push notification");
 
-		await db.insert(auditLogs).values({
-			userId: user.id,
-			action: "CREATE",
-			tableName: "push_history",
-			details: auditDetail.notification("Menguji notifikasi", "push", user.id),
-		});
+		try {
+			await sendPush(
+				[endpoint!],
+				{
+					title: "Test Notifikasi",
+					body: "Notifikasi berhasil dikirim! 🎉",
+				},
+				{ logger: log },
+			);
+
+			await db.insert(auditLogs).values({
+				userId: user.id,
+				action: "CREATE",
+				tableName: "push_history",
+				details: auditDetail.notification(
+					"Menguji notifikasi",
+					"push",
+					user.id,
+				),
+			});
+
+			log.info("test push notification sent successfully");
+		} catch (error) {
+			log.error(
+				{ error, userId: user.id },
+				"failed to send test push notification",
+			);
+			throw error;
+		}
 	},
 });

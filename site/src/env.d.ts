@@ -21,7 +21,7 @@ declare namespace App {
 			details: import("@indekos/database/schema").AuditDetails,
 		) => Promise<void>;
 		user?: SessionData["user"] & { allowEdit?: boolean };
-
+		logger: import("@indekos/utilities/logger").Logger;
 		actionResults: import("~/lib/form-result").ActionResult[];
 	}
 }

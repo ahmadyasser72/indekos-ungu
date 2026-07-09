@@ -1,5 +1,7 @@
 import type { Room, Tenant } from "@indekos/database/schema";
 
+import type { Logger } from "pino";
+
 export interface ActiveTenant extends Tenant {
 	lease: { room: Room };
 }
@@ -34,6 +36,7 @@ export interface StepResult {
 export type StepHandler = (
 	input: MessageInput,
 	session: ConversationSession,
+	options?: { logger?: Logger },
 ) => StepResult | Promise<StepResult>;
 
 export interface FlowDef {

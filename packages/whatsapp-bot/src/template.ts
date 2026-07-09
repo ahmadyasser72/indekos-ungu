@@ -2,6 +2,7 @@ import path from "node:path";
 import { config } from "@indekos/utilities/brand";
 
 import { Eta } from "eta";
+import type { Logger } from "pino";
 
 const eta = new Eta({
 	views: path.join(import.meta.dirname, "templates"),
@@ -119,4 +120,15 @@ interface TemplateParams {
 export const render = <K extends keyof TemplateParams>(
 	name: K,
 	params: TemplateParams[K],
-) => eta.render(`./${name}`, { ...params, config }).trimEnd();
+	options?: { logger?: Logger },
+) => {
+	const log = options?.logger?.child({ submodule: "template" });
+
+	try {
+		log?.debug({ templateName: name }, "rendering template");
+		return eta.render(`./${name}`, { ...params, config }).trimEnd();
+	} catch (error) {
+		log?.error({ error, templateName: name }, "template render failed");
+		throw error;
+	}
+};

@@ -1,9 +1,15 @@
 import { createHmac } from "node:crypto";
+import type { Logger } from "@indekos/utilities/logger";
 
 export interface DuitkuConfig {
 	merchantCode: string;
 	apiKey: string;
 	baseUrl: string;
+}
+
+export interface DuitkuExecutionOptions {
+	/** An optional, request-scoped child logger instance passed down from the runtime layer. */
+	logger?: Logger;
 }
 
 export const config = (): DuitkuConfig => {
@@ -13,8 +19,9 @@ export const config = (): DuitkuConfig => {
 		DUITKU_BASE_URL = "https://api-sandbox.duitku.com",
 	} = process.env;
 
-	if (!DUITKU_MERCHANT_CODE || !DUITKU_API_KEY)
+	if (!DUITKU_MERCHANT_CODE || !DUITKU_API_KEY) {
 		throw new Error("DUITKU_MERCHANT_CODE and DUITKU_API_KEY is not set.");
+	}
 
 	return {
 		merchantCode: DUITKU_MERCHANT_CODE,
@@ -91,7 +98,12 @@ export const getPaymentUrlFromReference = (reference: string): string => {
 
 export const createInvoice = async (
 	params: CreateInvoiceParams,
+	options?: DuitkuExecutionOptions,
 ): Promise<CreateInvoiceResponse> => {
+	const log = options?.logger?.child({
+		module: "database:duitku:createInvoice",
+	});
+
 	const { merchantCode, apiKey, baseUrl } = config();
 	const timestamp = Date.now().toString();
 	const signature = generateSignature(merchantCode, timestamp, apiKey);
@@ -114,9 +126,13 @@ export const createInvoice = async (
 
 	const url = `${baseUrl}/api/merchant/createInvoice`;
 
-	let res: Response;
+	let response: Response;
 	try {
-		res = await fetch(url, {
+		log?.info(
+			{ merchantOrderId: params.merchantOrderId },
+			"duitku-client: dispatching gateway payload creation request",
+		);
+		response = await fetch(url, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -126,24 +142,41 @@ export const createInvoice = async (
 			},
 			body: JSON.stringify(body),
 		});
-	} catch (err) {
+	} catch (error) {
+		log?.error(
+			{ error, merchantOrderId: params.merchantOrderId },
+			"duitku-client: core network connection failure encountered",
+		);
 		throw new DuitkuError(
 			"NETWORK_ERROR",
-			`Gagal terhubung ke Duitku: ${(err as Error).message}`,
+			`Gagal terhubung ke Duitku: ${(error as Error).message}`,
 		);
 	}
 
-	const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+	const json = (await response.json().catch(() => ({}))) as Record<
+		string,
+		unknown
+	>;
 
-	if (!res.ok) {
-		const msg = String(
-			json?.StatusMessage ?? json?.statusMessage ?? `HTTP ${res.status}`,
+	if (!response.ok) {
+		const message = String(
+			json?.StatusMessage ?? json?.statusMessage ?? `HTTP ${response.status}`,
 		);
 		const code = String(
-			json?.StatusCode ?? json?.statusCode ?? `HTTP_${res.status}`,
+			json?.StatusCode ?? json?.statusCode ?? `HTTP_${response.status}`,
 		);
-		throw new DuitkuError(code, `Duitku API error: ${msg}`);
+
+		log?.error(
+			{ responseCode: code, responseMessage: message },
+			"duitku-client: vendor endpoint returned an operational error code",
+		);
+		throw new DuitkuError(code, `Duitku API error: ${message}`);
 	}
+
+	log?.info(
+		{ reference: String(json.Reference ?? "") },
+		"duitku-client: transaction invoice token generated successfully",
+	);
 
 	return {
 		reference: String(json.Reference ?? json.reference ?? ""),

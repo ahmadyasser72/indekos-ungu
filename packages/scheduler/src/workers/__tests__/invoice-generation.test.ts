@@ -110,6 +110,7 @@ describe("runInvoiceGeneration", () => {
 			expect.any(Number),
 			"http://localhost:4321",
 			systemUser.id,
+			expect.any(Object),
 		);
 	});
 

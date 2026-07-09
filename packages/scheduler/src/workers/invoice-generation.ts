@@ -1,92 +1,122 @@
 import { db } from "@indekos/database";
 import { generatePaymentLink } from "@indekos/database/duitku/invoice-payment";
-import {
-	auditDetail,
-	auditLogs,
-	invoices,
-	type User,
-} from "@indekos/database/schema";
+import { auditDetail, auditLogs, invoices } from "@indekos/database/schema";
 import dayjs from "@indekos/utilities/date";
 
-import { logger } from "../logger";
+import type { SchedulerWorkerFunction } from "./types";
 
-export const runInvoiceGeneration = async (systemUser: User, now?: Date) => {
-	const ref = now ?? new Date();
+export const runInvoiceGeneration: SchedulerWorkerFunction = async (
+	systemUser,
+	referenceDate,
+	options,
+) => {
+	// Spawn a contextual child logger specifically for this background execution block
+	const log = options?.logger?.child({ module: "workers:invoice-generation" });
 
-	const activeLeases = await db.query.leases.findMany({
-		where: { isActive: true },
-		with: { room: true, invoices: true },
-	});
+	const referenceTime = referenceDate ?? new Date();
 
-	const toCreate: { leaseId: number; amount: number; dueDate: Date }[] = [];
+	log?.info(
+		{ referenceExecutionTime: referenceTime.toISOString() },
+		"invoice-generation: starting automated lease invoice validation loop",
+	);
 
-	for (const lease of activeLeases) {
-		const endDate = lease.endDate ? dayjs(lease.endDate) : null;
-		let cycleStart = dayjs(lease.startDate).add(1, "month");
+	try {
+		const activeLeases = await db.query.leases.findMany({
+			where: { isActive: true },
+			with: { room: true, invoices: true },
+		});
 
-		while (true) {
-			// Stop if cycle start is past lease end
-			if (endDate && !cycleStart.isBefore(endDate, "day")) break;
+		const toCreate: { leaseId: number; amount: number; dueDate: Date }[] = [];
 
-			const creationDate = cycleStart.subtract(7, "days");
+		for (const lease of activeLeases) {
+			const endDate = lease.endDate ? dayjs(lease.endDate) : null;
+			let cycleStart = dayjs(lease.startDate).add(1, "month");
 
-			// Don't create invoices too far in the future
-			if (creationDate.isAfter(dayjs(ref), "day")) break;
+			while (true) {
+				// Stop if cycle start is past lease end
+				if (endDate && !cycleStart.isBefore(endDate, "day")) break;
 
-			// Avoid duplicate invoices for the same period
-			const existing = lease.invoices.find(({ dueDate }) =>
-				cycleStart.isSame(dueDate, "days"),
+				const creationDate = cycleStart.subtract(7, "days");
+
+				// Don't create invoices too far in the future
+				if (creationDate.isAfter(dayjs(referenceTime), "day")) break;
+
+				// Avoid duplicate invoices for the same period
+				const existing = lease.invoices.find(({ dueDate }) =>
+					cycleStart.isSame(dueDate, "days"),
+				);
+
+				if (!existing) {
+					toCreate.push({
+						leaseId: lease.id,
+						amount: lease.room.monthlyPrice,
+						dueDate: cycleStart.toDate(),
+					});
+				}
+
+				cycleStart = cycleStart.add(1, "month");
+			}
+		}
+
+		let newInvoices: { id: number }[] = [];
+
+		if (toCreate.length > 0) {
+			newInvoices = await db
+				.insert(invoices)
+				.values(toCreate)
+				.returning({ id: invoices.id });
+
+			log?.info(
+				{ invoiceCount: newInvoices.length },
+				"invoice-generation: persistent database records committed successfully",
 			);
 
-			if (!existing) {
-				toCreate.push({
-					leaseId: lease.id,
-					amount: lease.room.monthlyPrice,
-					dueDate: cycleStart.toDate(),
-				});
+			await db.insert(auditLogs).values({
+				userId: systemUser.id,
+				action: "CREATE",
+				tableName: "invoices",
+				details: auditDetail.cron(
+					`Cron membuat ${newInvoices.length} invoice(s)`,
+					"invoices",
+					newInvoices.map(({ id }) => id),
+				),
+			});
+		}
+
+		// Generate payment links for newly created invoices
+		const siteUrl = process.env.SITE_URL;
+		if (newInvoices.length > 0 && siteUrl) {
+			let generatedCount = 0;
+
+			for (const { id } of newInvoices) {
+				try {
+					await generatePaymentLink(id, siteUrl, systemUser.id, {
+						logger: log,
+					});
+					generatedCount++;
+				} catch (error) {
+					log?.error(
+						{ invoiceId: id, error },
+						"invoice-generation: failed to generate transaction payment gateway link",
+					);
+				}
 			}
 
-			cycleStart = cycleStart.add(1, "month");
+			log?.info(
+				{ generatedCount, totalInvoices: newInvoices.length },
+				"invoice-generation: payment links compilation sequence complete",
+			);
 		}
-	}
 
-	let newInvoices: { id: number }[] = [];
-
-	if (toCreate.length > 0) {
-		newInvoices = await db
-			.insert(invoices)
-			.values(toCreate)
-			.returning({ id: invoices.id });
-
-		await db.insert(auditLogs).values({
-			userId: systemUser.id,
-			action: "CREATE",
-			tableName: "invoices",
-			details: auditDetail.cron(
-				`Cron membuat ${newInvoices.length} invoice(s)`,
-				"invoices",
-				newInvoices.map(({ id }) => id),
-			),
-		});
-	}
-
-	// Generate payment links for newly created invoices
-	const siteUrl = process.env.SITE_URL;
-	if (newInvoices.length > 0 && siteUrl) {
-		let generated = 0;
-		for (const { id } of newInvoices) {
-			try {
-				await generatePaymentLink(id, siteUrl, systemUser.id);
-				generated++;
-			} catch (err) {
-				logger.error({ invoiceId: id, err }, "Failed to generate payment link");
-			}
-		}
-		logger.info(
-			{ generated, total: newInvoices.length },
-			"Payment links generated",
+		log?.info(
+			{ createdInvoiceCount: toCreate.length },
+			"invoice-generation: execution routine completed successfully",
 		);
+	} catch (error) {
+		log?.error(
+			{ error },
+			"invoice-generation: unhandled exception encountered during generation batch pipeline",
+		);
+		throw error;
 	}
-
-	logger.info({ count: toCreate.length }, "Invoices generated");
 };

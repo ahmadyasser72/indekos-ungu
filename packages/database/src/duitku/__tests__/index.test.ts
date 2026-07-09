@@ -65,10 +65,10 @@ describe("getPaymentUrlFromReference", () => {
 
 describe("DuitkuError", () => {
 	it("extends Error with code property", () => {
-		const err = new DuitkuError("ERR01", "test error");
-		expect(err).toBeInstanceOf(Error);
-		expect(err.name).toBe("DuitkuError");
-		expect(err.code).toBe("ERR01");
-		expect(err.message).toBe("test error");
+		const error = new DuitkuError("ERR01", "test error");
+		expect(error).toBeInstanceOf(Error);
+		expect(error.name).toBe("DuitkuError");
+		expect(error.code).toBe("ERR01");
+		expect(error.message).toBe("test error");
 	});
 });

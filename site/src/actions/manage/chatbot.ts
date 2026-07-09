@@ -10,14 +10,19 @@ export const remove = defineAction({
 		id: z.coerce.number(),
 	}),
 	handler: async ({ id }, context) => {
+		const log = context.locals.logger.child({
+			module: "actions:manage:chatbot:remove",
+		});
 		const value = await db.query.chatbotMessages.findFirst({ where: { id } });
 		if (!value) {
-			console.error("chatbot.remove: message not found", { id });
+			log.error({ messageId: id }, "chatbot message not found");
 			throw new ActionError({
 				code: "NOT_FOUND",
 				message: "Pesan chatbot tidak ditemukan.",
 			});
 		}
+
+		log.info({ messageId: id }, "attempting to delete chatbot message");
 
 		await db.delete(chatbotMessages).where(eq(chatbotMessages.id, id));
 
@@ -28,6 +33,7 @@ export const remove = defineAction({
 			auditDetail.delete(`Menghapus log pesan chatbot dengan ID: ${id}`, value),
 		);
 
+		log.info("chatbot message deleted");
 		return { success: true, id };
 	},
 });

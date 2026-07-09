@@ -1,22 +1,15 @@
-import path from "node:path";
-
 import pino from "pino";
-import PinoPretty from "pino-pretty";
 
-import { MONOREPO_ROOT } from "./monorepo";
+export type Logger = pino.Logger;
 
-export { pino };
+export const baseLogger = pino({
+	transport: import.meta.env.DEV
+		? { target: "pino-pretty", options: { colorize: true } }
+		: undefined,
 
-export const createLogger = (name: string): pino.Logger<never> =>
-	pino(
-		{ name },
-		pino.multistream([
-			{ level: "info", stream: PinoPretty() },
-			{
-				level: "info",
-				stream: pino.destination(
-					path.join(MONOREPO_ROOT, "logs", `${name}.log`),
-				),
-			},
-		]),
-	);
+	level: process.env.LOG_LEVEL ?? "info",
+});
+
+export const createLogger = (componentName: string) => {
+	return baseLogger.child({ componentName });
+};
