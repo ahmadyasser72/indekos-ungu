@@ -18,6 +18,7 @@ export const runOverdueReminder = async (systemUser: User, now?: Date) => {
 			status: "overdue",
 			dueDate: { lte: ref },
 			NOT: {
+				// Only queue a reminder if no pending/sent reminder exists from the last 23 hours
 				notifications: {
 					type: "overdue_reminder",
 					status: { NOT: "failed" },

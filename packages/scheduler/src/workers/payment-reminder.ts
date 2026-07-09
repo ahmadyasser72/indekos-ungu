@@ -22,6 +22,7 @@ export const runPaymentReminder = async (systemUser: User, now?: Date) => {
 				lte: dayjs(ref).add(3, "days").endOf("day").toDate(),
 			},
 			NOT: {
+				// Only queue a reminder if no pending/sent reminder exists from the last 23 hours
 				notifications: {
 					type: "reminder",
 					status: { NOT: "failed" },
