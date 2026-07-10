@@ -28,7 +28,7 @@ jobs:
       - uses: ./.github/actions/setup-bun
       - run: bun run format:check
 
-  push-ghcr:
+  docker-build-push:
     needs: [check, test]
     runs-on: ubuntu-latest
     permissions:
@@ -36,7 +36,7 @@ jobs:
       packages: write
     env:
       IMAGE_REGISTRY: ghcr.io
-      BASE_IMAGE_TAG: ghcr.io/${{ github.actor }}
+      BASE_IMAGE_TAG: ghcr.io/${{ github.repository_owner }}
 
     steps:
       - uses: actions/checkout@v7.0.0
