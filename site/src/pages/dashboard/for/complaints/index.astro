@@ -45,7 +45,7 @@ const complaintStats = getComplaintStats(complaints);
 		<a
 			class="btn btn-outline btn-sm"
 			id="complaints-print"
-			href={`/dashboard/manage/complaints/report/html${Astro.url.search}`}
+			href={`/dashboard/for/complaints/report/html${Astro.url.search}`}
 			hx-swap-oob="true"
 			target="_blank"
 		>
@@ -201,7 +201,7 @@ const complaintStats = getComplaintStats(complaints);
 								<div class="flex shrink-0 items-center gap-2 self-end md:self-center">
 									{isOpen && (
 										<button
-											hx-get={`/dashboard/manage/complaints/modal/process/${id}`}
+											hx-get={`/dashboard/for/complaints/modal/process/${id}`}
 											class="btn btn-outline btn-sm btn-warning"
 										>
 											<Icon name="lucide:loader" />
@@ -210,7 +210,7 @@ const complaintStats = getComplaintStats(complaints);
 									)}
 									{isResolvable ? (
 										<button
-											hx-get={`/dashboard/manage/complaints/modal/resolve/${id}`}
+											hx-get={`/dashboard/for/complaints/modal/resolve/${id}`}
 											class="btn btn-outline btn-sm btn-success"
 										>
 											<Icon name="lucide:circle-check" />

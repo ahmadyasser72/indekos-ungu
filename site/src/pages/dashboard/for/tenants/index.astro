@@ -58,7 +58,7 @@ const tenantsStats = getTenantsStats(tenants);
 		<a
 			class="btn btn-outline btn-sm"
 			id="tenants-print"
-			href={`/dashboard/manage/tenants/report/html${Astro.url.search}`}
+			href={`/dashboard/for/tenants/report/html${Astro.url.search}`}
 			hx-swap-oob="true"
 			target="_blank"
 		>
@@ -68,7 +68,7 @@ const tenantsStats = getTenantsStats(tenants);
 		{
 			Astro.locals.user?.allowEdit && (
 				<button
-					hx-get="/dashboard/manage/tenants/modal/add"
+					hx-get="/dashboard/for/tenants/modal/add"
 					class="btn btn-primary btn-sm"
 				>
 					<Icon name="lucide:plus" size="size-5" />
@@ -206,14 +206,14 @@ const tenantsStats = getTenantsStats(tenants);
 									<td class="text-right">
 										<div class="flex justify-end gap-1.5">
 											<button
-												hx-get={`/dashboard/manage/tenants/modal/chat/${id}`}
+												hx-get={`/dashboard/for/tenants/modal/chat/${id}`}
 												class="btn flex items-center gap-1 btn-outline btn-primary btn-xs"
 											>
 												<Icon name="lucide:message-square" /> Chat
 											</button>
 
 											<button
-												hx-get={`/dashboard/manage/tenants/modal/detail/${id}`}
+												hx-get={`/dashboard/for/tenants/modal/detail/${id}`}
 												class="btn flex items-center gap-1 btn-outline btn-primary btn-xs"
 											>
 												<Icon name="lucide:file-text" /> Detail
@@ -228,7 +228,7 @@ const tenantsStats = getTenantsStats(tenants);
 													>
 														<li>
 															<button
-																hx-get={`/dashboard/manage/tenants/modal/edit/${id}`}
+																hx-get={`/dashboard/for/tenants/modal/edit/${id}`}
 															>
 																<Icon name="lucide:pencil" />
 																Edit
@@ -236,7 +236,7 @@ const tenantsStats = getTenantsStats(tenants);
 														</li>
 														<li>
 															<button
-																hx-get={`/dashboard/manage/tenants/modal/move/${id}`}
+																hx-get={`/dashboard/for/tenants/modal/move/${id}`}
 															>
 																<Icon name="lucide:arrow-right-circle" />
 																Pindah Kamar
@@ -244,7 +244,7 @@ const tenantsStats = getTenantsStats(tenants);
 														</li>
 														<li>
 															<button
-																hx-get={`/dashboard/manage/tenants/modal/terminate/${id}`}
+																hx-get={`/dashboard/for/tenants/modal/terminate/${id}`}
 																class="text-error"
 															>
 																<Icon name="lucide:x" /> Berhenti Menginap
@@ -259,7 +259,7 @@ const tenantsStats = getTenantsStats(tenants);
 													>
 														<li>
 															<button
-																hx-get={`/dashboard/manage/tenants/modal/edit/${id}`}
+																hx-get={`/dashboard/for/tenants/modal/edit/${id}`}
 															>
 																<Icon name="lucide:pencil" />
 																Edit
@@ -267,7 +267,7 @@ const tenantsStats = getTenantsStats(tenants);
 														</li>
 														<li>
 															<button
-																hx-get={`/dashboard/manage/tenants/modal/register/${id}`}
+																hx-get={`/dashboard/for/tenants/modal/register/${id}`}
 																class="text-success"
 															>
 																<Icon name="lucide:plus" /> Sewa Baru

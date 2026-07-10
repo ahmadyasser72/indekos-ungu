@@ -38,7 +38,7 @@ const auditStats = getAuditStats(auditLogs);
 		<a
 			class="btn btn-outline btn-sm"
 			id="audit-print"
-			href={`/dashboard/log/audit/report/html${Astro.url.search}`}
+			href={`/dashboard/for/audit/report/html${Astro.url.search}`}
 			hx-swap-oob="true"
 			target="_blank"
 		>
@@ -146,7 +146,7 @@ const auditStats = getAuditStats(auditLogs);
 												details.type === "payment" ||
 												details.type === "notification") && (
 												<button
-													hx-get={`/dashboard/log/audit/modal/detail/${id}`}
+													hx-get={`/dashboard/for/audit/modal/detail/${id}`}
 													class="btn btn-square btn-ghost btn-xs"
 												>
 													<Icon name="lucide:eye" />
@@ -155,7 +155,7 @@ const auditStats = getAuditStats(auditLogs);
 
 										{Astro.locals.user?.allowEdit && (
 											<button
-												hx-get={`/dashboard/log/audit/modal/delete/${id}`}
+												hx-get={`/dashboard/for/audit/modal/delete/${id}`}
 												class="btn btn-square btn-ghost text-error btn-xs"
 											>
 												<Icon name="lucide:x" />

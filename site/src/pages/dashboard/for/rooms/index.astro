@@ -51,7 +51,7 @@ const roomStats = getRoomStats(rooms);
 		<a
 			class="btn btn-outline btn-sm"
 			id="rooms-print"
-			href={`/dashboard/manage/rooms/report/html${Astro.url.search}`}
+			href={`/dashboard/for/rooms/report/html${Astro.url.search}`}
 			hx-swap-oob="true"
 			target="_blank"
 		>
@@ -61,7 +61,7 @@ const roomStats = getRoomStats(rooms);
 		{
 			Astro.locals.user?.allowEdit && (
 				<button
-					hx-get="/dashboard/manage/rooms/modal/add"
+					hx-get="/dashboard/for/rooms/modal/add"
 					class="btn btn-primary btn-sm"
 				>
 					<Icon name="lucide:plus" size="size-5" />
@@ -170,7 +170,7 @@ const roomStats = getRoomStats(rooms);
 
 								<div class="card-actions flex-row gap-2">
 									<button
-										hx-get={`/dashboard/manage/rooms/modal/detail/${id}`}
+										hx-get={`/dashboard/for/rooms/modal/detail/${id}`}
 										class="btn flex flex-1 items-center justify-center gap-1 btn-outline btn-primary btn-xs"
 									>
 										<Icon name="lucide:file-text" /> Detail
@@ -183,7 +183,7 @@ const roomStats = getRoomStats(rooms);
 										>
 											<li>
 												<button
-													hx-get={`/dashboard/manage/rooms/modal/edit/${id}`}
+													hx-get={`/dashboard/for/rooms/modal/edit/${id}`}
 													class="flex items-center gap-2"
 												>
 													<Icon name="lucide:pencil" /> Edit Kamar
@@ -191,7 +191,7 @@ const roomStats = getRoomStats(rooms);
 											</li>
 											<li>
 												<button
-													hx-get={`/dashboard/manage/rooms/modal/delete/${id}`}
+													hx-get={`/dashboard/for/rooms/modal/delete/${id}`}
 													class="flex items-center gap-2 text-error"
 												>
 													<Icon name="lucide:trash-2" /> Hapus

@@ -12,7 +12,7 @@ import DashboardLayout from "~/layouts/dashboard-layout.astro";
 import {
 	COMPLAINT_STATUS_BADGES,
 	COMPLAINT_STATUS_LABELS,
-} from "~/pages/dashboard/manage/complaints/_data";
+} from "~/pages/dashboard/for/complaints/_data";
 
 const now = dayjs();
 
@@ -137,7 +137,7 @@ const getStatusBadge = (status: string) => {
 						Astro.locals.user?.role !== "admin" && (
 							<a
 								class="btn btn-outline btn-primary btn-xs"
-								href="/dashboard/report/transactions"
+								href="/dashboard/for/transactions"
 							>
 								Lihat Semua
 							</a>
@@ -198,7 +198,7 @@ const getStatusBadge = (status: string) => {
 						Astro.locals.user?.role !== "admin" && (
 							<a
 								class="btn btn-outline btn-primary btn-xs"
-								href="/dashboard/manage/complaints"
+								href="/dashboard/for/complaints"
 							>
 								{Astro.locals.user?.role === "staff" ? "Kelola" : "Lihat"}{" "}
 								Komplain

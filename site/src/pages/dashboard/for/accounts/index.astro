@@ -41,7 +41,7 @@ const accounts = await fetchAccounts(params);
 		{
 			Astro.locals.user?.allowEdit && (
 				<button
-					hx-get="/dashboard/manage/accounts/modal/add"
+					hx-get="/dashboard/for/accounts/modal/add"
 					class="btn btn-primary btn-sm"
 				>
 					<Icon name="lucide:plus" size="size-5" />
@@ -136,13 +136,13 @@ const accounts = await fetchAccounts(params);
 							<td class="text-right">
 								<div class="flex justify-end gap-1.5">
 									<button
-										hx-get={`/dashboard/manage/accounts/modal/edit/${id}`}
+										hx-get={`/dashboard/for/accounts/modal/edit/${id}`}
 										class="btn btn-outline btn-info btn-xs"
 									>
 										<Icon name="lucide:pencil" /> Edit
 									</button>
 									<button
-										hx-get={`/dashboard/manage/accounts/modal/delete/${id}`}
+										hx-get={`/dashboard/for/accounts/modal/delete/${id}`}
 										class="btn btn-outline btn-error btn-xs"
 									>
 										<Icon name="lucide:trash-2" /> Hapus

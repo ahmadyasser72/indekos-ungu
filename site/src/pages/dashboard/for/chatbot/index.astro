@@ -32,7 +32,7 @@ const chatbotStats = getChatbotStats(chatbotLogs);
 		<a
 			class="btn btn-outline btn-sm"
 			id="chatbot-print"
-			href={`/dashboard/log/chatbot/report/html${Astro.url.search}`}
+			href={`/dashboard/for/chatbot/report/html${Astro.url.search}`}
 			hx-swap-oob="true"
 			target="_blank"
 		>
@@ -114,7 +114,7 @@ const chatbotStats = getChatbotStats(chatbotLogs);
 								<td class="text-right">
 									<div class="flex justify-end gap-1.5">
 										<button
-											hx-get={`/dashboard/manage/tenants/modal/chat/${tenantId}`}
+											hx-get={`/dashboard/for/tenants/modal/chat/${tenantId}`}
 											class="btn btn-square btn-ghost btn-xs"
 											title="Chat"
 											hx-vals={JSON.stringify({ message: id })}
@@ -122,7 +122,7 @@ const chatbotStats = getChatbotStats(chatbotLogs);
 											<Icon name="lucide:message-square" />
 										</button>
 										<button
-											hx-get={`/dashboard/log/chatbot/modal/view-message/${id}`}
+											hx-get={`/dashboard/for/chatbot/modal/view-message/${id}`}
 											class="btn btn-square btn-ghost btn-xs"
 											title="Lihat pesan"
 										>
@@ -130,7 +130,7 @@ const chatbotStats = getChatbotStats(chatbotLogs);
 										</button>
 										{Astro.locals.user?.allowEdit && (
 											<button
-												hx-get={`/dashboard/log/chatbot/modal/delete/${id}`}
+												hx-get={`/dashboard/for/chatbot/modal/delete/${id}`}
 												class="btn btn-square btn-ghost text-error btn-xs"
 											>
 												<Icon name="lucide:x" />
