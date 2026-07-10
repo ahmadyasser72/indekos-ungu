@@ -36,7 +36,6 @@ const login = async () => {
 
 				if (connection === "open") {
 					log.info("whatsapp connection established successfully");
-					console.log("\nWhatsApp berhasil terhubung!");
 					await SVGFile.delete();
 					process.exit(0);
 				}

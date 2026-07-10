@@ -12,13 +12,11 @@ const logout = async () => {
 
 		if (rows.length === 0) {
 			log.warn("no active whatsapp session found");
-			console.log("Tidak ada sesi WhatsApp yang aktif.");
 		} else {
 			log.info(
 				{ deletedAuth: rows.length },
 				"whatsapp session credentials deleted",
 			);
-			console.log(`Sesi WhatsApp telah dihapus (${rows.length} data auth).`);
 		}
 
 		process.exit(0);

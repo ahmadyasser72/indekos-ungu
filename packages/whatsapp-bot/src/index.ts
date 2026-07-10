@@ -332,9 +332,9 @@ export const main = async () => {
 			const pollLogger = baseLogger.child({ module: "bot:polling-interval" });
 			try {
 				await Promise.allSettled([
-					pollNotifications(socket, botUser.id),
-					pollResolvedComplaints(socket, botUser.id),
-					pollInProgressComplaints(socket, botUser.id),
+					pollNotifications(socket, botUser.id, { logger: pollLogger }),
+					pollResolvedComplaints(socket, botUser.id, { logger: pollLogger }),
+					pollInProgressComplaints(socket, botUser.id, { logger: pollLogger }),
 				]);
 			} catch (error) {
 				pollLogger.error(

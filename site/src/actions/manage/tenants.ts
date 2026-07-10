@@ -78,7 +78,7 @@ export const add = defineAction({
 					.all();
 
 				if (!inserted) {
-					console.error("tenants.add: failed to insert tenant");
+					log.error("failed to insert tenant");
 					throw new ActionError({
 						code: "INTERNAL_SERVER_ERROR",
 						message: "Gagal menyimpan data penghuni baru.",
@@ -358,12 +358,15 @@ export const move = defineAction({
 		start_date: z.string(),
 	}),
 	handler: async (input, context) => {
+		const log = context.locals.logger.child({
+			module: "actions:manage:tenants:move",
+		});
 		const target = await db.query.tenants.findFirst({
 			columns: { id: true, fullName: true },
 			where: { id: input.id },
 		});
 		if (!target) {
-			console.error("tenants.move: tenant not found", { id: input.id });
+			log.error({ tenantId: input.id }, "tenant not found");
 			throw new ActionError({
 				code: "BAD_REQUEST",
 				message: "Penghuni tidak ditemukan.",
@@ -381,12 +384,17 @@ export const move = defineAction({
 			where: { tenantId: input.id, isActive: true },
 		});
 		if (!oldLease) {
-			console.error("tenants.move: no active lease", { tenantId: input.id });
+			log.error({ tenantId: input.id }, "no active lease found");
 			throw new ActionError({
 				code: "BAD_REQUEST",
 				message: "Penghuni tidak memiliki kontrak sewa aktif.",
 			});
 		}
+
+		log.info(
+			{ tenantId: input.id, roomId: input.room_id },
+			"attempting to move tenant to new room",
+		);
 
 		db.transaction((tx) => {
 			const roomTaken = tx.query.leases
@@ -397,9 +405,7 @@ export const move = defineAction({
 				.sync();
 
 			if (roomTaken) {
-				console.error("tenants.move: target room occupied", {
-					room_id: input.room_id,
-				});
+				log.error({ roomId: input.room_id }, "target room occupied");
 				throw new ActionError({
 					code: "BAD_REQUEST",
 					message: "Kamar tujuan sudah terisi.",
@@ -438,6 +444,7 @@ export const move = defineAction({
 			),
 		);
 
+		log.info({ tenantId: input.id }, "tenant moved successfully");
 		return { id: input.id };
 	},
 });
