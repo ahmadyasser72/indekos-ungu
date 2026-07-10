@@ -8,7 +8,6 @@ export const runOverdueCheck: SchedulerWorkerFunction = async (
 	referenceDate,
 	options,
 ) => {
-	// Spawn a contextual child logger specifically for this background status verification block
 	const log = options?.logger?.child({ module: "workers:overdue" });
 
 	const referenceTime = referenceDate ?? new Date();
@@ -56,11 +55,21 @@ export const runOverdueCheck: SchedulerWorkerFunction = async (
 			{ processedInvoiceCount: overdueInvoices.length },
 			"overdue: status check execution routine completed successfully",
 		);
+
+		return {
+			success: true,
+			processedCount: overdueInvoices.length,
+			message: `Berhasil menandai ${overdueInvoices.length} invoice sebagai jatuh tempo`,
+		};
 	} catch (error) {
 		log?.error(
 			{ error },
 			"overdue: unhandled exception encountered during invoice aging execution loop",
 		);
-		throw error;
+		return {
+			success: false,
+			processedCount: 0,
+			message: `Gagal: ${error instanceof Error ? error.message : "Kesalahan tidak diketahui"}`,
+		};
 	}
 };

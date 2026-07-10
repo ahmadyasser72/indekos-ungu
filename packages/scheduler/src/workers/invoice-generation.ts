@@ -10,7 +10,6 @@ export const runInvoiceGeneration: SchedulerWorkerFunction = async (
 	referenceDate,
 	options,
 ) => {
-	// Spawn a contextual child logger specifically for this background execution block
 	const log = options?.logger?.child({ module: "workers:invoice-generation" });
 
 	const referenceTime = referenceDate ?? new Date();
@@ -84,15 +83,12 @@ export const runInvoiceGeneration: SchedulerWorkerFunction = async (
 		}
 
 		// Generate payment links for newly created invoices
-		const siteUrl = process.env.SITE_URL;
-		if (newInvoices.length > 0 && siteUrl) {
+		if (newInvoices.length > 0) {
 			let generatedCount = 0;
 
 			for (const { id } of newInvoices) {
 				try {
-					await generatePaymentLink(id, siteUrl, systemUser.id, {
-						logger: log,
-					});
+					await generatePaymentLink(id, systemUser.id, { logger: log });
 					generatedCount++;
 				} catch (error) {
 					log?.error(
@@ -112,11 +108,21 @@ export const runInvoiceGeneration: SchedulerWorkerFunction = async (
 			{ createdInvoiceCount: toCreate.length },
 			"invoice-generation: execution routine completed successfully",
 		);
+
+		return {
+			success: true,
+			processedCount: toCreate.length,
+			message: `Berhasil membuat ${toCreate.length} invoice dengan ${newInvoices.length} link pembayaran`,
+		};
 	} catch (error) {
 		log?.error(
 			{ error },
 			"invoice-generation: unhandled exception encountered during generation batch pipeline",
 		);
-		throw error;
+		return {
+			success: false,
+			processedCount: 0,
+			message: `Gagal: ${error instanceof Error ? error.message : "Kesalahan tidak diketahui"}`,
+		};
 	}
 };

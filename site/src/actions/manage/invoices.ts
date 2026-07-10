@@ -27,7 +27,6 @@ export const generatePaymentLink = defineAction({
 
 			const result = await createPaymentLink(
 				input.invoice_id,
-				context.url.origin,
 				context.locals.user?.id,
 				{ logger: log },
 			);

@@ -3,6 +3,9 @@
 	"type": "module",
 	"license": "AGPL-3.0",
 	"private": true,
+	"exports": {
+		"./*": "./src/workers/*.ts"
+	},
 	"scripts": {
 		"start": "bun src/index.ts",
 		"check": "tsc --noEmit",

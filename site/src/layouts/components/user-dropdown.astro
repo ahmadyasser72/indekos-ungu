@@ -14,6 +14,11 @@ Astro.locals.actionResults.push(
 		"Update profil",
 		(d) => `Berhasil memperbarui profil! (ID: ${d.id})`,
 	),
+	createActionResult(
+		actions.worker.trigger,
+		"Trigger manual",
+		(d) => d.message,
+	),
 );
 ---
 
@@ -53,6 +58,7 @@ Astro.locals.actionResults.push(
 			>
 		</div>
 	</li>
+
 	<li>
 		<button
 			hx-get="/dashboard/modal/profile"
@@ -71,6 +77,16 @@ Astro.locals.actionResults.push(
 			Branding
 		</button>
 	</li>
+	<li>
+		<button
+			hx-get="/dashboard/modal/trigger"
+			class="btn justify-start btn-ghost btn-sm"
+		>
+			<Icon name="lucide:cpu" size="size-5" />
+			Trigger Worker
+		</button>
+	</li>
+
 	<li>
 		<form
 			hx-post={actions.auth.logout}

@@ -26,6 +26,7 @@ const {
 		"alert",
 		type === "info" && "alert-info",
 		type == "error" && "alert-error",
+		Astro.slots.has("default") && "alert-vertical sm:alert-horizontal",
 		className,
 	]}
 	{...props}
@@ -44,10 +45,12 @@ const {
 	}
 
 	{
-		close && (
+		close ? (
 			<button class="alert-close btn btn-circle btn-ghost btn-sm">
 				<Icon name="lucide:x" />
 			</button>
+		) : (
+			<slot />
 		)
 	}
 </div>

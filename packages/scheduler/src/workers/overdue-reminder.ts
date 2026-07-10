@@ -13,7 +13,6 @@ export const runOverdueReminder: SchedulerWorkerFunction = async (
 	referenceDate,
 	options,
 ) => {
-	// Spawn a contextual child logger specifically for this background reminder execution block
 	const log = options?.logger?.child({ module: "workers:overdue-reminder" });
 
 	const referenceTime = referenceDate ?? new Date();
@@ -50,7 +49,11 @@ export const runOverdueReminder: SchedulerWorkerFunction = async (
 				{ createdReminderCount: 0 },
 				"overdue-reminder: no eligible past-due invoices found requiring notification dispatch",
 			);
-			return;
+			return {
+				success: true,
+				processedCount: 0,
+				message: "Tidak ada invoice jatuh tempo yang memerlukan pengingat",
+			};
 		}
 
 		const invoiceIds = overdueInvoices.map((invoice) => invoice.id);
@@ -86,11 +89,21 @@ export const runOverdueReminder: SchedulerWorkerFunction = async (
 			},
 			"overdue-reminder: reminder notifications successfully inserted into the database queue",
 		);
+
+		return {
+			success: true,
+			processedCount: newNotifications.length,
+			message: `Berhasil membuat ${newNotifications.length} pengingat invoice jatuh tempo`,
+		};
 	} catch (error) {
 		log?.error(
 			{ error },
 			"overdue-reminder: unhandled exception encountered during reminder calculation and generation process",
 		);
-		throw error;
+		return {
+			success: false,
+			processedCount: 0,
+			message: `Gagal: ${error instanceof Error ? error.message : "Kesalahan tidak diketahui"}`,
+		};
 	}
 };

@@ -18,10 +18,8 @@ export default defineConfig({
 
 	env: {
 		schema: {
-			DATABASE_PATH: envField.string({
-				access: "secret",
-				context: "server",
-			}),
+			SITE_URL: envField.string({ access: "public", context: "server" }),
+			DATABASE_PATH: envField.string({ access: "secret", context: "server" }),
 			UPLOADS_DIR: envField.string({
 				access: "secret",
 				context: "server",

@@ -108,7 +108,6 @@ describe("runInvoiceGeneration", () => {
 		expect(mockGeneratePaymentLink).toHaveBeenCalledTimes(1);
 		expect(mockGeneratePaymentLink).toHaveBeenCalledWith(
 			expect.any(Number),
-			"http://localhost:4321",
 			systemUser.id,
 			expect.any(Object),
 		);

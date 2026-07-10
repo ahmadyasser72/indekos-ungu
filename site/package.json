@@ -16,6 +16,7 @@
 		"@astrojs/node": "11.0.2",
 		"@croct/md-lite": "0.3.1",
 		"@indekos/database": "workspace:*",
+		"@indekos/scheduler": "workspace:*",
 		"@indekos/utilities": "workspace:*",
 		"@tailwindcss/vite": "4.3.2",
 		"@zumer/snapdom": "2.15.0",

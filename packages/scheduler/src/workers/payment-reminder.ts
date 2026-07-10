@@ -13,7 +13,6 @@ export const runPaymentReminder: SchedulerWorkerFunction = async (
 	referenceDate,
 	options,
 ) => {
-	// Spawn a contextual child logger specifically for this standard payment reminder execution block
 	const log = options?.logger?.child({ module: "workers:payment-reminder" });
 
 	const referenceTime = referenceDate ?? new Date();
@@ -54,7 +53,11 @@ export const runPaymentReminder: SchedulerWorkerFunction = async (
 				{ createdReminderCount: 0 },
 				"payment-reminder: no upcoming unpaid invoices found requiring early warning notifications",
 			);
-			return;
+			return {
+				success: true,
+				processedCount: 0,
+				message: "Tidak ada invoice mendatang yang memerlukan pengingat",
+			};
 		}
 
 		const invoiceIds = dueInvoices.map((invoice) => invoice.id);
@@ -90,11 +93,21 @@ export const runPaymentReminder: SchedulerWorkerFunction = async (
 			},
 			"payment-reminder: pending warning notifications successfully committed to the outbound message queue",
 		);
+
+		return {
+			success: true,
+			processedCount: newNotifications.length,
+			message: `Berhasil membuat ${newNotifications.length} pengingat pembayaran`,
+		};
 	} catch (error) {
 		log?.error(
 			{ error },
 			"payment-reminder: unhandled exception encountered during notification generation schedule parsing",
 		);
-		throw error;
+		return {
+			success: false,
+			processedCount: 0,
+			message: `Gagal: ${error instanceof Error ? error.message : "Kesalahan tidak diketahui"}`,
+		};
 	}
 };

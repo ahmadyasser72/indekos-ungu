@@ -1,0 +1,78 @@
+---
+import { actions, type ActionInputSchema } from "astro:actions";
+import { z } from "astro/zod";
+
+import FormField from "~/components/form/form-field.astro";
+import ModalForm from "~/components/form/modal-form.astro";
+import Modal from "~/components/modal/modal.astro";
+
+export const partial = true;
+
+const onlyNotificationWorker = Astro.url.searchParams.has(
+	"notification-worker",
+);
+
+const workers = {
+	"payment-reminder": "Pengingat Pembayaran (H-3)",
+	"overdue-reminder": "Pengingat Overdue",
+	report: "Laporan Bulanan",
+	...(!onlyNotificationWorker && {
+		overdue: "Tandai Overdue",
+		invoice: "Generate Invoice",
+	}),
+} satisfies Partial<
+	Record<
+		z.infer<
+			ActionInputSchema<typeof actions.worker.trigger>["def"]["shape"]["worker"]
+		>,
+		string
+	>
+>;
+---
+
+<Modal
+	id="trigger_worker"
+	title={`Trigger ${onlyNotificationWorker ? "Pengingat" : "Worker"}`}
+	icon="lucide:play"
+>
+	<ModalForm
+		action={actions.worker.trigger}
+		modalId="trigger_worker"
+		submitLabel="Jalankan"
+	>
+		<FormField
+			label={`Pilih ${onlyNotificationWorker ? "Jenis Pengingat" : "Worker"}`}
+		>
+			<select class="select w-full" name="worker" required>
+				<option value="" disabled selected
+					>-- Pilih {onlyNotificationWorker ? "pengingat" : "worker"} --</option
+				>
+				{
+					Object.entries(workers).map(([id, label]) => (
+						<option value={id}>{label}</option>
+					))
+				}
+			</select>
+		</FormField>
+
+		<FormField
+			helperText={`Jalankan ${onlyNotificationWorker ? "pengingat" : "worker"} untuk tanggal tertentu (kosongkan untuk menggunakan waktu sekarang)`}
+			label="Tanggal Eksekusi"
+		>
+			<input class="input w-full" name="target" type="datetime-local" />
+		</FormField>
+	</ModalForm>
+</Modal>
+
+<script>
+	// Set default date to today
+	document.addEventListener("htmx:load", () => {
+		const dateInput = document.querySelector(
+			'input[name="targetDate"]',
+		) as HTMLInputElement;
+		if (dateInput && !dateInput.value) {
+			const today = new Date();
+			dateInput.value = today.toISOString().split("T")[0];
+		}
+	});
+</script>

@@ -45,7 +45,15 @@ const notificationStats = getNotificationStats(notifications);
 		title="Sistem Otomatisasi Aktif"
 		close={false}
 		description="Sistem mengirimkan pesan pengingat tagihan (WhatsApp) otomatis setiap hari pukul 08.00 WITA untuk penyewa yang memiliki tagihan belum lunas mendekati H-3 jatuh tempo."
-	/>
+	>
+		<button
+			hx-get="/dashboard/modal/trigger?notification-worker"
+			class="btn btn-sm"
+		>
+			<Icon name="lucide:play" />
+			Jalankan Manual
+		</button>
+	</Alert>
 
 	<FilterToolbar name="notifications" from={params.from} to={params.to}>
 		<Fragment slot="actions">

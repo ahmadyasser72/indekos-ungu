@@ -13,7 +13,6 @@ export const runMonthlyReport: SchedulerWorkerFunction = async (
 	referenceDate,
 	options,
 ) => {
-	// Spawn a contextual child logger specifically for this background compilation execution block
 	const log = options?.logger?.child({ module: "workers:monthly-report" });
 
 	const referenceTime = referenceDate ?? new Date();
@@ -86,11 +85,21 @@ export const runMonthlyReport: SchedulerWorkerFunction = async (
 			},
 			"monthly-report: push notification statement summary sent successfully",
 		);
+
+		return {
+			success: true,
+			processedCount: users.length,
+			message: `Berhasil mengirim laporan ke ${users.length} pengguna (${paid.length} terbayar, ${unpaid.length} tertunggak)`,
+		};
 	} catch (error) {
 		log?.error(
 			{ error },
 			"monthly-report: unhandled exception encountered during monthly statement broadcast compilation",
 		);
-		throw error;
+		return {
+			success: false,
+			processedCount: 0,
+			message: `Gagal: ${error instanceof Error ? error.message : "Kesalahan tidak diketahui"}`,
+		};
 	}
 };

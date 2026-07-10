@@ -10,7 +10,7 @@ import {
 	createInvoice as duitkuCreateInvoice,
 	DuitkuError,
 	getPaymentUrlFromReference,
-	type DuitkuExecutionOptions, // 🆕 Import the options interface definition
+	type DuitkuExecutionOptions,
 } from "./index";
 
 export { DuitkuError };
@@ -24,14 +24,21 @@ export class InvoicePaymentError extends Error {
 
 export const generatePaymentLink = async (
 	invoiceId: number,
-	baseUrl: string,
 	auditUserId?: number,
-	options?: DuitkuExecutionOptions, // 🆕 Accept options configuration parameter
+	options?: DuitkuExecutionOptions,
 ) => {
 	const log = options?.logger?.child({
 		module: "database:payment:generatePaymentLink",
 		invoiceId,
 	});
+
+	const baseUrl = process.env.SITE_URL;
+	if (!baseUrl) {
+		log?.error("payment-service: SITE_URL environment variable is missing");
+		throw new InvoicePaymentError(
+			"Konfigurasi sistem tidak lengkap (SITE_URL belum diatur).",
+		);
+	}
 
 	try {
 		const invoice = await db.query.invoices.findFirst({
@@ -90,7 +97,7 @@ export const generatePaymentLink = async (
 				paymentMethod: "",
 			},
 			options,
-		); // 🆕 Hand down the options object
+		);
 
 		await db
 			.update(invoices)
