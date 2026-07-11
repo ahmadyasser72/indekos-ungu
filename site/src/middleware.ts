@@ -94,7 +94,11 @@ export const onRequest = defineMiddleware(async (context, next) => {
 		}
 
 		context.session?.set("user", user);
-		context.locals.user = { ...user, allowEdit: user.role !== "owner" };
+		context.locals.user = {
+			...user,
+			allowEdit: user.role !== "owner",
+			allowChat: user.role === "admin" || user.role === "staff",
+		};
 	}
 
 	const { action } = getActionContext(context);
@@ -135,7 +139,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 	}
 
 	const response = await next();
-	if (persistQuery.size > 0) {
+	if (persistQuery.size > 0 && !context.url.pathname.includes("/modal/")) {
 		response.headers.set(
 			"hx-replace-url",
 			`${context.url.pathname}?${persistQuery}`,

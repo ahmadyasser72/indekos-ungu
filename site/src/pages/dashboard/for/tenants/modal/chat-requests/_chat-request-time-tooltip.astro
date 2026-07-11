@@ -1,0 +1,23 @@
+---
+import dayjs, { formatDate } from "@indekos/utilities/date";
+
+import Icon from "~/components/ui/icon.astro";
+
+interface Props {
+	label: string;
+	icon: `lucide:${string}`;
+	date: Date;
+	relativeTo?: Date;
+}
+
+const { label, icon, date, relativeTo } = Astro.props;
+---
+
+<div class="flex items-center gap-1 text-xs">
+	<Icon name={icon} size="size-3.5" />
+	<span>{label} </span>
+	<span>{formatDate(date, "DD-MM-YYYY HH:MM")}</span>
+	<span>
+		({relativeTo ? dayjs(date).from(relativeTo) : dayjs(date).fromNow()})
+	</span>
+</div>

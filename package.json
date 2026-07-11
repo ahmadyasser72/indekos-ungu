@@ -33,6 +33,7 @@
 		"prettier-plugin-astro": "0.14.1",
 		"prettier-plugin-tailwindcss": "0.7.4",
 		"puppeteer-core": "25.3.0",
-		"tailwindcss": "4.3.2"
+		"tailwindcss": "4.3.2",
+		"typescript": "6.0.3"
 	}
 }

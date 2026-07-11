@@ -1,0 +1,59 @@
+---
+import Icon from "~/components/ui/icon.astro";
+---
+
+<dialog class="modal" id="confirm-modal">
+	<div class="modal-box">
+		<form method="dialog">
+			<button class="btn absolute top-2 right-2 btn-circle btn-ghost btn-sm"
+				>✕</button
+			>
+		</form>
+
+		<h3 class="flex items-center gap-2 text-xl font-bold">
+			<Icon class="text-primary" name="lucide:octagon-alert" size="size-6" />
+			Konfirmasi
+		</h3>
+		<p class="py-4" id="confirm-modal-content"></p>
+
+		<div class="modal-action">
+			<form class="flex gap-2" method="dialog">
+				<button class="btn btn-soft btn-error" value="no">Batal</button>
+				<button class="btn btn-primary" value="yes">Ya</button>
+			</form>
+		</div>
+	</div>
+	<form class="modal-backdrop" method="dialog">
+		<button>close</button>
+	</form>
+</dialog>
+
+<script>
+	const modal = document.getElementById("confirm-modal") as HTMLDialogElement;
+	const modalContent = modal.querySelector<HTMLElement>(
+		"#confirm-modal-content",
+	)!;
+
+	document.addEventListener("htmx:confirm", (e) => {
+		const event = e as Event & {
+			detail: {
+				question?: string;
+				issueRequest: (yes: boolean) => void;
+			};
+		};
+
+		if (!event.detail.question) return;
+		event.preventDefault();
+
+		modalContent.innerText = event.detail.question;
+		modal.addEventListener(
+			"close",
+			() => {
+				if (modal.returnValue === "yes") event.detail.issueRequest(true);
+				modalContent.innerText = "";
+			},
+			{ once: true },
+		);
+		modal.showModal();
+	});
+</script>

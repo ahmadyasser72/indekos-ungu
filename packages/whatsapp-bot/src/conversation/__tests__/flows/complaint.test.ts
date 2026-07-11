@@ -14,7 +14,7 @@ const mockRender = mock(
 	(template: string, _data?: any) => `rendered:${template}`,
 );
 
-mock.module("~/lib/complaint", () => ({
+mock.module("~/conversation/flows/complaint", () => ({
 	createComplaint: mockCreateComplaint,
 	notifyStaffNewComplaint: mockNotifyStaff,
 }));
@@ -92,6 +92,7 @@ describe("komplainFlow", () => {
 				session.tenant,
 				"Foto",
 				expect.objectContaining({ mimetype: "image/jpeg" }),
+				expect.any(Object),
 			);
 			expect(result.reply).toBe("rendered:submit-complaint");
 			expect(result.next).toBeNull();
@@ -108,6 +109,7 @@ describe("komplainFlow", () => {
 				session.tenant,
 				"AC rusak",
 				undefined,
+				expect.any(Object),
 			);
 			expect(result.reply).toBe("rendered:submit-complaint");
 			expect(result.next).toBeNull();
@@ -121,6 +123,7 @@ describe("komplainFlow", () => {
 				session.tenant,
 				"AC rusak",
 				undefined,
+				expect.any(Object),
 			);
 		});
 
@@ -205,6 +208,7 @@ describe("komplainFlow", () => {
 				session.tenant,
 				"AC kamar tidak dingin",
 				undefined,
+				expect.any(Object),
 			);
 			expect(mockNotifyStaff).toHaveBeenCalledTimes(1);
 			expect(result.reply).toBe("rendered:submit-complaint");

@@ -163,6 +163,14 @@ const [recentNotifications, allNotifications] = pushActive
 		},
 	);
 
+	if (sw) {
+		navigator.serviceWorker.addEventListener("message", (event) => {
+			if (event.data.type === "url-htmx") {
+				htmx.ajax("get", event.data.value, document.body);
+			}
+		});
+	}
+
 	htmx.onLoad(async (node) => {
 		if (
 			!(node instanceof HTMLElement) ||

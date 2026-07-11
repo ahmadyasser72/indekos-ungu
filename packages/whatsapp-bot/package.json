@@ -9,7 +9,7 @@
 		"build": "bun build src/index.ts --sourcemap --minify --target=bun --outdir dist",
 		"start": "bun dist/index.js",
 		"check": "tsc --noEmit",
-		"dev": "bun src/index.ts"
+		"dev": "DEV=1 bun src/index.ts"
 	},
 	"dependencies": {
 		"@indekos/database": "workspace:*",

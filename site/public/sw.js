@@ -1,29 +1,48 @@
-self.addEventListener("push", (event) => {
-	const { title, body, url = "/dashboard", imagePath } = event.data.json();
+/// <reference lib="webworker" />
+/** @type {ServiceWorkerGlobalScope} */
+const sw = self;
+
+sw.addEventListener("push", (event) => {
+	const {
+		title,
+		body,
+		url = "/dashboard",
+		urlHtmx,
+		imagePath,
+	} = event.data.json();
 
 	event.waitUntil(
-		self.registration.showNotification(title, {
+		sw.registration.showNotification(title, {
 			body,
 			icon: "/favicon.svg",
 			image: imagePath ? `/api/uploads/${imagePath}` : undefined,
-			data: { url },
+			data: { url, htmx: urlHtmx },
 		}),
 	);
 });
 
-self.addEventListener("notificationclick", (event) => {
+sw.addEventListener("notificationclick", (event) => {
 	event.notification.close();
 
+	const { url, htmx } = event.notification.data;
 	event.waitUntil(
-		clients
+		sw.clients
 			.matchAll({ type: "window", includeUncontrolled: true })
-			.then((clientList) => {
+			.then(async (clientList) => {
 				for (const client of clientList) {
-					if (client.url === event.notification.data.url && "focus" in client) {
+					if (client.url === url && "focus" in client) {
+						if (htmx) {
+							client.postMessage({ type: "url-htmx", value: htmx });
+						}
+
 						return client.focus();
 					}
 				}
-				return clients.openWindow(event.notification.data.url);
+
+				const window = await sw.clients.openWindow(url);
+				if (window && htmx) {
+					window.postMessage({ type: "url-htmx", value: htmx });
+				}
 			}),
 	);
 });

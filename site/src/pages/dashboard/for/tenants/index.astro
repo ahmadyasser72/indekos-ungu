@@ -1,4 +1,6 @@
 ---
+import { db, eq } from "@indekos/database";
+import { chatRequests } from "@indekos/database/schema";
 import { formatDate } from "@indekos/utilities/date";
 
 import { actions } from "astro:actions";
@@ -74,6 +76,42 @@ const tenantsStats = getTenantsStats(tenants);
 					<Icon name="lucide:plus" size="size-5" />
 					Tambah Penghuni
 				</button>
+			)
+		}
+
+		{
+			Astro.locals.user?.allowChat && (
+				<div class="indicator">
+					<button
+						hx-get="/dashboard/for/tenants/modal/chat-requests"
+						class="btn btn-secondary btn-sm"
+					>
+						<Icon name="lucide:message-square" size="size-5" />
+						Permintaan Chat
+					</button>
+
+					{await (async () => {
+						const pendingRequests = await db.$count(
+							chatRequests,
+							eq(chatRequests.status, "pending"),
+						);
+
+						return (
+							pendingRequests > 0 && (
+								<span
+									hx-get={Astro.url.pathname}
+									hx-trigger="reload-chat-request from:body"
+									class="indicator-item badge px-1 badge-sm badge-warning"
+									id="pending-request-indicator"
+									hx-select="#pending-request-indicator"
+									hx-swap="outerHTML"
+								>
+									{pendingRequests}
+								</span>
+							)
+						);
+					})()}
+				</div>
 			)
 		}
 	</Fragment>

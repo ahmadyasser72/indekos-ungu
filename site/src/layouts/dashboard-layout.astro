@@ -6,6 +6,7 @@ import { actions } from "astro:actions";
 import Icon from "~/components/ui/icon.astro";
 import type { Props as BaseProps } from "./base-layout.astro";
 import BaseLayout from "./base-layout.astro";
+import ConfirmModal from "./components/confirm-modal.astro";
 import FormResult from "./components/form-result.astro";
 import NavbarMenu from "./components/navbar-menu.astro";
 import NotificationDropdown from "./components/notification-dropdown.astro";
@@ -74,7 +75,7 @@ if (logoutResult && !logoutResult.error) {
 										<p class="text-sm text-base-content/60">{description}</p>
 									)}
 								</div>
-								<div class="flex items-center gap-2">
+								<div class="flex flex-wrap items-center gap-2 max-sm:*:w-full sm:justify-end max-sm:[&_button]:w-full">
 									<slot name="page-action" />
 								</div>
 							</div>
@@ -99,5 +100,6 @@ if (logoutResult && !logoutResult.error) {
 		</div>
 	</div>
 
+	<ConfirmModal />
 	<FormResult />
 </BaseLayout>

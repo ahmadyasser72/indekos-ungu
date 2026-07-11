@@ -3,6 +3,8 @@ import {
 	auditDetail,
 	auditLogs,
 	chatbotMessages,
+	chatRequests,
+	pendingChatMessages,
 	tenants,
 } from "@indekos/database/schema";
 import { createLogger } from "@indekos/utilities/logger";
@@ -20,9 +22,9 @@ import { checkComplaint } from "./commands/check-complaint";
 import { help } from "./commands/help";
 import { listComplaints } from "./commands/list-complaints";
 import { paymentHistory } from "./commands/payment-history";
-import { submitComplaint } from "./commands/submit-complaint";
 import { tenantInfo } from "./commands/tenant-info";
 import { complaintFlow } from "./conversation/flows/complaint";
+import { contactStaffFlow } from "./conversation/flows/contact-staff";
 import { ConversationManager } from "./conversation/manager";
 import type { ConversationSession, MessageInput } from "./conversation/types";
 import {
@@ -30,6 +32,7 @@ import {
 	pollResolvedComplaints,
 } from "./polls/complaints";
 import { pollNotifications } from "./polls/notifications";
+import { pollPendingMessages } from "./polls/pending-messages";
 import { render } from "./template";
 
 const baseLogger = createLogger("whatsapp-bot");
@@ -38,6 +41,7 @@ const unknownCooldowns = new Map<string, number>();
 
 const conversationManager = new ConversationManager();
 conversationManager.registerFlow(complaintFlow);
+conversationManager.registerFlow(contactStaffFlow);
 
 export const main = async () => {
 	const log = baseLogger.child({ module: "bot:main" });
@@ -64,14 +68,22 @@ export const main = async () => {
 		}
 
 		// Pass a dedicated child logger into Baileys' internal connection configuration object
+		const baileysLogger = baseLogger.child({ module: "vendor:baileys" });
 		const socket = makeWASocket({
 			auth: state,
-			logger: baseLogger.child({ module: "vendor:baileys" }),
+			logger: {
+				child: baileysLogger.child.bind(baileysLogger),
+				debug: baileysLogger.debug.bind(baileysLogger),
+				error: baileysLogger.error.bind(baileysLogger),
+				warn: baileysLogger.warn.bind(baileysLogger),
+				level: baileysLogger.level,
+				trace: baileysLogger.trace.bind(baileysLogger),
+				info: baileysLogger.debug.bind(baileysLogger),
+			},
 		});
 
 		let lastSendTime = 0;
 		const rawSendMessage = socket.sendMessage;
-
 		socket.sendMessage = async (...argumentsList) => {
 			const currentTime = Date.now();
 			const elapsedTime = currentTime - lastSendTime;
@@ -82,6 +94,7 @@ export const main = async () => {
 					{ waitTimeMilliseconds: waitTime },
 					"rate limit encountered: throttling outgoing worker stream thread",
 				);
+
 				await Bun.sleep(waitTime);
 			}
 
@@ -177,7 +190,6 @@ export const main = async () => {
 						},
 					},
 				});
-
 				if (!tenant) {
 					const cooldownUntil = unknownCooldowns.get(jid);
 					if (cooldownUntil && Date.now() < cooldownUntil) return;
@@ -208,11 +220,14 @@ export const main = async () => {
 					tenantId: tenant.id,
 				});
 
-				await db.insert(chatbotMessages).values({
-					tenantId: tenant.id,
-					direction: "incoming",
-					message: imageMessage ? ["📷 [gambar]", text].join("\n") : text,
-				});
+				const [insertedMessage] = await db
+					.insert(chatbotMessages)
+					.values({
+						tenantId: tenant.id,
+						direction: "incoming",
+						message: imageMessage ? ["📷 [gambar]", text].join("\n") : text,
+					})
+					.returning({ id: chatbotMessages.id });
 
 				// Tenant verification sequence checkpoint
 				if (!tenant.isVerified) {
@@ -272,7 +287,63 @@ export const main = async () => {
 					}
 				}
 
-				if (conversationManager.hasActiveSession(jid)) {
+				const activeChatRequest = await db.query.chatRequests.findFirst({
+					where: {
+						tenantId: tenant.id,
+						status: { in: ["pending", "accepted"] },
+					},
+				});
+
+				if (activeChatRequest) {
+					if (activeChatRequest.status === "pending") {
+						if (lowerText === "batal") {
+							tenantLogger.info(
+								{ chatRequestId: activeChatRequest.id },
+								"pending chat request cancelled by tenant",
+							);
+
+							await db
+								.update(chatRequests)
+								.set({ status: "cancelled", cancelledAt: new Date() })
+								.where(eq(chatRequests.id, activeChatRequest.id));
+
+							await replyAndLog(
+								jid,
+								tenant.id,
+								"❌ Permintaan dibatalkan.",
+								message,
+							);
+							return;
+						}
+
+						// Queue message while pending
+						tenantLogger.info(
+							{
+								chatRequestId: activeChatRequest.id,
+								chatbotMessageId: insertedMessage.id,
+							},
+							"queueing message while chat request pending",
+						);
+
+						await db.insert(pendingChatMessages).values({
+							chatRequestId: activeChatRequest.id,
+							chatbotMessageId: insertedMessage.id,
+						});
+
+						return;
+					}
+
+					// Status accepted: block message (don't queue, staff will handle via chat)
+					messageLogger.info(
+						{
+							chatRequestId: activeChatRequest.id,
+							status: activeChatRequest.status,
+						},
+						"active chat request accepted: message will be sent via staff chat handler",
+					);
+
+					return;
+				} else if (conversationManager.hasActiveSession(jid)) {
 					tenantLogger.info(
 						"active multi-turn conversational session context detected, bypassing static routing",
 					);
@@ -284,7 +355,7 @@ export const main = async () => {
 					return;
 				}
 
-				if (lowerText === "komplain") {
+				if (lowerText === "komplain" || lowerText.startsWith("komplain ")) {
 					tenantLogger.info(
 						"conversational wizard command matched: initializing active complaint flow session context",
 					);
@@ -298,15 +369,25 @@ export const main = async () => {
 					return;
 				}
 
+				if (lowerText === "cs" || lowerText.startsWith("cs ")) {
+					tenantLogger.info(
+						"conversational wizard command matched: initializing contact staff flow session context",
+					);
+					conversationManager.startSession(jid, tenant, "contact_staff");
+
+					const reply = await conversationManager.handleMessage(
+						jid,
+						messageInput,
+					);
+					if (reply) await replyAndLog(jid, tenant.id, reply, message);
+					return;
+				}
+
 				tenantLogger.info(
 					{ commandText: lowerText },
 					"processing standard command text instruction keyword match",
 				);
-				const responseText = await processCommand(
-					tenant,
-					text,
-					messageInput.image,
-				);
+				const responseText = await processCommand(tenant, text);
 
 				await replyAndLog(jid, tenant.id, responseText, message);
 			};
@@ -333,6 +414,7 @@ export const main = async () => {
 			try {
 				await Promise.allSettled([
 					pollNotifications(socket, botUser.id, { logger: pollLogger }),
+					pollPendingMessages(socket, botUser.id, { logger: pollLogger }),
 					pollResolvedComplaints(socket, botUser.id, { logger: pollLogger }),
 					pollInProgressComplaints(socket, botUser.id, { logger: pollLogger }),
 				]);
@@ -359,14 +441,10 @@ export const main = async () => {
 const processCommand = async (
 	tenant: ConversationSession["tenant"],
 	text: string,
-	image?: { buffer: Buffer; mimetype: string },
 ): Promise<string> => {
 	const lowerText = text.toLowerCase().trim();
 
 	if (lowerText === "help") return help(tenant);
-	if (lowerText === "komplain" || lowerText.startsWith("komplain ")) {
-		return submitComplaint(tenant, text, image);
-	}
 	if (lowerText === "tagihan") return checkBills(tenant);
 	if (lowerText === "riwayat") return paymentHistory(tenant);
 	if (lowerText === "info") return tenantInfo(tenant);

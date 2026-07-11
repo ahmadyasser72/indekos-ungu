@@ -65,7 +65,7 @@ describe("listComplaints no complaints", () => {
 			.insert(tenants)
 			.values({
 				fullName: "No Complaints",
-				phoneNumber: "6281234567896",
+				phoneNumber: "62812345678" + Math.random().toString().slice(2),
 			})
 			.returning({ id: tenants.id });
 

@@ -20,7 +20,9 @@ declare namespace App {
 			recordId: number | null,
 			details: import("@indekos/database/schema").AuditDetails,
 		) => Promise<void>;
-		user?: SessionData["user"] & { allowEdit?: boolean };
+
+		user?: SessionData["user"] & { allowEdit?: boolean; allowChat?: boolean };
+
 		logger: import("@indekos/utilities/logger").Logger;
 		actionResults: import("~/lib/form-result").ActionResult[];
 	}

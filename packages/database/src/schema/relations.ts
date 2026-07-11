@@ -42,6 +42,10 @@ export const relations = defineRelations(schema, (r) => ({
 			from: r.tenants.id,
 			to: r.chatbotMessages.tenantId,
 		}),
+		chatRequest: r.many.chatRequests({
+			from: r.tenants.id,
+			to: r.chatRequests.tenantId,
+		}),
 	},
 
 	rooms: {
@@ -114,6 +118,32 @@ export const relations = defineRelations(schema, (r) => ({
 		notification: r.one.notifications({
 			from: r.chatbotMessages.id,
 			to: r.notifications.chatbotMessageId,
+		}),
+
+		sentBy: r.one.users({
+			from: r.chatbotMessages.staffId,
+			to: r.users.id,
+			where: { displayName: { isNotNull: true } },
+		}),
+	},
+
+	chatRequests: {
+		tenant: r.one.tenants({
+			from: r.chatRequests.tenantId,
+			to: r.tenants.id,
+			optional: false,
+		}),
+		pendingMessages: r.many.pendingChatMessages({
+			from: r.chatRequests.id,
+			to: r.pendingChatMessages.chatRequestId,
+		}),
+	},
+
+	pendingChatMessages: {
+		chatbotMessage: r.one.chatbotMessages({
+			from: r.pendingChatMessages.chatbotMessageId,
+			to: r.chatbotMessages.id,
+			optional: false,
 		}),
 	},
 

@@ -1,0 +1,62 @@
+---
+import type { ChatbotMessage, Tenant, User } from "@indekos/database/schema";
+import { formatDate } from "@indekos/utilities/date";
+
+import Icon from "~/components/ui/icon.astro";
+import { formatMessageMarkdown } from "~/pages/dashboard/for/chatbot/_data";
+
+interface Props {
+	chatbotMessage: ChatbotMessage & { sentBy: User | null };
+	tenant: Tenant;
+}
+
+const { chatbotMessage, tenant, ...props } = Astro.props;
+const { direction, sentBy, sentAt, message } = chatbotMessage;
+---
+
+<div
+	class:list={["chat", direction === "incoming" ? "chat-start" : "chat-end"]}
+	{...props}
+>
+	<div class="avatar chat-image">
+		<div class="size-8 rounded-full">
+			{
+				direction === "incoming" ? (
+					<div class="flex size-full items-center justify-center bg-base-300">
+						<Icon name="lucide:user" size="size-5" />
+					</div>
+				) : (
+					<div
+						class:list={[
+							"flex size-full items-center justify-center",
+							sentBy
+								? "bg-primary text-primary-content"
+								: "bg-secondary text-secondary-content",
+						]}
+					>
+						<Icon name={sentBy ? "lucide:user" : "lucide:bot"} size="size-5" />
+					</div>
+				)
+			}
+		</div>
+	</div>
+	<div class="chat-header">
+		{
+			direction === "incoming"
+				? tenant.fullName
+				: (sentBy?.displayName ?? "Chatbot")
+		}
+		<time class="text-xs opacity-50">
+			{formatDate(sentAt, "HH:mm")}
+		</time>
+	</div>
+	<div
+		class:list={[
+			"chat-bubble max-w-xs text-sm",
+			direction === "incoming" && "chat-bubble-info",
+			direction === "outgoing" &&
+				(sentBy ? "chat-bubble-primary" : "chat-bubble-secondary"),
+		]}
+		set:html={formatMessageMarkdown(message)}
+	/>
+</div>

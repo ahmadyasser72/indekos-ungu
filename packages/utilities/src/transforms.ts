@@ -19,3 +19,6 @@ export const parseInvoiceNumber = (invoiceNumber: string): number =>
  */
 export const formatCurrency = (amount: number): string =>
 	`Rp ${amount.toLocaleString("id-ID")}`;
+
+export const truncate = (text: string): string =>
+	text.slice(0, 50) + (text.length > 50 ? "..." : "");

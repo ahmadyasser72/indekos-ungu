@@ -1,0 +1,201 @@
+---
+import { db } from "@indekos/database";
+
+import { actions } from "astro:actions";
+import { z } from "astro/zod";
+
+import Modal from "~/components/modal/modal.astro";
+import IconLoader from "~/components/ui/icon-loader.astro";
+import NotFound from "~/components/ui/not-found.astro";
+import ChatBubble from "./_chat-bubble.astro";
+
+export const partial = true;
+
+const tenantId = Number(Astro.params.id);
+const params = Astro.locals.parseQuery(
+	z.object({
+		from: z.union([z.iso.datetime(), z.coerce.number()]).optional(),
+		to: z.union([z.iso.datetime(), z.coerce.number()]).optional(),
+		request: z.coerce.number().optional(),
+	}),
+);
+
+const chatRequest = params.request
+	? await db.query.chatRequests.findFirst({
+			where: { id: params.request },
+			with: {
+				pendingMessages: {
+					with: { chatbotMessage: { with: { sentBy: true } } },
+				},
+			},
+		})
+	: undefined;
+
+const tenant = await db.query.tenants.findFirst({
+	where: { id: tenantId },
+	with: {
+		lease: { with: { room: true } },
+
+		chatbotLogs: {
+			where: {
+				id: {
+					...(typeof params.from === "number" && { gte: params.from }),
+					...(typeof params.to === "number" && { lte: params.to }),
+					...(chatRequest && {
+						notIn: chatRequest.pendingMessages.map(
+							({ chatbotMessageId }) => chatbotMessageId,
+						),
+						...(chatRequest.pendingMessages.length > 0 && {
+							gt: chatRequest.pendingMessages[0].chatbotMessageId,
+						}),
+					}),
+				},
+				sentAt: {
+					...(typeof params.from === "string" && {
+						gte: new Date(params.from),
+					}),
+					...(typeof params.to === "string" && { lte: new Date(params.to) }),
+				},
+			},
+			with: { sentBy: true },
+		},
+	},
+});
+
+const chatbotLogs = tenant?.chatbotLogs ?? [];
+const chatbotMessages = chatRequest
+	? [
+			...chatRequest.pendingMessages.map((it) => it.chatbotMessage),
+			...chatbotLogs,
+		]
+	: chatbotLogs;
+
+if (!tenant) {
+	Astro.response.status = 404;
+} else if (tenant.chatbotLogs.length > 0) {
+	const lastMessagesCount = Number(Astro.url.searchParams.get("count"));
+	if (
+		!Number.isNaN(lastMessagesCount) &&
+		lastMessagesCount === tenant.chatbotLogs.length
+	)
+		return new Response(null, { status: 304 });
+
+	Astro.url.searchParams.set("count", tenant.chatbotLogs.length.toString());
+}
+
+const actionCalled = Astro.getActionResult(
+	actions.manage.tenants.chat.request.close,
+);
+if (actionCalled && !actionCalled.error)
+	Astro.response.headers.set("hx-trigger", "reload-chat-request");
+---
+
+<Modal
+	id="chat"
+	title={`Chat ${tenant?.fullName ?? "Penghuni"}`}
+	icon="lucide:message-square"
+	modalClass="max-w-xl"
+>
+	{
+		tenant ? (
+			<div class="space-y-4">
+				<div class="mb-4 border-b border-base-200 pb-3 text-sm">
+					<p>
+						<span class="font-bold">Kamar:</span>
+						<span class="ml-1">{tenant.lease?.room?.roomNumber ?? "-"}</span>
+					</p>
+
+					{chatRequest && (
+						<p>
+							<span class="font-bold">Topik:</span>
+							<span class="ml-1">{chatRequest.description}</span>
+						</p>
+					)}
+				</div>
+
+				<div
+					hx-get={`${Astro.url.pathname}${Astro.url.search}`}
+					hx-trigger="every 5s"
+					class="chat-container max-h-88 space-y-2 overflow-y-auto"
+					id="chat-messages"
+					hx-select="#chat-messages"
+					hx-swap="outerHTML transition:true scroll:bottom"
+				>
+					{chatbotMessages.length > 0 ? (
+						chatbotMessages.map((chatbotMessage, idx) => (
+							<ChatBubble
+								{chatbotMessage}
+								{tenant}
+								{...((!chatRequest ||
+									chatRequest.pendingMessages.length === 0) &&
+									idx === tenant.chatbotLogs.length - 1 && {
+										"data-scroll-here": "",
+									})}
+							/>
+						))
+					) : (
+						<div class="py-8 text-center text-sm opacity-50">
+							Tidak ada pesan
+						</div>
+					)}
+				</div>
+
+				{Astro.locals.user?.allowChat && (
+					<form
+						hx-post={actions.manage.tenants.chat.send}
+						class="border-t border-base-200 sm:pt-2 sm:pl-4"
+						id="send-chat"
+						hx-disabled-elt="#send-chat fieldset"
+						hx-indicator="#send-chat-button"
+						hx-on--after-request={`window.htmx.ajax("GET", "${Astro.url.pathname}${Astro.url.search}", { select: "#chat-messages", target: "#chat-messages", swap: "outerHTML transition:true" }).then(() => this.reset())`}
+						hx-swap="none"
+					>
+						<input name="tenantId" type="hidden" value={tenantId} />
+						<fieldset
+							class="flex items-end gap-2"
+							disabled={chatRequest && chatRequest.status !== "accepted"}
+						>
+							<textarea
+								class="textarea flex-1 textarea-sm"
+								id="send_chat_content"
+								name="message"
+								placeholder="Ketik pesan..."
+								required
+								rows="3"
+							/>
+
+							<div class="flex flex-col gap-2">
+								{chatRequest && (
+									<button
+										hx-post={actions.manage.tenants.chat.request.close}
+										class="btn btn-soft btn-error btn-sm"
+										hx-confirm={`Akhiri percakapan dengan ${tenant.fullName}?`}
+										hx-on--after-request="event.detail.successful && chat_modal.close()"
+										hx-vals={JSON.stringify({
+											chatRequestId: chatRequest.id,
+										})}
+										form=""
+									>
+										Tutup
+										<IconLoader name="lucide:circle-x" />
+									</button>
+								)}
+
+								<button
+									class="btn btn-primary btn-sm"
+									id="send-chat-button"
+									type="submit"
+								>
+									Kirim
+									<IconLoader name="lucide:send" />
+								</button>
+							</div>
+						</fieldset>
+					</form>
+				)}
+			</div>
+		) : (
+			<NotFound label="Penghuni" />
+		)
+	}
+</Modal>

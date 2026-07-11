@@ -22,6 +22,7 @@ export const pollInProgressComplaints = async (
 			where: { status: "in_progress", processedAt: { isNull: true } },
 			with: { tenant: true },
 		});
+		if (inProgress.length === 0) return;
 
 		log?.info(
 			{ complaint: inProgress.length },
@@ -100,6 +101,7 @@ export const pollResolvedComplaints = async (
 			where: { status: "resolved", resolvedAt: { isNull: true } },
 			with: { tenant: true, resolver: true },
 		});
+		if (resolved.length === 0) return;
 
 		log?.info(
 			{ complaint: resolved.length },

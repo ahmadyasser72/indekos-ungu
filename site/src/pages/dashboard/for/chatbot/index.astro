@@ -117,7 +117,7 @@ const chatbotStats = getChatbotStats(chatbotLogs);
 											hx-get={`/dashboard/for/tenants/modal/chat/${tenantId}`}
 											class="btn btn-square btn-ghost btn-xs"
 											title="Chat"
-											hx-vals={JSON.stringify({ message: id })}
+											hx-vals={JSON.stringify({ from: params.from, to: id })}
 										>
 											<Icon name="lucide:message-square" />
 										</button>

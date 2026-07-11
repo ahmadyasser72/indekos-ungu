@@ -28,6 +28,7 @@ export const pollNotifications = async (
 		const pending = await db.query.notifications.findMany({
 			where: { status: "pending" },
 		});
+		if (pending.length === 0) return;
 
 		log?.info(
 			{ notification: pending.length },

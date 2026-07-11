@@ -10,6 +10,8 @@ import { ActionError, defineAction } from "astro:actions";
 import { z } from "astro/zod";
 import { toCamelCaseKeys } from "es-toolkit/object";
 
+export * as chat from "./tenants-chat";
+
 const normalizePhone = (raw: string): string => {
 	const stripped = raw.replace(/\D/g, "").replace(/^0/, "");
 	return stripped.startsWith("62") ? stripped : `62${stripped}`;
@@ -103,7 +105,7 @@ export const add = defineAction({
 				"tenants",
 				insertedTenant.id,
 				auditDetail.create(
-					`Mendaftarkan tenant ${input.full_name} (${input.phone_number}) di kamar ID ${input.room_id}`,
+					`Mendaftarkan tenant ${input.full_name} (+${phoneNumber}) di kamar ID ${input.room_id}`,
 					toCamelCaseKeys(input),
 				),
 			);

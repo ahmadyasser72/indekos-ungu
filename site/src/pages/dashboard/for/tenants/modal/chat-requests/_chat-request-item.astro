@@ -1,0 +1,186 @@
+---
+import type {
+	ChatRequest,
+	Lease,
+	Room,
+	Tenant,
+} from "@indekos/database/schema";
+import { formatDate } from "@indekos/utilities/date";
+import { truncate } from "@indekos/utilities/transforms";
+
+import { actions } from "astro:actions";
+
+import Icon from "~/components/ui/icon.astro";
+import ChatRequestTimeTooltip from "./_chat-request-time-tooltip.astro";
+
+interface Props {
+	request: ChatRequest & {
+		tenant: Tenant & { lease: null | (Lease & { room: Room }) };
+	};
+}
+
+const { request } = Astro.props;
+const elementId = `chat-request-${request.id}`;
+
+const STATUS_CLASSES = {
+	pending: "bg-warning/10 border-warning text-warning",
+	accepted: "bg-success/10 border-success text-success",
+	closed: "bg-base-200 border-base-content/20 text-base-content/60",
+	cancelled: "bg-error/10 border-error text-error",
+} satisfies Record<ChatRequest["status"], string>;
+
+const STATUS_ICONS = {
+	pending: "lucide:clock-3",
+	accepted: "lucide:check-circle",
+	closed: "lucide:circle-slash",
+	cancelled: "lucide:x-circle",
+} as const satisfies Record<ChatRequest["status"], string>;
+---
+
+<li class="list-row items-center" id={elementId}>
+	<div>
+		<div
+			class:list={[
+				"flex size-10 items-center justify-center rounded-full border",
+				STATUS_CLASSES[request.status],
+			]}
+		>
+			<Icon class="size-6" name={STATUS_ICONS[request.status]} />
+		</div>
+	</div>
+
+	<div>
+		<div class="flex gap-1 max-sm:flex-col sm:items-center">
+			<div class="font-medium">
+				{request.tenant.fullName}
+			</div>
+
+			<div class="tooltip">
+				<div class="tooltip-content truncate overflow-x-clip">
+					<ChatRequestTimeTooltip
+						date={request.requestedAt}
+						icon="lucide:calendar"
+						label="Diminta"
+					/>
+
+					{
+						request.acceptedAt && (
+							<ChatRequestTimeTooltip
+								date={request.acceptedAt}
+								icon="lucide:calendar-plus"
+								label="Diterima"
+								relativeTo={request.requestedAt}
+							/>
+						)
+					}
+
+					{
+						request.closedAt && (
+							<ChatRequestTimeTooltip
+								date={request.closedAt}
+								icon="lucide:calendar-check"
+								label="Ditutup"
+								relativeTo={request.acceptedAt!}
+							/>
+						)
+					}
+
+					{
+						request.cancelledAt && (
+							<ChatRequestTimeTooltip
+								date={request.cancelledAt}
+								icon="lucide:calendar-x"
+								label="Dibatalkan"
+								relativeTo={request.acceptedAt!}
+							/>
+						)
+					}
+				</div>
+
+				<button class="btn btn-ghost btn-xs">
+					<Icon name="lucide:clock" size="size-3.5" />
+					<span>{formatDate(request.requestedAt, "DD MMMM YYYY")}</span>
+				</button>
+			</div>
+		</div>
+	</div>
+
+	<p class="col-span-2 list-col-wrap text-xs">
+		{truncate(request.description)}
+	</p>
+
+	{
+		request.status === "pending" ? (
+			<div class="flex justify-center gap-1 max-sm:flex-col">
+				<button
+					hx-get={`/dashboard/for/tenants/modal/chat/${request.tenant.id}`}
+					class="btn btn-soft btn-info btn-sm"
+					hx-vals={JSON.stringify({
+						from: request.requestedAt,
+						request: request.id,
+					})}
+				>
+					<Icon name="lucide:eye" />
+					Lihat
+				</button>
+
+				<button
+					hx-post={`${Astro.url.pathname}${actions.manage.tenants.chat.request.accept}&status=accepted`}
+					class="btn btn-soft btn-sm btn-success"
+					hx-select={`#${elementId}`}
+					hx-swap="outerHTML transition:true"
+					hx-target={`#${elementId}`}
+					hx-vals={JSON.stringify({ chatRequestId: request.id })}
+				>
+					<Icon name="lucide:check" />
+					Terima
+				</button>
+			</div>
+		) : request.status === "cancelled" ? (
+			<div class="flex items-center justify-center gap-1 max-sm:flex-col">
+				<button
+					hx-get={`/dashboard/for/tenants/modal/chat/${request.tenant.id}`}
+					class="btn btn-soft btn-info btn-sm"
+					hx-vals={JSON.stringify({
+						from: request.requestedAt,
+						to: request.cancelledAt,
+						request: request.id,
+					})}
+				>
+					<Icon name="lucide:eye" />
+					Lihat
+				</button>
+			</div>
+		) : (
+			<div class="flex justify-center gap-1 max-sm:flex-col">
+				<button
+					hx-get={`/dashboard/for/tenants/modal/chat/${request.tenant.id}`}
+					class="btn btn-soft btn-info btn-sm"
+					hx-vals={JSON.stringify({
+						from: request.acceptedAt,
+						request: request.id,
+						...(request.closedAt && { to: request.closedAt }),
+					})}
+				>
+					<Icon name="lucide:eye" />
+					Lihat
+				</button>
+
+				{request.status === "accepted" && (
+					<button
+						hx-post={`${Astro.url.pathname}${actions.manage.tenants.chat.request.close}&status=closed`}
+						class="btn btn-soft btn-error btn-sm"
+						hx-confirm={`Akhiri percakapan dengan ${request.tenant.fullName}?`}
+						hx-select={`#${elementId}`}
+						hx-swap="outerHTML transition:true"
+						hx-target={`#${elementId}`}
+						hx-vals={JSON.stringify({ chatRequestId: request.id })}
+					>
+						<Icon name="lucide:message-square-x" />
+						Tutup
+					</button>
+				)}
+			</div>
+		)
+	}
+</li>

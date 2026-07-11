@@ -1,0 +1,134 @@
+---
+import { CHAT_REQUEST_STATUS, db, eq } from "@indekos/database";
+import { chatRequests, type ChatRequest } from "@indekos/database/schema";
+
+import { actions } from "astro:actions";
+import { z } from "astro/zod";
+
+import FormField from "~/components/form/form-field.astro";
+import Modal from "~/components/modal/modal.astro";
+import ChatRequestItem from "./_chat-request-item.astro";
+
+export const partial = true;
+
+const params = Astro.locals.parseQuery(
+	z.object({
+		tenant: z.coerce.number().optional(),
+		status: z.enum(CHAT_REQUEST_STATUS).catch("pending"),
+	}),
+);
+
+const activeTenants = await db.query.tenants.findMany({
+	where: { lease: { isActive: true } },
+	with: { lease: { with: { room: true } } },
+	orderBy: { fullName: "asc" },
+});
+
+const requests = await db.query.chatRequests.findMany({
+	where: {
+		...(params.tenant && { tenantId: params.tenant }),
+		status: params.status,
+	},
+	with: {
+		tenant: { with: { lease: { with: { room: true } } } },
+	},
+	orderBy: { requestedAt: "desc" },
+});
+
+const requestCount: Record<ChatRequest["status"], number> = Object.fromEntries(
+	await Promise.all(
+		CHAT_REQUEST_STATUS.map(async (status) => [
+			status,
+			await db.$count(chatRequests, eq(chatRequests.status, status)),
+		]),
+	),
+);
+
+const actionCalled =
+	Astro.getActionResult(actions.manage.tenants.chat.request.accept) ??
+	Astro.getActionResult(actions.manage.tenants.chat.request.close);
+if (actionCalled && !actionCalled.error)
+	Astro.response.headers.set("hx-trigger", "reload-chat-request");
+
+const STATUS_LABELS = {
+	pending: "Menunggu",
+	accepted: "Diterima",
+	closed: "Ditutup",
+	cancelled: "Dibatalkan",
+} satisfies Record<ChatRequest["status"], string>;
+---
+
+<Modal
+	id="chat-requests"
+	title="Permintaan Chat Penghuni"
+	icon="lucide:message-circle-question"
+	modalClass="max-w-2xl"
+>
+	<div
+		hx-get={`${Astro.url.pathname}${Astro.url.search}`}
+		hx-trigger="reload-chat-request from:body"
+		class="contents"
+		id="request-filter"
+		hx-select="#request-list"
+		hx-select-oob="#request-filter"
+		hx-swap="outerHTML"
+		hx-target="#request-list"
+	>
+		<FormField label="Filter penghuni">
+			<select
+				hx-get={Astro.url.pathname}
+				class="select mb-2 w-full"
+				name="tenant"
+				hx-vals={JSON.stringify({ status: params.status })}
+			>
+				<option value="" disabled selected={!params.tenant}
+					>-- Pilih penghuni --</option
+				>
+
+				{
+					activeTenants.map(({ id, fullName }) => (
+						<option value={id} selected={params.tenant === id}>
+							{fullName}
+						</option>
+					))
+				}
+			</select>
+		</FormField>
+
+		<div class="tabs-lift tabs tabs-sm" id="request-status-filter">
+			{
+				CHAT_REQUEST_STATUS.map((status) => (
+					<button
+						hx-get={Astro.url.pathname}
+						hx-vals={JSON.stringify({ ...params, status })}
+						class:list={[
+							"tab indicator",
+							params.status === status && "tab-active",
+						]}
+					>
+						{STATUS_LABELS[status]}
+						{requestCount[status] > 0 && (
+							<span class="indicator-item badge">{requestCount[status]}</span>
+						)}
+					</button>
+				))
+			}
+		</div>
+	</div>
+
+	<ul
+		id="request-list"
+		class:list={[
+			"list min-h-36 rounded-box bg-base-100 shadow-md",
+			requests.length === 0 ? "justify-center text-center" : "first:text-sm",
+		]}
+	>
+		{
+			requests.length === 0 && (
+				<li class="p-4 tracking-wide opacity-60">Permintaan chat kosong</li>
+			)
+		}
+
+		{requests.map((request) => <ChatRequestItem {request} />)}
+	</ul>
+</Modal>
