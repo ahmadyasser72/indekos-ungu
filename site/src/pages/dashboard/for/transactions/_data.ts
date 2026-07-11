@@ -1,6 +1,5 @@
 import { db, INVOICE_STATUS } from "@indekos/database";
 import { getPaymentUrlFromReference } from "@indekos/database/duitku";
-import { parseDateRange } from "@indekos/utilities/date";
 import {
 	formatCurrency,
 	formatInvoiceNumber,
@@ -17,8 +16,6 @@ export { INVOICE_STATUS };
 export const fetchTransactions = async (
 	params: z.infer<typeof transactionQuerySchema>,
 ) => {
-	const { startDate, endDate } = parseDateRange(params.from, params.to);
-
 	const invoices = await db.query.invoices.findMany({
 		where: {
 			...(params.query && {
@@ -30,7 +27,7 @@ export const fetchTransactions = async (
 
 			...(params.status && { status: params.status }),
 
-			dueDate: { gte: startDate, lte: endDate },
+			dueDate: { gte: params.from, lte: params.to },
 		},
 		with: {
 			lease: {

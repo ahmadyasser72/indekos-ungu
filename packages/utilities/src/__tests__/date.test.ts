@@ -1,10 +1,6 @@
 import { describe, expect, it } from "bun:test";
 
-import {
-	formatDate,
-	getCurrentMonthStr,
-	normalizePeriodRange,
-} from "../date.ts";
+import dayjs, { formatDate, normalizePeriodRange } from "../date.ts";
 
 describe("formatDate", () => {
 	it("returns '-' for null date", () => {
@@ -30,26 +26,28 @@ describe("formatDate", () => {
 	});
 });
 
-describe("getCurrentMonthStr", () => {
-	it("returns current month in YYYY-MM format", () => {
-		const now = new Date();
-		const expected = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-		expect(getCurrentMonthStr()).toBe(expected);
-	});
-});
-
 describe("normalizePeriodRange", () => {
 	it("returns same values when from <= to", () => {
-		expect(normalizePeriodRange("2025-01", "2025-06")).toEqual({
-			from: "2025-01",
-			to: "2025-06",
+		expect(
+			normalizePeriodRange(
+				dayjs("2025-01-01").toDate(),
+				dayjs("2025-06-01").toDate(),
+			),
+		).toEqual({
+			from: dayjs("2025-01-01").toDate(),
+			to: dayjs("2025-06-01").toDate(),
 		});
 	});
 
 	it("sets to = from when from > to", () => {
-		expect(normalizePeriodRange("2025-06", "2025-01")).toEqual({
-			from: "2025-06",
-			to: "2025-06",
+		expect(
+			normalizePeriodRange(
+				dayjs("2025-06-01").toDate(),
+				dayjs("2025-01-01").toDate(),
+			),
+		).toEqual({
+			from: dayjs("2025-06-01").toDate(),
+			to: dayjs("2025-06-01").toDate(),
 		});
 	});
 });

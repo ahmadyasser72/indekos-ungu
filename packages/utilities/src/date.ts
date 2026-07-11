@@ -19,30 +19,10 @@ export const formatDate = (
 	return dayjs(date).format(formatStr);
 };
 
-export const getCurrentMonthStr = (): string => dayjs().format("YYYY-MM");
+export const formatPeriod = (date: Date | string | number) =>
+	formatDate(date, "YYYY-MM");
 
-export const parsePeriod = (from: string, to: string) => {
-	const startDate = dayjs(`${from}-01`).startOf("month").toDate();
-	const endDate = dayjs(`${to}-01`).endOf("month").toDate();
-
-	return { startDate, endDate };
-};
-
-export const normalizePeriodRange = (
-	from: string,
-	to: string,
-): { from: string; to: string } => {
-	if (from > to) {
-		return { from, to: from };
-	}
-	return { from, to };
-};
-
-export const parseDateRange = (from: string, to: string) => {
-	const fromStr = from ?? getCurrentMonthStr();
-	const toStr = to ?? fromStr;
-	const normalized = normalizePeriodRange(fromStr, toStr);
-	return parsePeriod(normalized.from, normalized.to);
-};
+export const normalizePeriodRange = (from: Date, to: Date) =>
+	dayjs(from).isAfter(to) ? { from, to: from } : { from, to };
 
 export default dayjs;

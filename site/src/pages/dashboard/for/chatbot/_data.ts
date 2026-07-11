@@ -1,5 +1,4 @@
 import { CHATBOT_DIRECTIONS, db } from "@indekos/database";
-import { parseDateRange } from "@indekos/utilities/date";
 
 import { render } from "@croct/md-lite";
 import { z } from "astro/zod";
@@ -17,8 +16,6 @@ export const chatbotQuerySchema = z.object({
 export const fetchChatbotLogs = async (
 	params: z.infer<typeof chatbotQuerySchema>,
 ) => {
-	const { startDate, endDate } = parseDateRange(params.from, params.to);
-
 	const logs = await db.query.chatbotMessages.findMany({
 		where: {
 			...(params.query && {
@@ -30,7 +27,7 @@ export const fetchChatbotLogs = async (
 
 			...(params.direction && { direction: params.direction }),
 
-			sentAt: { gte: startDate, lte: endDate },
+			sentAt: { gte: params.from, lte: params.to },
 		},
 		with: {
 			tenant: {

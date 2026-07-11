@@ -55,7 +55,7 @@ const notificationStats = getNotificationStats(notifications);
 		</button>
 	</Alert>
 
-	<FilterToolbar name="notifications" from={params.from} to={params.to}>
+	<FilterToolbar name="notifications" {...params}>
 		<Fragment slot="actions">
 			<FilterPopover
 				name="notifications"

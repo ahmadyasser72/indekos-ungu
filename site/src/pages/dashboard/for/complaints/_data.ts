@@ -1,5 +1,4 @@
 import { COMPLAINT_STATUS, db } from "@indekos/database";
-import { parseDateRange } from "@indekos/utilities/date";
 
 import { z } from "astro/zod";
 import { countBy } from "es-toolkit";
@@ -10,8 +9,6 @@ import { periodFields, querySchema, statusSchema } from "~/lib/query";
 export const fetchComplaints = async (
 	params: z.infer<typeof complaintQuerySchema>,
 ) => {
-	const { startDate, endDate } = parseDateRange(params.from, params.to);
-
 	const complaints = await db.query.complaints.findMany({
 		where: {
 			...(params.query && {
@@ -23,7 +20,7 @@ export const fetchComplaints = async (
 
 			...(params.status && { status: params.status }),
 
-			createdAt: { gte: startDate, lte: endDate },
+			createdAt: { gte: params.from, lte: params.to },
 		},
 		with: {
 			tenant: { with: { lease: { with: { room: true } } } },

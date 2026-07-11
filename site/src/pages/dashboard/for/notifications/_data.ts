@@ -1,5 +1,4 @@
 import { db, NOTIFICATION_STATUS, NOTIFICATION_TYPES } from "@indekos/database";
-import { parseDateRange } from "@indekos/utilities/date";
 import { formatInvoiceNumber } from "@indekos/utilities/transforms";
 
 import { z } from "astro/zod";
@@ -18,8 +17,6 @@ export const notificationQuerySchema = z.object({
 export const fetchNotifications = async (
 	params: z.infer<typeof notificationQuerySchema>,
 ) => {
-	const { startDate, endDate } = parseDateRange(params.from, params.to);
-
 	const notifications = await db.query.notifications.findMany({
 		where: {
 			...(params.query && {
@@ -29,7 +26,7 @@ export const fetchNotifications = async (
 			...(params.type && { type: params.type }),
 			...(params.status && { status: params.status }),
 
-			createdAt: { gte: startDate, lte: endDate },
+			createdAt: { gte: params.from, lte: params.to },
 		},
 		columns: {
 			id: true,

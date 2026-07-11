@@ -1,5 +1,4 @@
 import { AUDIT_ACTIONS, db } from "@indekos/database";
-import { parseDateRange } from "@indekos/utilities/date";
 
 import { z } from "astro/zod";
 import { countBy, uniqBy } from "es-toolkit";
@@ -12,8 +11,6 @@ export { AUDIT_ACTIONS };
 export const fetchAuditLogs = async (
 	params: z.infer<typeof auditQuerySchema>,
 ) => {
-	const { startDate, endDate } = parseDateRange(params.from, params.to);
-
 	const logs = await db.query.auditLogs.findMany({
 		where: {
 			...(params.query && {
@@ -24,7 +21,7 @@ export const fetchAuditLogs = async (
 					{ user: { username: { like: `%${params.query}%` } } },
 				],
 			}),
-			createdAt: { gte: startDate, lte: endDate },
+			createdAt: { gte: params.from, lte: params.to },
 			user: { role: params.show_system ? "system" : { ne: "system" } },
 			...(params.action && { action: params.action }),
 		},

@@ -40,7 +40,7 @@ const chatbotStats = getChatbotStats(chatbotLogs);
 		</a>
 	</Fragment>
 
-	<FilterToolbar name="chatbot" from={params.from} to={params.to}>
+	<FilterToolbar name="chatbot" {...params}>
 		<Fragment slot="actions">
 			<FilterPopover
 				name="chatbot"

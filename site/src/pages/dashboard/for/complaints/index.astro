@@ -53,7 +53,7 @@ const complaintStats = getComplaintStats(complaints);
 		</a>
 	</Fragment>
 
-	<FilterToolbar name="complaints" from={params.from} to={params.to}>
+	<FilterToolbar name="complaints" {...params}>
 		<Fragment slot="actions">
 			<FilterPopover
 				name="complaints"

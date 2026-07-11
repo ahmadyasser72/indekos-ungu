@@ -1,10 +1,12 @@
 ---
+import { formatPeriod } from "@indekos/utilities/date";
+
 import Icon from "~/components/ui/icon.astro";
 
 interface Props {
 	name: string;
-	from?: string;
-	to?: string;
+	from?: Date;
+	to?: Date;
 }
 
 const { name, from, to } = Astro.props;
@@ -21,7 +23,7 @@ const targetId = `#${name}-content-wrapper`;
 		hx-target={targetId}
 	>
 		{
-			from != null && to != null && (
+			from && to && (
 				<div
 					class="flex w-full items-center gap-3 sm:flex-1"
 					id="filter-period"
@@ -40,7 +42,7 @@ const targetId = `#${name}-content-wrapper`;
 						class={`input input-sm ${filterClass} w-full sm:w-40`}
 						name="from"
 						type="month"
-						value={from}
+						value={formatPeriod(from)}
 					/>
 					<span class="text-sm font-semibold text-base-content/70">
 						Sampai:
@@ -50,8 +52,8 @@ const targetId = `#${name}-content-wrapper`;
 						class={`input input-sm ${filterClass} w-full sm:w-40`}
 						name="to"
 						type="month"
-						value={to}
-						min={from}
+						value={formatPeriod(to)}
+						min={formatPeriod(from)}
 					/>
 				</div>
 			)
