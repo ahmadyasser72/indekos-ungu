@@ -28,7 +28,7 @@ Halaman utama yang menampilkan ringkasan kondisi kos secara keseluruhan, seperti
 
 ![Akun](wireframe-v2/png/input/2-akun.png)
 
-Halaman untuk melihat dan mengelola daftar akun pengguna yang memiliki akses ke sistem, seperti Admin, Petugas, atau Pemilik Kos. Setiap akun memiliki nama pengguna, peran, dan waktu terakhir kali masuk ke sistem.
+Setiap akun memiliki nama pengguna, peran, dan waktu terakhir mengakses sistem.
 
 **Aksi/Fitur:** Halaman ini menyediakan tombol **Tambah Akun** untuk membuat akun pengguna baru melalui formulir pop-up, tombol **Edit** untuk mengubah informasi akun seperti nama atau peran, serta tombol **Hapus** untuk menghapus akun dari sistem. Selain itu, terdapat fitur **Pencarian** untuk mencari akun berdasarkan nama pengguna dan fitur **Saring (Filter)** untuk memilah akun berdasarkan peran tertentu.
 
