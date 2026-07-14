@@ -7,7 +7,10 @@ import { defineConfig, envField, logHandlers } from "astro/config";
 export default defineConfig({
 	output: "server",
 	adapter: node({ mode: "standalone" }),
-	security: { allowedDomains: [{ hostname: "cat.opah-barley.ts.net" }] },
+	security: {
+		checkOrigin: false,
+		allowedDomains: [{ hostname: "cat.opah-barley.ts.net" }],
+	},
 	vite: {
 		plugins: [tailwindcss()],
 		server: {

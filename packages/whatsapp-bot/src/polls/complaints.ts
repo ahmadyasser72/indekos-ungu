@@ -1,5 +1,10 @@
 import { db, eq } from "@indekos/database";
-import { auditDetail, auditLogs, complaints } from "@indekos/database/schema";
+import {
+	auditDetail,
+	auditLogs,
+	chatbotMessages,
+	complaints,
+} from "@indekos/database/schema";
 import type { Logger } from "@indekos/utilities/logger";
 
 import type { WASocket } from "baileys";
@@ -39,10 +44,14 @@ export const pollInProgressComplaints = async (
 
 				await sock.sendMessage(
 					`${complaint.tenant.phoneNumber}@s.whatsapp.net`,
-					{
-						text: message,
-					},
+					{ text: message },
 				);
+
+				await db.insert(chatbotMessages).values({
+					tenantId: complaint.tenantId,
+					direction: "outgoing",
+					message,
+				});
 
 				await db
 					.update(complaints)
@@ -120,10 +129,14 @@ export const pollResolvedComplaints = async (
 
 				await sock.sendMessage(
 					`${complaint.tenant.phoneNumber}@s.whatsapp.net`,
-					{
-						text: message,
-					},
+					{ text: message },
 				);
+
+				await db.insert(chatbotMessages).values({
+					tenantId: complaint.tenantId,
+					direction: "outgoing",
+					message,
+				});
 
 				await db
 					.update(complaints)

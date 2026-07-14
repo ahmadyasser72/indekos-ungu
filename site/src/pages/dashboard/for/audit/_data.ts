@@ -18,6 +18,7 @@ export const fetchAuditLogs = async (
 					{ action: { like: `%${params.query}%` } },
 					{ tableName: { like: `%${params.query}%` } },
 					{ recordId: { like: `%${params.query}%` } },
+					{ details: { like: `%${params.query}%` } },
 					{ user: { username: { like: `%${params.query}%` } } },
 				],
 			}),

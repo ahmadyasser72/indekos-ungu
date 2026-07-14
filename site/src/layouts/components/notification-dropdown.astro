@@ -22,6 +22,7 @@ const [recentNotifications, allNotifications] = pushActive
 
 const lastNotificationCount = Number(Astro.url.searchParams.get("count"));
 if (
+	Astro.url.searchParams.has("count") &&
 	!Number.isNaN(lastNotificationCount) &&
 	lastNotificationCount === recentNotifications.length
 )
@@ -109,7 +110,14 @@ if (
 							</div>
 
 							<div>
-								<div>{data.title}</div>
+								{data.url ? (
+									<a hx-get={data.urlHtmx} class="link" href={data.url}>
+										{data.title}
+									</a>
+								) : (
+									<div>{data.title}</div>
+								)}
+
 								<div class="text-xs text-base-content/60">{data.body}</div>
 								<div class="text-xs text-base-content/50">
 									{dayjs(createdAt).fromNow()}
@@ -266,7 +274,7 @@ if (
 				const error = await (subscribed ? unsubscribe : subscribe)();
 				if (!error) {
 					syncLocalSubscription(subscription);
-					await updateUI();
+					updateUI();
 				}
 
 				event.target.disabled = false;
@@ -278,7 +286,7 @@ if (
 					console.error("Failed to send test notification:", error);
 					showClientSideToast("error", "Gagal kirim test notifikasi.");
 				} else {
-					await updateUI();
+					updateUI();
 					showClientSideToast("info", "Notifikasi test dikirim!");
 				}
 
@@ -294,7 +302,7 @@ if (
 					);
 					showClientSideToast("error", "Gagal menghapus riwayat notifikasi.");
 				} else {
-					await updateUI();
+					updateUI();
 				}
 			}
 		});
