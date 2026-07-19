@@ -125,6 +125,24 @@ interface TemplateParams {
 	"phone-change-verification": {
 		fullName: string;
 	};
+	"move-additional-payment": {
+		fullName: string;
+		roomNumber: string | null;
+		amount: string | null;
+		dueDate: string | null;
+		paymentUrl: string | null;
+	};
+	"move-success": {
+		fullName: string;
+		roomNumber: string | null;
+	};
+	"move-payment-success": {
+		fullName: string;
+		roomNumber: string | null;
+		amount: string | null;
+		date: string | null;
+		invoiceUrl: string | null;
+	};
 }
 
 export const render = <K extends keyof TemplateParams>(

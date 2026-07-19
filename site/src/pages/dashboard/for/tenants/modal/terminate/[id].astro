@@ -7,15 +7,25 @@ import FormField from "~/components/form/form-field.astro";
 import ModalForm from "~/components/form/modal-form.astro";
 import Modal from "~/components/modal/modal.astro";
 import NotFound from "~/components/ui/not-found.astro";
+import { endDateCalendar, type CalendarData } from "../_lease-calendar-helpers";
 
 export const partial = true;
 
 const tenant = await db.query.tenants.findFirst({
 	columns: { id: true, fullName: true },
+	with: {
+		lease: {
+			columns: { startDate: true },
+		},
+	},
 	where: { id: Number(Astro.params.id) },
 });
 
 if (!tenant) Astro.response.status = 404;
+
+const endDateCalendarData: CalendarData = tenant?.lease?.startDate
+	? endDateCalendar(tenant.lease.startDate, { disablePast: false })
+	: { enabled: [] };
 ---
 
 <Modal
@@ -44,7 +54,11 @@ if (!tenant) Astro.response.status = 404;
 					<input name="id" type="hidden" value={tenant.id} />
 
 					<FormField label="Tanggal Selesai">
-						<input class="input w-full" name="end_date" type="date" />
+						<div
+							class="end-period vc w-full"
+							data-calendar={JSON.stringify(endDateCalendarData)}
+						/>
+						<input class="input w-full" name="end_date" type="text" readonly />
 					</FormField>
 				</ModalForm>
 			</>
@@ -53,3 +67,16 @@ if (!tenant) Astro.response.status = 404;
 		)
 	}
 </Modal>
+
+<script>
+	import { initCalendar } from "../_lease-calendar";
+
+	initCalendar({
+		selector: ".end-period",
+		onClickDate: ({ calendar, date }) => {
+			const input = calendar.nextElementSibling as HTMLInputElement;
+			input.value = date ?? "";
+			input.dispatchEvent(new Event("input"));
+		},
+	});
+</script>

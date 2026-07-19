@@ -97,12 +97,27 @@ export const POST: APIRoute = async ({ request, locals }) => {
 					.where(eq(invoices.id, invoiceId))
 					.run();
 
+				// Check if this invoice is from a room move
+				const moveNotif = tx.query.notifications
+					.findFirst({
+						columns: { id: true },
+						where: {
+							invoiceId: invoiceId,
+							type: "move_additional_payment",
+						},
+					})
+					.sync();
+
+				const notificationType = moveNotif
+					? "move_payment_success"
+					: "payment_success";
+
 				tx.insert(notifications)
 					.values({
 						tenantId: invoice.lease!.tenantId,
 						roomId: invoice.lease!.roomId,
 						invoiceId: invoice.id,
-						type: "payment_success",
+						type: notificationType,
 						status: "pending",
 					})
 					.run();

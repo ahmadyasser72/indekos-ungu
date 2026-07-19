@@ -1,0 +1,10 @@
+*🔄 Pindah Kamar Berhasil*
+
+Yth. <%= it.fullName %>,
+Anda telah dipindahkan ke kamar baru.
+<% if (it.roomNumber) { %>
+📍 Kamar Baru: <%= it.roomNumber %>
+<% } %>
+Ketik *info* untuk melihat data Anda.
+
+_Pesan ini dikirim otomatis oleh sistem._

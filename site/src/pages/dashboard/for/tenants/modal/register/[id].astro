@@ -1,28 +1,55 @@
 ---
 import { db } from "@indekos/database";
+import dayjs from "@indekos/utilities/date";
 
 import { actions } from "astro:actions";
+import { z } from "astro/zod";
 
 import FormField from "~/components/form/form-field.astro";
 import ModalForm from "~/components/form/modal-form.astro";
 import Modal from "~/components/modal/modal.astro";
 import NotFound from "~/components/ui/not-found.astro";
 import AvailableRoomsSelect from "../_available-rooms-select.astro";
+import {
+	datesBetween,
+	endDateCalendar,
+	type CalendarData,
+} from "../_lease-calendar-helpers";
 
 export const partial = true;
 
 const tenant = await db.query.tenants.findFirst({
 	columns: { id: true, fullName: true },
+	with: {
+		leaseHistory: {
+			columns: { startDate: true, endDate: true },
+		},
+	},
 	where: { id: Number(Astro.params.id) },
 });
 
 if (!tenant) Astro.response.status = 404;
+
+const disabledStartDates = (tenant?.leaseHistory ?? []).flatMap((lease) => {
+	const end = lease.endDate ?? dayjs().toDate();
+	return datesBetween(lease.startDate, end);
+});
+
+const { start_date: startDate } = Astro.locals.parseQuery(
+	z.object({ start_date: z.iso.date().optional() }),
+);
+
+const startDateCalendar: CalendarData = { disabled: disabledStartDates };
+const endDateCalendarData: CalendarData = startDate
+	? endDateCalendar(startDate)
+	: { enabled: [] };
 ---
 
 <Modal
 	id="register_tenant"
 	title="Daftarkan Ulang Sewa"
 	icon="lucide:file-plus"
+	modalClass="max-w-3xl"
 >
 	{
 		tenant ? (
@@ -41,15 +68,36 @@ if (!tenant) Astro.response.status = 404;
 
 					<div class="grid grid-cols-2 gap-3">
 						<FormField label="Tanggal Mulai">
+							<div
+								hx-get={Astro.url.pathname}
+								hx-trigger="input from:next"
+								class="reg-period vc w-full"
+								data-calendar={JSON.stringify(startDateCalendar)}
+								hx-include="input[name=start_date]"
+								hx-select="#reg-period-end"
+								hx-swap="outerHTML"
+								hx-target="#reg-period-end"
+							/>
 							<input
 								class="input w-full"
 								name="start_date"
-								type="date"
+								type="text"
+								readonly
 								required
 							/>
 						</FormField>
 						<FormField label="Tanggal Selesai">
-							<input class="input w-full" name="end_date" type="date" />
+							<div
+								class="reg-period vc w-full"
+								id="reg-period-end"
+								data-calendar={JSON.stringify(endDateCalendarData)}
+							/>
+							<input
+								class="input w-full"
+								name="end_date"
+								type="text"
+								readonly
+							/>
 						</FormField>
 					</div>
 				</ModalForm>
@@ -59,3 +107,24 @@ if (!tenant) Astro.response.status = 404;
 		)
 	}
 </Modal>
+
+<script>
+	import { initCalendar } from "../_lease-calendar";
+
+	initCalendar({
+		selector: ".reg-period",
+		onClickDate: ({ calendar, date }) => {
+			const input = calendar.nextElementSibling as HTMLInputElement;
+			input.value = date ?? "";
+
+			if (input.name === "start_date") {
+				const endDateInput = calendar
+					.closest(".grid")
+					?.querySelector("input[name=end_date]");
+				if (endDateInput instanceof HTMLInputElement) endDateInput.value = "";
+			}
+
+			input.dispatchEvent(new Event("input"));
+		},
+	});
+</script>

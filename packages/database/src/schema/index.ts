@@ -26,6 +26,9 @@ export const NOTIFICATION_TYPES = [
 	"payment_success",
 	"welcome",
 	"phone_change",
+	"move_success",
+	"move_additional_payment",
+	"move_payment_success",
 ] as const;
 export const NOTIFICATION_STATUS = ["pending", "sent", "failed"] as const;
 export const COMPLAINT_STATUS = ["open", "in_progress", "resolved"] as const;

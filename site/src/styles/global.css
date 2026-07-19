@@ -38,3 +38,9 @@
 		@apply pointer-events-none;
 	}
 }
+
+@utility vc {
+	&:not(input) {
+		@apply h-80;
+	}
+}

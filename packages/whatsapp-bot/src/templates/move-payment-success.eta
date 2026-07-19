@@ -1,0 +1,16 @@
+*✅ Pembayaran Selisih Diterima*
+
+Yth. <%= it.fullName %>,
+Pembayaran selisih biaya pindah kamar telah diterima.
+<% if (it.roomNumber) { %>
+📍 Kamar: <%= it.roomNumber %>
+<% } %><% if (it.amount) { %>
+💰 Jumlah: <%= it.amount %>
+<% } %><% if (it.date) { %>
+📅 Pembayaran: <%= it.date %>
+<% } %><% if (it.invoiceUrl) { %>
+🔗 Link Invoice: <%= it.invoiceUrl %>
+<% } %>
+Terima kasih.
+
+_Pesan ini dikirim otomatis oleh sistem._

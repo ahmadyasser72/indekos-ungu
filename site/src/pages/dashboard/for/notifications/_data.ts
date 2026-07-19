@@ -71,6 +71,9 @@ export const NOTIFICATION_TYPE_BADGES = {
 	payment_success: "badge-success",
 	welcome: "badge-primary",
 	phone_change: "badge-secondary",
+	move_success: "badge-info",
+	move_additional_payment: "badge-info",
+	move_payment_success: "badge-success",
 } satisfies Record<(typeof NOTIFICATION_TYPES)[number], string>;
 
 export const NOTIFICATION_TYPE_LABELS = {
@@ -79,6 +82,9 @@ export const NOTIFICATION_TYPE_LABELS = {
 	payment_success: "Pembayaran Sukses",
 	welcome: "Verifikasi",
 	phone_change: "Verifikasi Ganti Nomor",
+	move_success: "Pindah Kamar",
+	move_additional_payment: "Selisih Biaya Pindah Kamar",
+	move_payment_success: "Pembayaran Selisih Pindah Kamar",
 } satisfies Record<(typeof NOTIFICATION_TYPES)[number], string>;
 
 export const NOTIFICATION_STATUS_LABELS = {

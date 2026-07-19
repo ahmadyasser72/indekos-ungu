@@ -1,6 +1,6 @@
 ---
 import { db } from "@indekos/database";
-import { formatDate } from "@indekos/utilities/date";
+import dayjs, { formatDate } from "@indekos/utilities/date";
 
 import { actions } from "astro:actions";
 
@@ -9,6 +9,7 @@ import ModalForm from "~/components/form/modal-form.astro";
 import Modal from "~/components/modal/modal.astro";
 import NotFound from "~/components/ui/not-found.astro";
 import AvailableRoomsSelect from "../_available-rooms-select.astro";
+import { datesBetween, type CalendarData } from "../_lease-calendar-helpers";
 import { ROOM_TYPE_LABELS } from "../../../rooms/_data";
 
 export const partial = true;
@@ -18,16 +19,35 @@ const tenant = await db.query.tenants.findFirst({
 	where: { id: Number(Astro.params.id) },
 	with: {
 		lease: {
+			columns: { startDate: true, endDate: true },
 			with: { room: true },
 		},
 		leaseHistory: {
-			with: { room: true },
+			columns: { startDate: true, endDate: true },
 			orderBy: { startDate: "desc" },
 		},
 	},
 });
 
 if (!tenant || !tenant.lease) Astro.response.status = 404;
+
+const allLeases = [
+	...(tenant?.lease
+		? [{ startDate: tenant.lease.startDate, endDate: tenant.lease.endDate }]
+		: []),
+	...(tenant?.leaseHistory ?? []),
+];
+
+const disabledStartDates = allLeases.flatMap((lease) => {
+	const end = lease.endDate ?? dayjs().subtract(1, "day").toDate();
+	return datesBetween(lease.startDate, end);
+});
+
+const startDateCalendar: CalendarData = {
+	disabled: disabledStartDates,
+	disableToday: false,
+	disablePast: true,
+};
 ---
 
 <Modal
@@ -65,10 +85,15 @@ if (!tenant || !tenant.lease) Astro.response.status = 404;
 					</FormField>
 
 					<FormField label="Tanggal Pindah">
+						<div
+							class="move-period vc w-full"
+							data-calendar={JSON.stringify(startDateCalendar)}
+						/>
 						<input
 							class="input w-full"
 							name="start_date"
-							type="date"
+							type="text"
+							readonly
 							required
 						/>
 					</FormField>
@@ -79,3 +104,16 @@ if (!tenant || !tenant.lease) Astro.response.status = 404;
 		)
 	}
 </Modal>
+
+<script>
+	import { initCalendar } from "../_lease-calendar";
+
+	initCalendar({
+		selector: ".move-period",
+		onClickDate: ({ calendar, date }) => {
+			const input = calendar.nextElementSibling as HTMLInputElement;
+			input.value = date ?? "";
+			input.dispatchEvent(new Event("input"));
+		},
+	});
+</script>

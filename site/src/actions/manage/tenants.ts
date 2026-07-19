@@ -415,6 +415,36 @@ export const register = defineAction({
 			});
 		}
 
+		// Validate new lease doesn't overlap with any previous leases
+		const existingLeases = await db.query.leases.findMany({
+			columns: { id: true, startDate: true, endDate: true },
+			with: { room: { columns: { roomNumber: true } } },
+			where: { tenantId: input.id },
+		});
+		const newStart = dayjs(input.start_date).startOf("day");
+		const newEnd = input.end_date ? dayjs(input.end_date).endOf("day") : null;
+		const overlappingLease = existingLeases.find((lease) => {
+			const existingStart = dayjs(lease.startDate).startOf("day");
+			const existingEnd = lease.endDate
+				? dayjs(lease.endDate).endOf("day")
+				: null;
+			// overlap when: newStart < existingEnd AND existingStart < newEnd
+			// null end = open-ended = treated as infinity
+			const newBeforeExistingEnd =
+				!existingEnd || newStart.isBefore(existingEnd);
+			const existingBeforeNewEnd = !newEnd || existingStart.isBefore(newEnd);
+			return newBeforeExistingEnd && existingBeforeNewEnd;
+		});
+		if (overlappingLease) {
+			const fmt = (d: Date) => dayjs(d).format("DD MMM YYYY");
+			throw new ActionError({
+				code: "BAD_REQUEST",
+				message:
+					`Bentrok dengan sewa kamar ${overlappingLease.room.roomNumber} ` +
+					`(${fmt(overlappingLease.startDate)} – ${overlappingLease.endDate ? fmt(overlappingLease.endDate) : "buka"}).`,
+			});
+		}
+
 		log.info(
 			{ tenantId: input.id, roomId: input.room_id },
 			"attempting to re-register tenant with new lease",
@@ -512,37 +542,171 @@ export const move = defineAction({
 			"attempting to move tenant to new room",
 		);
 
-		db.transaction((tx) => {
-			const roomTaken = tx.query.leases
-				.findFirst({
-					columns: { id: true },
-					where: { roomId: input.room_id, isActive: true },
-				})
-				.sync();
+		const { newLeaseId, additionalInvoiceId, newRoomNumber } = db.transaction(
+			(tx) => {
+				const roomTaken = tx.query.leases
+					.findFirst({
+						columns: { id: true },
+						where: { roomId: input.room_id, isActive: true },
+					})
+					.sync();
 
-			if (roomTaken) {
-				log.error({ roomId: input.room_id }, "target room occupied");
-				throw new ActionError({
-					code: "BAD_REQUEST",
-					message: "Kamar tujuan sudah terisi.",
-				});
+				if (roomTaken) {
+					log.error({ roomId: input.room_id }, "target room occupied");
+					throw new ActionError({
+						code: "BAD_REQUEST",
+						message: "Kamar tujuan sudah terisi.",
+					});
+				}
+
+				tx.update(leases)
+					.set({
+						isActive: false,
+						endDate: dayjs(input.start_date).subtract(1, "day").toDate(),
+					})
+					.where(eq(leases.id, oldLease.id))
+					.run();
+
+				const [newLease] = tx
+					.insert(leases)
+					.values({
+						tenantId: input.id,
+						roomId: input.room_id,
+						startDate: new Date(input.start_date),
+						endDate: input.end_date ? new Date(input.end_date) : null,
+						isActive: true,
+					})
+					.returning({ id: leases.id })
+					.all();
+
+				const newRoom = tx.query.rooms
+					.findFirst({
+						columns: { monthlyPrice: true, roomNumber: true },
+						where: { id: input.room_id },
+					})
+					.sync();
+
+				const oldRoom = tx.query.rooms
+					.findFirst({
+						columns: { monthlyPrice: true },
+						where: { id: oldLease.roomId },
+					})
+					.sync();
+
+				// Cancel unpaid invoices on old lease
+				const unpaidInvoices = tx.query.invoices
+					.findMany({
+						columns: { id: true },
+						where: { leaseId: oldLease.id, status: "unpaid" },
+					})
+					.sync();
+
+				for (const inv of unpaidInvoices) {
+					tx.update(invoices)
+						.set({ status: "overdue" })
+						.where(eq(invoices.id, inv.id))
+						.run();
+				}
+
+				// Always notify tenant about the move
+				tx.insert(notifications)
+					.values({
+						tenantId: input.id,
+						roomId: input.room_id,
+						type: "move_success",
+						status: "pending",
+					})
+					.run();
+
+				// Create additional invoice for price difference (prorated)
+				let additionalInvoiceId: number | null = null;
+				let newRoomNumber: string | null = null;
+
+				if (
+					newRoom?.monthlyPrice &&
+					oldRoom?.monthlyPrice &&
+					newRoom.monthlyPrice > oldRoom.monthlyPrice
+				) {
+					const moveDate = dayjs(input.start_date);
+					let cycleStart = dayjs(oldLease.startDate);
+					let cycleEnd = cycleStart.add(1, "month");
+
+					// Find the billing cycle containing the move date
+					while (!moveDate.isBefore(cycleEnd, "day")) {
+						cycleStart = cycleEnd;
+						cycleEnd = cycleEnd.add(1, "month");
+					}
+
+					const totalCycleDays = cycleEnd.diff(cycleStart, "day");
+					const remainingDays = cycleEnd.diff(moveDate, "day");
+					const priceDifference = newRoom.monthlyPrice - oldRoom.monthlyPrice;
+					const additionalAmount = Math.round(
+						(priceDifference * remainingDays) / totalCycleDays,
+					);
+
+					if (additionalAmount > 0 && newLease) {
+						const dueDate = moveDate.add(3, "days").toDate();
+
+						const [additionalInvoice] = tx
+							.insert(invoices)
+							.values({
+								leaseId: newLease.id,
+								amount: additionalAmount,
+								dueDate,
+								status: "unpaid",
+							})
+							.returning({ id: invoices.id })
+							.all();
+
+						if (additionalInvoice) {
+							additionalInvoiceId = additionalInvoice.id;
+							newRoomNumber = newRoom.roomNumber;
+
+							tx.insert(notifications)
+								.values({
+									tenantId: input.id,
+									roomId: input.room_id,
+									invoiceId: additionalInvoice.id,
+									type: "move_additional_payment",
+									status: "pending",
+								})
+								.run();
+
+							log.info(
+								{
+									tenantId: input.id,
+									amount: additionalAmount,
+									remainingDays,
+								},
+								"additional invoice created for price difference",
+							);
+						}
+					}
+				}
+
+				return {
+					newLeaseId: newLease!.id,
+					additionalInvoiceId,
+					newRoomNumber,
+				};
+			},
+		);
+
+		// Generate payment link for additional invoice (outside transaction)
+		if (additionalInvoiceId) {
+			try {
+				await generatePaymentLink(
+					additionalInvoiceId,
+					context.locals.user?.id,
+					{ logger: log },
+				);
+			} catch (error) {
+				log.error(
+					{ error, invoiceId: additionalInvoiceId },
+					"failed to generate payment link for additional invoice",
+				);
 			}
-
-			tx.update(leases)
-				.set({ isActive: false, endDate: new Date() })
-				.where(eq(leases.id, oldLease.id))
-				.run();
-
-			tx.insert(leases)
-				.values({
-					tenantId: input.id,
-					roomId: input.room_id,
-					startDate: new Date(input.start_date),
-					endDate: input.end_date ? new Date(input.end_date) : null,
-					isActive: true,
-				})
-				.run();
-		});
+		}
 
 		await context.locals.logAudit(
 			"UPDATE",

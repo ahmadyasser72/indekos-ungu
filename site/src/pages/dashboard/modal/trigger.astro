@@ -159,6 +159,7 @@ if (selectedWorker === "invoice") {
 			// Show month start date
 			const monthStart = dayjs(yearMonth, "YYYY-MM")
 				.startOf("month")
+				.add(1, "month")
 				.format("YYYY-MM-DD");
 			data[monthStart] = ["1 Laporan Bulanan"];
 		}
@@ -223,7 +224,7 @@ export type Data = typeof data;
 
 	import type { Data } from "./trigger.astro";
 
-	htmx.onLoad((node) => {
+	const init = (node: unknown) => {
 		if (!(node instanceof HTMLElement)) return;
 
 		const calendarElement = node.matches(".vc#select-trigger-date")
@@ -274,5 +275,8 @@ export type Data = typeof data;
 		});
 
 		calendar.init();
-	});
+	};
+
+	htmx.onLoad((node) => init(node));
+	init(document.documentElement);
 </script>

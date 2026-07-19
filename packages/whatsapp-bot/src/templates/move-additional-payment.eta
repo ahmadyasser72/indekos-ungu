@@ -1,0 +1,17 @@
+*🔄 Pindah Kamar - Selisih Biaya*
+
+Yth. <%= it.fullName %>,
+Anda telah dipindahkan ke kamar baru.
+<% if (it.roomNumber) { %>
+📍 Kamar Baru: <%= it.roomNumber %>
+<% } %><% if (it.amount) { %>
+💰 Selisih Biaya: <%= it.amount %>
+<% } %><% if (it.dueDate) { %>
+📅 Batas Bayar: <%= it.dueDate %>
+<% } %><% if (it.paymentUrl) { %>
+💳 Bayar sekarang: <%= it.paymentUrl %>
+<% } %>
+Silakan lakukan pembayaran selisih biaya tepat waktu.
+Ketik *tagihan* untuk info lebih lanjut.
+
+_Pesan ini dikirim otomatis oleh sistem._

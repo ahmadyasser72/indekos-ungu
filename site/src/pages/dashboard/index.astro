@@ -137,7 +137,7 @@ const getStatusBadge = (status: string) => {
 						Astro.locals.user?.role !== "admin" && (
 							<a
 								class="btn btn-outline btn-primary btn-xs"
-								href="/dashboard/for/transactions"
+								href="/dashboard/for/invoices"
 							>
 								Lihat Semua
 							</a>
@@ -157,29 +157,47 @@ const getStatusBadge = (status: string) => {
 						</thead>
 						<tbody>
 							{
-								pendingBills.map(
-									({ tenant, room, dueDate, status, amount }) => (
-										<tr>
-											<td>{tenant}</td>
-											<td>
-												<span class="badge font-mono badge-neutral">
-													{room}
-												</span>
-											</td>
-											<td class="font-mono">{formatCurrency(amount)}</td>
-											<td class="font-mono">{formatDate(dueDate)}</td>
-											<td>
-												<span
-													class:list={[
-														"badge badge-sm font-bold",
-														getStatusBadge(status),
-													]}
-												>
-													{status}
-												</span>
-											</td>
-										</tr>
-									),
+								pendingBills.length === 0 ? (
+									<tr>
+										<td
+											class="py-12 text-center text-sm text-base-content/50"
+											colspan="5"
+										>
+											<div class="flex flex-col items-center justify-center py-12 text-center text-sm text-base-content/50">
+												<Icon
+													class="mb-2 text-base-content/30"
+													name="lucide:inbox"
+													size="size-10"
+												/>
+												Tidak ada tagihan mendekati jatuh tempo
+											</div>
+										</td>
+									</tr>
+								) : (
+									pendingBills.map(
+										({ tenant, room, dueDate, status, amount }) => (
+											<tr>
+												<td>{tenant}</td>
+												<td>
+													<span class="badge font-mono badge-neutral">
+														{room}
+													</span>
+												</td>
+												<td class="font-mono">{formatCurrency(amount)}</td>
+												<td class="font-mono">{formatDate(dueDate)}</td>
+												<td>
+													<span
+														class:list={[
+															"badge badge-sm font-bold",
+															getStatusBadge(status),
+														]}
+													>
+														{status}
+													</span>
+												</td>
+											</tr>
+										),
+									)
 								)
 							}
 						</tbody>
@@ -206,35 +224,51 @@ const getStatusBadge = (status: string) => {
 						)
 					}
 				</div>
-				<div class="divide-y divide-base-200">
+				<div
+					class:list={[
+						"divide-y divide-base-200",
+						recentComplaints.length === 0 && "h-full",
+					]}
+				>
 					{
-						recentComplaints.map(
-							({ description, createdAt, tenant, status }) => (
-								<div class="flex items-start justify-between rounded-lg px-2 py-3.5 transition-colors first:pt-0 last:pb-0 hover:bg-base-200/20">
-									<div class="flex flex-col gap-1">
-										<span class="text-sm font-bold text-base-content">
-											{description}
-										</span>
-										<div class="flex flex-wrap items-center gap-2 text-xs text-base-content/60">
-											<span class="badge badge-ghost badge-sm">
-												{tenant.lease?.room.roomNumber ?? "-"}
+						recentComplaints.length === 0 ? (
+							<div class="flex h-full flex-col items-center justify-center py-12 text-center text-sm text-base-content/50">
+								<Icon
+									class="mb-2 text-base-content/30"
+									name="lucide:inbox"
+									size="size-10"
+								/>
+								Belum ada komplain
+							</div>
+						) : (
+							recentComplaints.map(
+								({ description, createdAt, tenant, status }) => (
+									<div class="flex items-start justify-between rounded-lg px-2 py-3.5 transition-colors first:pt-0 last:pb-0 hover:bg-base-200/20">
+										<div class="flex flex-col gap-1">
+											<span class="text-sm font-bold text-base-content">
+												{description}
 											</span>
-											<span>&bull;</span>
-											<span>{tenant.fullName}</span>
-											<span>&bull;</span>
-											<span>{formatDate(createdAt)}</span>
+											<div class="flex flex-wrap items-center gap-2 text-xs text-base-content/60">
+												<span class="badge badge-ghost badge-sm">
+													{tenant.lease?.room.roomNumber ?? "-"}
+												</span>
+												<span>&bull;</span>
+												<span>{tenant.fullName}</span>
+												<span>&bull;</span>
+												<span>{formatDate(createdAt)}</span>
+											</div>
 										</div>
+										<span
+											class:list={[
+												"badge badge-sm font-bold",
+												COMPLAINT_STATUS_BADGES[status],
+											]}
+										>
+											{COMPLAINT_STATUS_LABELS[status]}
+										</span>
 									</div>
-									<span
-										class:list={[
-											"badge badge-sm font-bold",
-											COMPLAINT_STATUS_BADGES[status],
-										]}
-									>
-										{COMPLAINT_STATUS_LABELS[status]}
-									</span>
-								</div>
-							),
+								),
+							)
 						)
 					}
 				</div>

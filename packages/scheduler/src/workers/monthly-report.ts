@@ -60,7 +60,7 @@ export const runMonthlyReport: SchedulerWorkerFunction = async (
 			{
 				title: `Laporan Keuangan ${formatDate(startDate, "MMMM YYYY")}`,
 				body: `Terbayar: ${formatCurrency(paidTotal)} | Tertunggak: ${formatCurrency(unpaidTotal)}`,
-				url: "/dashboard/for/transactions",
+				url: `/dashboard/for/transactions?period=${formatDate(startDate, "YYYY-MM-DD")}~${formatDate(endDate, "YYYY-MM-DD")}`,
 			},
 			{ logger: log },
 		);

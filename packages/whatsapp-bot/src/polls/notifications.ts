@@ -131,6 +131,48 @@ export const pollNotifications = async (
 						dueDate: invoiceData ? formatDate(invoiceData.dueDate) : null,
 						paymentUrl,
 					});
+				} else if (notification.type === "move_additional_payment") {
+					const siteUrl = process.env.SITE_URL;
+					const paymentUrl =
+						siteUrl && invoiceData?.duitkuReference
+							? getPaymentUrlFromReference(invoiceData.duitkuReference)
+							: null;
+
+					msg = render("move-additional-payment", {
+						fullName: tenant.fullName,
+						roomNumber: invoiceData?.lease?.room?.roomNumber ?? null,
+						amount: invoiceData ? formatCurrency(invoiceData.amount) : null,
+						dueDate: invoiceData ? formatDate(invoiceData.dueDate) : null,
+						paymentUrl,
+					});
+				} else if (notification.type === "move_success") {
+					msg = render("move-success", {
+						fullName: tenant.fullName,
+						roomNumber: invoiceData?.lease?.room?.roomNumber ?? null,
+					});
+				} else if (notification.type === "move_payment_success") {
+					const wasUnverified = !tenant.isVerified;
+
+					if (wasUnverified) {
+						await db
+							.update(tenants)
+							.set({ isVerified: true })
+							.where(eq(tenants.id, tenant.id));
+					}
+
+					const siteUrl = process.env.SITE_URL;
+					const invoiceUrl =
+						siteUrl && invoiceData
+							? `${siteUrl}/invoice/${invoiceData.id}`
+							: null;
+
+					msg = render("move-payment-success", {
+						fullName: tenant.fullName,
+						roomNumber: invoiceData?.lease?.room?.roomNumber ?? null,
+						amount: invoiceData ? formatCurrency(invoiceData.amount) : null,
+						date: invoiceData ? formatDate(invoiceData.dueDate) : null,
+						invoiceUrl,
+					});
 				} else {
 					log?.warn(
 						{ notificationId: notification.id, type: notification.type },
@@ -168,6 +210,9 @@ export const pollNotifications = async (
 					payment_success: "konfirmasi pembayaran sukses",
 					overdue_reminder: "pengingat invoice jatuh tempo",
 					reminder: "pengingat pembayaran",
+					move_success: "konfirmasi pindah kamar",
+					move_additional_payment: "selisih biaya pindah kamar",
+					move_payment_success: "konfirmasi pembayaran selisih pindah kamar",
 				} satisfies Record<typeof notification.type, string>;
 				const botAction = `Bot mengirim ${notificationMessages[notification.type]} ke tenant #${tenant.id}`;
 
