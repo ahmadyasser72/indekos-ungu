@@ -1,6 +1,6 @@
 # 📄 Dokumentasi Antarmuka Sistem Manajemen Kos (Tangkapan Layar)
 
-Dokumen ini menjelaskan tangkapan layar (*screenshot*) antarmuka aplikasi **Indekos Ungu** yang diambil langsung dari implementasi sistem. Penjelasan memuat fungsi utama tiap halaman serta tombol aksi yang tersedia bagi pengelola kos. Struktur dokumen mengikuti pembagian `input` (halaman pengelolaan data) dan `output` (laporan/dokumen cetak) seperti pada folder `wireframe-v2`.
+Dokumen ini menjelaskan tangkapan layar (_screenshot_) antarmuka aplikasi **Indekos Ungu** yang diambil langsung dari implementasi sistem. Penjelasan memuat fungsi utama tiap halaman serta tombol aksi yang tersedia bagi pengelola kos. Struktur dokumen mengikuti pembagian `input` (halaman pengelolaan data) dan `output` (laporan/dokumen cetak) seperti pada folder `wireframe-v2`.
 
 ---
 
@@ -30,7 +30,7 @@ Bagian Tagihan Mendekati Jatuh Tempo menampilkan daftar tagihan yang perlu seger
 
 Halaman pengelolaan akun pengguna sistem. Setiap akun memiliki nama pengguna, peran, dan waktu terakhir mengakses sistem.
 
-Tombol Tambah Akun digunakan untuk membuat akun baru. Setiap baris akun memiliki tombol *Edit* untuk mengubah informasi akun dan tombol Hapus untuk menghapus akun dari sistem. Tersedia fitur Pencarian berdasarkan nama pengguna dan *Filter* berdasarkan peran.
+Tombol Tambah Akun digunakan untuk membuat akun baru. Setiap baris akun memiliki tombol _Edit_ untuk mengubah informasi akun dan tombol Hapus untuk menghapus akun dari sistem. Tersedia fitur Pencarian berdasarkan nama pengguna dan _Filter_ berdasarkan peran.
 
 </details>
 
@@ -43,7 +43,7 @@ Tombol Tambah Akun digunakan untuk membuat akun baru. Setiap baris akun memiliki
 
 Halaman untuk melihat seluruh data unit kamar kos beserta status ketersediaannya. Informasi mencakup nomor kamar, tipe kamar, harga sewa bulanan, dan status (Kosong, Terisi, atau Nonaktif). Data ditampilkan dalam bentuk kartu visual.
 
-Tombol *PDF* digunakan untuk mengunduh laporan kamar dan tombol Tambah Kamar untuk menambah unit baru. Setiap kartu kamar memiliki tombol Detail untuk melihat informasi lengkap, serta tombol *expand* (^) untuk mengakses aksi *Edit* Kamar dan Hapus. Tersedia fitur Pencarian berdasarkan nomor atau tipe kamar dan *Filter* berdasarkan status.
+Tombol _PDF_ digunakan untuk mengunduh laporan kamar dan tombol Tambah Kamar untuk menambah unit baru. Setiap kartu kamar memiliki tombol Detail untuk melihat informasi lengkap, serta tombol _expand_ (^) untuk mengakses aksi _Edit_ Kamar dan Hapus. Tersedia fitur Pencarian berdasarkan nomor atau tipe kamar dan _Filter_ berdasarkan status.
 
 </details>
 
@@ -56,7 +56,7 @@ Tombol *PDF* digunakan untuk mengunduh laporan kamar dan tombol Tambah Kamar unt
 
 Halaman untuk mengelola data penyewa yang menempati kamar kos. Informasi mencakup nama lengkap, nomor telepon, kamar yang ditempati, periode sewa, dan status keaktifan penghuni.
 
-Tombol *PDF* digunakan untuk mengunduh laporan penghuni, tombol Tambah Penghuni untuk mendaftarkan penyewa baru, dan tombol Permintaan *Chat* untuk membuka daftar permintaan *WhatsApp*. Setiap baris memiliki tombol *Chat* (*WhatsApp*), Detail, dan *dropdown* Aksi yang berisi opsi *Edit* Penghuni, Pindah Kamar, Berhenti Menginap, serta Nonaktifkan Penghuni. Tersedia fitur Pencarian berdasarkan nama penghuni dan *Filter* berdasarkan status.
+Tombol _PDF_ digunakan untuk mengunduh laporan penghuni, tombol Tambah Penghuni untuk mendaftarkan penyewa baru, dan tombol Permintaan _Chat_ untuk membuka daftar permintaan _WhatsApp_. Setiap baris memiliki tombol _Chat_ (_WhatsApp_), Detail, dan _dropdown_ Aksi yang berisi opsi _Edit_ Penghuni, Pindah Kamar, Berhenti Menginap, serta Nonaktifkan Penghuni. Tersedia fitur Pencarian berdasarkan nama penghuni dan _Filter_ berdasarkan status.
 
 </details>
 
@@ -69,7 +69,7 @@ Tombol *PDF* digunakan untuk mengunduh laporan penghuni, tombol Tambah Penghuni 
 
 Halaman untuk melacak keluhan atau kerusakan fasilitas dari penghuni kos. Setiap komplain mencakup deskripsi keluhan, status penanganan (Terbuka, Proses, Selesai), kamar terkait, nama penghuni pelapor, serta catatan tindak lanjut.
 
-Tombol *PDF* digunakan untuk mengunduh laporan komplain. Kotak Pilih Periode digunakan untuk memfilter berdasarkan rentang waktu. Tombol Tandai Proses digunakan untuk mengubah status menjadi sedang diproses, dan tombol Tandai Selesai untuk menyelesaikan komplain. Tersedia fitur Pencarian berdasarkan kata kunci deskripsi atau nama penghuni dan *Filter* berdasarkan status penanganan.
+Tombol _PDF_ digunakan untuk mengunduh laporan komplain. Kotak Pilih Periode digunakan untuk memfilter berdasarkan rentang waktu. Tombol Tandai Proses digunakan untuk mengubah status menjadi sedang diproses, dan tombol Tandai Selesai untuk menyelesaikan komplain. Tersedia fitur Pencarian berdasarkan kata kunci deskripsi atau nama penghuni dan _Filter_ berdasarkan status penanganan.
 
 </details>
 
@@ -80,9 +80,9 @@ Tombol *PDF* digunakan untuk mengunduh laporan komplain. Kotak Pilih Periode dig
 
 ![Transaksi](interface/input/6-transaksi.png)
 
-Halaman untuk melihat rekapitulasi tagihan dan riwayat pembayaran sewa bulanan penghuni. Setiap transaksi mencakup nomor *invoice*, nama penghuni, kamar, nominal, tanggal jatuh tempo, tanggal pembayaran, dan status pembayaran.
+Halaman untuk melihat rekapitulasi tagihan dan riwayat pembayaran sewa bulanan penghuni. Setiap transaksi mencakup nomor _invoice_, nama penghuni, kamar, nominal, tanggal jatuh tempo, tanggal pembayaran, dan status pembayaran.
 
-Tombol *PDF* digunakan untuk mengunduh laporan transaksi. Kotak Pilih Periode digunakan untuk memfilter berdasarkan bulan. Tersedia fitur Pencarian berdasarkan nama penghuni atau nomor kamar dan *Filter* berdasarkan status kelunasan.
+Tombol _PDF_ digunakan untuk mengunduh laporan transaksi. Kotak Pilih Periode digunakan untuk memfilter berdasarkan bulan. Tersedia fitur Pencarian berdasarkan nama penghuni atau nomor kamar dan _Filter_ berdasarkan status kelunasan.
 
 </details>
 
@@ -93,9 +93,9 @@ Tombol *PDF* digunakan untuk mengunduh laporan transaksi. Kotak Pilih Periode di
 
 ![Notifikasi](interface/input/7-notifikasi.png)
 
-Halaman untuk memantau pesan pengingat tagihan via *WhatsApp* yang dikirim sistem secara otomatis maupun manual. Setiap notifikasi mencatat waktu pengiriman, penghuni tujuan, jenis notifikasi, dan status terkirim atau gagal.
+Halaman untuk memantau pesan pengingat tagihan via _WhatsApp_ yang dikirim sistem secara otomatis maupun manual. Setiap notifikasi mencatat waktu pengiriman, penghuni tujuan, jenis notifikasi, dan status terkirim atau gagal.
 
-*Banner* Sistem Otomatisasi Aktif menampilkan informasi jadwal pengiriman otomatis setiap pukul 08:00 WITA. Tombol Jalankan Manual digunakan untuk mengirim pengingat secara langsung kepada penghuni yang belum lunas. Tombol *PDF* digunakan untuk mencetak riwayat notifikasi. Kotak Pilih Periode digunakan untuk memfilter berdasarkan bulan pengiriman dan fitur Pencarian untuk menelusuri berdasarkan nama penerima atau status.
+_Banner_ Sistem Otomatisasi Aktif menampilkan informasi jadwal pengiriman otomatis setiap pukul 08:00 WITA. Tombol Jalankan Manual digunakan untuk mengirim pengingat secara langsung kepada penghuni yang belum lunas. Tombol _PDF_ digunakan untuk mencetak riwayat notifikasi. Kotak Pilih Periode digunakan untuk memfilter berdasarkan bulan pengiriman dan fitur Pencarian untuk menelusuri berdasarkan nama penerima atau status.
 
 </details>
 
@@ -106,9 +106,9 @@ Halaman untuk memantau pesan pengingat tagihan via *WhatsApp* yang dikirim siste
 
 ![Chatbot](interface/input/8-chatbot.png)
 
-Halaman untuk melihat riwayat percakapan antara *chatbot* *WhatsApp* dengan penghuni. Setiap percakapan mencatat waktu terkirim, nama penghuni, kamar, arah pesan (Masuk/Keluar), serta isi pesan.
+Halaman untuk melihat riwayat percakapan antara _chatbot_ _WhatsApp_ dengan penghuni. Setiap percakapan mencatat waktu terkirim, nama penghuni, kamar, arah pesan (Masuk/Keluar), serta isi pesan.
 
-Tombol *PDF* digunakan untuk mengunduh laporan *chatbot*. Kotak Pilih Periode digunakan untuk memfilter berdasarkan bulan pelaporan dan fitur Pencarian untuk menemukan percakapan berdasarkan nama penghuni atau kata kunci isi pesan.
+Tombol _PDF_ digunakan untuk mengunduh laporan _chatbot_. Kotak Pilih Periode digunakan untuk memfilter berdasarkan bulan pelaporan dan fitur Pencarian untuk menemukan percakapan berdasarkan nama penghuni atau kata kunci isi pesan.
 
 </details>
 
@@ -119,9 +119,9 @@ Tombol *PDF* digunakan untuk mengunduh laporan *chatbot*. Kotak Pilih Periode di
 
 ![Audit](interface/input/9-audit.png)
 
-Halaman untuk mencatat seluruh aktivitas pengguna di dalam sistem. Setiap catatan memuat waktu kejadian, nama pengguna yang melakukan aksi, jenis aksi (CREATE/UPDATE/DELETE), tabel target, ID *record*, serta detail perubahan.
+Halaman untuk mencatat seluruh aktivitas pengguna di dalam sistem. Setiap catatan memuat waktu kejadian, nama pengguna yang melakukan aksi, jenis aksi (CREATE/UPDATE/DELETE), tabel target, ID _record_, serta detail perubahan.
 
-Tombol *PDF* digunakan untuk mengunduh laporan audit dan tombol Detail per catatan audit untuk melihat rincian perubahan. Tersedia fitur Pencarian berdasarkan aksi, tabel, atau pengguna dan *Filter* berdasarkan jenis aksi (CREATE, UPDATE, DELETE).
+Tombol _PDF_ digunakan untuk mengunduh laporan audit dan tombol Detail per catatan audit untuk melihat rincian perubahan. Tersedia fitur Pencarian berdasarkan aksi, tabel, atau pengguna dan _Filter_ berdasarkan jenis aksi (CREATE, UPDATE, DELETE).
 
 </details>
 
@@ -132,7 +132,7 @@ Tombol *PDF* digunakan untuk mengunduh laporan audit dan tombol Detail per catat
 
 ![Login](interface/input/10-login.png)
 
-Halaman masuk untuk mengakses sistem. Pengguna wajib memasukkan nama pengguna dan kata sandi yang benar. Jika berhasil, diarahkan ke *dashboard* sesuai peran.
+Halaman masuk untuk mengakses sistem. Pengguna wajib memasukkan nama pengguna dan kata sandi yang benar. Jika berhasil, diarahkan ke _dashboard_ sesuai peran.
 
 </details>
 
@@ -143,9 +143,9 @@ Halaman masuk untuk mengakses sistem. Pengguna wajib memasukkan nama pengguna da
 
 ![Tagihan](interface/input/11-tagihan.png)
 
-Halaman untuk mengelola daftar tagihan per kontrak sewa penghuni. Data ditampilkan per grup kontrak sewa, mencakup nomor kamar, nama penghuni, periode sewa (tanggal awal *s/d* sekarang), dan status keaktifan. Setiap tagihan mencakup nomor *invoice*, tanggal jatuh tempo, tanggal pembayaran, nominal, dan status (Lunas, Belum Bayar, Terlambat).
+Halaman untuk mengelola daftar tagihan per kontrak sewa penghuni. Data ditampilkan per grup kontrak sewa, mencakup nomor kamar, nama penghuni, periode sewa (tanggal awal _s/d_ sekarang), dan status keaktifan. Setiap tagihan mencakup nomor _invoice_, tanggal jatuh tempo, tanggal pembayaran, nominal, dan status (Lunas, Belum Bayar, Terlambat).
 
-Tombol *PDF* digunakan untuk mengunduh laporan tagihan. Kotak Pilih Periode digunakan untuk memfilter berdasarkan bulan. Tersedia fitur Pencarian berdasarkan nama penghuni atau nomor kamar dan *Filter* berdasarkan status. Pada setiap tagihan, tersedia tombol Generate untuk membuat tautan pembayaran beserta Tandai Lunas jika *link* belum di-generate, atau tombol Salin *Link* untuk menyalin URL pembayaran beserta Tandai Lunas jika *link* sudah di-generate, serta tombol *Invoice* untuk membuka halaman *invoice* penghuni.
+Tombol _PDF_ digunakan untuk mengunduh laporan tagihan. Kotak Pilih Periode digunakan untuk memfilter berdasarkan bulan. Tersedia fitur Pencarian berdasarkan nama penghuni atau nomor kamar dan _Filter_ berdasarkan status. Pada setiap tagihan, tersedia tombol Generate untuk membuat tautan pembayaran beserta Tandai Lunas jika _link_ belum di-generate, atau tombol Salin _Link_ untuk menyalin URL pembayaran beserta Tandai Lunas jika _link_ sudah di-generate, serta tombol _Invoice_ untuk membuka halaman _invoice_ penghuni.
 
 </details>
 
@@ -195,7 +195,7 @@ Laporan data pengaduan dari penghuni. Informasi mencakup nama penghuni, kamar te
 
 ![Laporan Transaksi](interface/output/4-laporan-transaksi.png)
 
-Laporan data transaksi keuangan pembayaran dalam periode tertentu. Informasi mencakup nomor *invoice*, nama penghuni, kamar, nominal, tanggal jatuh tempo, dan status kelunasan.
+Laporan data transaksi keuangan pembayaran dalam periode tertentu. Informasi mencakup nomor _invoice_, nama penghuni, kamar, nominal, tanggal jatuh tempo, dan status kelunasan.
 
 </details>
 
@@ -206,7 +206,7 @@ Laporan data transaksi keuangan pembayaran dalam periode tertentu. Informasi men
 
 ![Laporan Notifikasi](interface/output/5-laporan-notifikasi.png)
 
-Laporan data pengiriman pesan notifikasi pengingat tagihan. Informasi mencakup tanggal dibuat dan dikirim, nama penghuni tujuan, nomor *invoice* terkait, jenis notifikasi, serta status pengiriman.
+Laporan data pengiriman pesan notifikasi pengingat tagihan. Informasi mencakup tanggal dibuat dan dikirim, nama penghuni tujuan, nomor _invoice_ terkait, jenis notifikasi, serta status pengiriman.
 
 </details>
 
@@ -217,7 +217,7 @@ Laporan data pengiriman pesan notifikasi pengingat tagihan. Informasi mencakup t
 
 ![Laporan Chatbot](interface/output/6-laporan-chatbot.png)
 
-Laporan data percakapan *chatbot* dengan penghuni. Informasi mencakup waktu percakapan, nama penghuni, kamar, arah pesan, dan isi percakapan.
+Laporan data percakapan _chatbot_ dengan penghuni. Informasi mencakup waktu percakapan, nama penghuni, kamar, arah pesan, dan isi percakapan.
 
 </details>
 
@@ -228,7 +228,7 @@ Laporan data percakapan *chatbot* dengan penghuni. Informasi mencakup waktu perc
 
 ![Laporan Audit](interface/output/7-laporan-audit.png)
 
-Laporan catatan aktivitas pengguna di dalam sistem. Informasi mencakup waktu kejadian, nama pengguna, jenis aksi, tabel data yang diubah, serta identitas *record* yang terpengaruh.
+Laporan catatan aktivitas pengguna di dalam sistem. Informasi mencakup waktu kejadian, nama pengguna, jenis aksi, tabel data yang diubah, serta identitas _record_ yang terpengaruh.
 
 </details>
 
@@ -239,7 +239,7 @@ Laporan catatan aktivitas pengguna di dalam sistem. Informasi mencakup waktu kej
 
 ![Invoice](interface/output/8-invoice.png)
 
-Halaman tagihan pembayaran yang dikirimkan kepada penghuni. Informasi mencakup nomor *invoice*, periode tagihan, rincian biaya sewa kamar, serta total tagihan yang harus dibayar.
+Halaman tagihan pembayaran yang dikirimkan kepada penghuni. Informasi mencakup nomor _invoice_, periode tagihan, rincian biaya sewa kamar, serta total tagihan yang harus dibayar.
 
 </details>
 
@@ -250,7 +250,7 @@ Halaman tagihan pembayaran yang dikirimkan kepada penghuni. Informasi mencakup n
 
 ![Laporan Tagihan](interface/output/9-laporan-tagihan.png)
 
-Laporan rekapitulasi tagihan per kontrak sewa penghuni dalam periode tertentu. Data dikelompokkan per kamar dan penghuni, mencakup nomor *invoice*, tanggal jatuh tempo, tanggal pembayaran, nominal, dan status kelunasan.
+Laporan rekapitulasi tagihan per kontrak sewa penghuni dalam periode tertentu. Data dikelompokkan per kamar dan penghuni, mencakup nomor _invoice_, tanggal jatuh tempo, tanggal pembayaran, nominal, dan status kelunasan.
 
 </details>
 

@@ -190,7 +190,7 @@ const tenantsStats = getTenantsStats(tenants);
 						}) => {
 							const status = isActive ? "Aktif" : "Selesai";
 							return (
-								<tr class:list={[( !isVerified || isBlocked) && "opacity-60"]}>
+								<tr class:list={[(!isVerified || isBlocked) && "opacity-60"]}>
 									<td class="font-semibold">
 										<div class="flex items-center gap-3">
 											<div class="avatar avatar-placeholder">
@@ -291,56 +291,72 @@ const tenantsStats = getTenantsStats(tenants);
 																Pindah Kamar
 															</button>
 														</li>
-												<li>
-														<button
-															hx-get={`/dashboard/for/tenants/modal/terminate/${id}`}
-															class="text-error"
-														>
-															<Icon name="lucide:x" /> Berhenti Menginap
-														</button>
-													</li>
-													<li>
-														<button
-															hx-get={`/dashboard/for/tenants/modal/block/${id}`}
-															class:list={[isBlocked && "text-success"]}
-														>
-															<Icon name={isBlocked ? "lucide:check-circle" : "lucide:ban"} />
-															{isBlocked ? "Aktifkan Chatbot" : "Nonaktifkan Chatbot"}
-														</button>
-													</li>
-												</ActionsMenu>
-											) : (
-												<ActionsMenu
-													id={id}
-													menuClass="w-52"
-													triggerLabel="Aksi"
-												>
-													<li>
-														<button
-															hx-get={`/dashboard/for/tenants/modal/edit/${id}`}
-														>
-															<Icon name="lucide:pencil" />
-															Edit
-														</button>
-													</li>
-													<li>
-														<button
-															hx-get={`/dashboard/for/tenants/modal/register/${id}`}
-															class="text-success"
-														>
-															<Icon name="lucide:plus" /> Sewa Baru
-														</button>
-													</li>
-													<li>
-														<button
-															hx-get={`/dashboard/for/tenants/modal/block/${id}`}
-															class:list={[isBlocked && "text-success"]}
-														>
-															<Icon name={isBlocked ? "lucide:check-circle" : "lucide:ban"} />
-															{isBlocked ? "Aktifkan Chatbot" : "Nonaktifkan Chatbot"}
-														</button>
-													</li>
-												</ActionsMenu>
+														<li>
+															<button
+																hx-get={`/dashboard/for/tenants/modal/terminate/${id}`}
+																class="text-error"
+															>
+																<Icon name="lucide:x" /> Berhenti Menginap
+															</button>
+														</li>
+														<li>
+															<button
+																hx-get={`/dashboard/for/tenants/modal/block/${id}`}
+																class:list={[isBlocked && "text-success"]}
+															>
+																<Icon
+																	name={
+																		isBlocked
+																			? "lucide:check-circle"
+																			: "lucide:ban"
+																	}
+																/>
+																{isBlocked
+																	? "Aktifkan Chatbot"
+																	: "Nonaktifkan Chatbot"}
+															</button>
+														</li>
+													</ActionsMenu>
+												) : (
+													<ActionsMenu
+														id={id}
+														menuClass="w-52"
+														triggerLabel="Aksi"
+													>
+														<li>
+															<button
+																hx-get={`/dashboard/for/tenants/modal/edit/${id}`}
+															>
+																<Icon name="lucide:pencil" />
+																Edit
+															</button>
+														</li>
+														<li>
+															<button
+																hx-get={`/dashboard/for/tenants/modal/register/${id}`}
+																class="text-success"
+															>
+																<Icon name="lucide:plus" /> Sewa Baru
+															</button>
+														</li>
+														<li>
+															<button
+																hx-get={`/dashboard/for/tenants/modal/block/${id}`}
+																class:list={[isBlocked && "text-success"]}
+															>
+																<Icon
+																	name={
+																		isBlocked
+																			? "lucide:check-circle"
+																			: "lucide:ban"
+																	}
+																/>
+																{isBlocked
+																	? "Aktifkan Chatbot"
+																	: "Nonaktifkan Chatbot"}
+															</button>
+														</li>
+													</ActionsMenu>
 												))}
 										</div>
 									</td>

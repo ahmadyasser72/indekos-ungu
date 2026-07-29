@@ -46,7 +46,10 @@ const { worker: selectedWorker } = Astro.locals.parseQuery(
 
 const data: Record<string, string[]> = {};
 const cumulativeCounts: Record<string, number> = {};
-const pendingByDate: Record<string, { roomNumber: string; tenantName: string }[]> = {};
+const pendingByDate: Record<
+	string,
+	{ roomNumber: string; tenantName: string }[]
+> = {};
 
 if (selectedWorker === "invoice") {
 	const activeLeases = await db.query.leases.findMany({
@@ -103,8 +106,7 @@ if (selectedWorker === "invoice") {
 		const cutoff = dayjs(dateStr).subtract(23, "hours");
 		return existingNotifications.some(
 			(n) =>
-				n.invoiceId === invoiceId &&
-				dayjs(n.createdAt).isAfter(cutoff, "hour"),
+				n.invoiceId === invoiceId && dayjs(n.createdAt).isAfter(cutoff, "hour"),
 		);
 	};
 
@@ -199,30 +201,36 @@ if (selectedWorker === "invoice") {
 const windowDays = selectedWorker === "payment-reminder" ? 3 : 7;
 const sortedDates = Object.keys(pendingByDate).sort();
 
-	for (const dateStr of sortedDates) {
-		const windowStart = dayjs(dateStr).subtract(windowDays - 1, "day").format("YYYY-MM-DD");
+for (const dateStr of sortedDates) {
+	const windowStart = dayjs(dateStr)
+		.subtract(windowDays - 1, "day")
+		.format("YYYY-MM-DD");
 
-		const windowItems: { roomNumber: string; tenantName: string }[] = [];
-		const seen = new Set<string>();
-		for (const d of sortedDates) {
-			if (d >= windowStart && d <= dateStr) {
-				for (const item of pendingByDate[d]) {
-					const key = `${item.roomNumber}-${item.tenantName}`;
-					if (!seen.has(key)) {
-						seen.add(key);
-						windowItems.push(item);
-					}
+	const windowItems: { roomNumber: string; tenantName: string }[] = [];
+	const seen = new Set<string>();
+	for (const d of sortedDates) {
+		if (d >= windowStart && d <= dateStr) {
+			for (const item of pendingByDate[d]) {
+				const key = `${item.roomNumber}-${item.tenantName}`;
+				if (!seen.has(key)) {
+					seen.add(key);
+					windowItems.push(item);
 				}
 			}
 		}
-		cumulativeCounts[dateStr] = windowItems.length;
-
-		data[dateStr] = windowItems.map(
-			({ roomNumber, tenantName }) => `${roomNumber} - ${tenantName}`,
-		);
 	}
+	cumulativeCounts[dateStr] = windowItems.length;
 
-export type Data = { items: Record<string, string[]>; cumulativeCounts: Record<string, number>; shortLabel: string };
+	data[dateStr] = windowItems.map(
+		({ roomNumber, tenantName }) => `${roomNumber} - ${tenantName}`,
+	);
+}
+
+export type Data = {
+	items: Record<string, string[]>;
+	cumulativeCounts: Record<string, number>;
+	shortLabel: string;
+};
 ---
 
 <Modal
@@ -266,7 +274,11 @@ export type Data = { items: Record<string, string[]>; cumulativeCounts: Record<s
 			<div
 				class="vc"
 				id="select-trigger-date"
-				data-calendar={JSON.stringify({ items: data, cumulativeCounts, shortLabel: shortLabels[selectedWorker ?? "invoice"] ?? "Worker" })}
+				data-calendar={JSON.stringify({
+					items: data,
+					cumulativeCounts,
+					shortLabel: shortLabels[selectedWorker ?? "invoice"] ?? "Worker",
+				})}
 			>
 			</div>
 			<input name="target" type="hidden" />
@@ -324,7 +336,9 @@ export type Data = { items: Record<string, string[]>; cumulativeCounts: Record<s
 						html: [
 							'<div class="flex max-w-52 min-w-full flex-col flex-wrap items-center gap-1 py-2 text-xs font-medium">',
 							...(cumulativeCounts[date]
-								? [`<span class="badge badge-xs badge-primary">${cumulativeCounts[date]} ${shortLabel}</span>`]
+								? [
+										`<span class="badge badge-xs badge-primary">${cumulativeCounts[date]} ${shortLabel}</span>`,
+									]
 								: []),
 							...items.map(
 								(item) =>

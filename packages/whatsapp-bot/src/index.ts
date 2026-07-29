@@ -223,7 +223,11 @@ export const main = async () => {
 					tenantId: tenant.id,
 				});
 
-				if (tenant.isBlocked && !(lowerText === "cs" || lowerText.startsWith("cs ")) && !conversationManager.hasActiveSession(jid)) {
+				if (
+					tenant.isBlocked &&
+					!(lowerText === "cs" || lowerText.startsWith("cs ")) &&
+					!conversationManager.hasActiveSession(jid)
+				) {
 					const blockedUntil = blockedCooldowns.get(jid);
 					if (blockedUntil && Date.now() < blockedUntil) return;
 
@@ -269,10 +273,7 @@ export const main = async () => {
 					conversationManager.startSession(jid, tenant, "contact_staff");
 
 					const csInput: MessageInput = { text };
-					const reply = await conversationManager.handleMessage(
-						jid,
-						csInput,
-					);
+					const reply = await conversationManager.handleMessage(jid, csInput);
 					if (reply)
 						await replyAndLog(
 							jid,
