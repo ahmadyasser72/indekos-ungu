@@ -1,0 +1,52 @@
+@startuml Manajemen Penghuni
+title Manajemen Penghuni
+
+skinparam backgroundColor #FFFFFF
+skinparam activityBorderColor #333333
+skinparam activityBackgroundColor #F8F8F8
+skinparam activityBorderThickness 2
+skinparam arrowThickness 2
+skinparam swimlaneBorderColor #444444
+skinparam swimlaneTitleBackgroundColor #E0E0E0
+skinparam swimlaneTitleFontSize 14
+skinparam swimlaneTitleFontStyle bold
+skinparam defaultTextColor #222222
+
+|Admin / Staff|
+start
+:Login ke sistem;
+:Buka menu Manajemen Penghuni;
+:Pilih aksi;
+
+if (Tambah penghuni baru?) then (ya)
+  :Isi data penghuni (nama, nomor telepon, dan lain-lain);
+  :Pilih kamar tersedia;
+  :Tentukan durasi sewa;
+elseif (Edit data penghuni?) then (ya)
+  :Cari penghuni;
+  :Ubah data penghuni;
+elseif (Terminate sewa?) then (ya)
+  :Pilih penghuni aktif;
+  :Konfirmasi terminate sewa;
+elseif (Pindah kamar?) then (ya)
+  :Pilih penghuni;
+  :Pilih kamar baru;
+  :Tentukan tanggal pindah;
+endif
+
+|Sistem|
+:Validasi nomor telepon unik;
+:Validasi kamar tersedia;
+
+if (Semua valid?) then (ya)
+  :Buat / perbarui kontrak sewa;
+  :Buat tagihan pertama (jika baru);
+  :Catat audit log;
+  :Tampilkan konfirmasi sukses;
+else (tidak)
+  :Tampilkan pesan error;
+  :Kembali ke form;
+endif
+
+stop
+@enduml

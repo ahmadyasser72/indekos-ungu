@@ -19,21 +19,38 @@ export const paymentHistory: CommandHandlerFunction = async (
 	log?.debug({ tenantId: tenant.id }, "retrieving payment history");
 
 	try {
-		const lease = await db.query.leases.findFirst({
-			columns: { id: true },
-			where: { tenantId: tenant.id, isActive: true },
+		const allLeases = await db.query.leases.findMany({
+			where: { tenantId: tenant.id },
 			with: {
+				room: true,
 				invoices: {
 					where: { status: "paid" },
-					limit: 10,
+					orderBy: { dueDate: "asc" },
 				},
 			},
+			orderBy: { startDate: "desc" },
 		});
 
-		if (!lease) {
-			log?.info({ tenantId: tenant.id }, "no active lease found");
+		if (allLeases.length === 0) {
+			log?.info({ tenantId: tenant.id }, "no leases found");
 			return "Anda tidak memiliki riwayat pembayaran.";
-		} else if (lease.invoices.length === 0) {
+		}
+
+		const leaseGroups = allLeases
+			.filter((l) => l.invoices.length > 0)
+			.map((l) => ({
+				roomNumber: l.room.roomNumber,
+				startDate: formatDate(l.startDate),
+				endDate: l.endDate ? formatDate(l.endDate) : "Berlangsung",
+				isActive: l.isActive,
+				paid: l.invoices.map(({ id, amount, dueDate }) => ({
+					id: formatInvoiceNumber({ id, dueDate }),
+					amount: formatCurrency(amount),
+					dueDate: formatDate(dueDate),
+				})),
+			}));
+
+		if (leaseGroups.length === 0) {
 			log?.info({ tenantId: tenant.id }, "no paid invoices found");
 			return "Belum ada riwayat pembayaran lunas.";
 		}
@@ -41,19 +58,12 @@ export const paymentHistory: CommandHandlerFunction = async (
 		log?.info(
 			{
 				tenantId: tenant.id,
-				leaseId: lease.id,
-				paid: lease.invoices.length,
+				leases: leaseGroups.length,
 			},
 			"payment history retrieved successfully",
 		);
 
-		return render("payment-history", {
-			paid: lease.invoices.map(({ id, amount, dueDate }) => ({
-				id: formatInvoiceNumber({ id, dueDate }),
-				amount: formatCurrency(amount),
-				dueDate: formatDate(dueDate),
-			})),
-		});
+		return render("payment-history", { leases: leaseGroups });
 	} catch (error) {
 		log?.error(
 			{ error, tenantId: tenant.id },

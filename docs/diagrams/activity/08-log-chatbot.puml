@@ -1,0 +1,35 @@
+@startuml
+' Use Case 08 - Log Chatbot (Staff/Owner)
+skinparam backgroundColor #FFFFFF
+skinparam activityBorderColor #333333
+skinparam activityBackgroundColor #F8F8F8
+skinparam activityBorderThickness 2
+skinparam arrowThickness 2
+skinparam swimlaneBorderColor #444444
+skinparam swimlaneTitleBackgroundColor #E0E0E0
+skinparam swimlaneTitleFontSize 14
+skinparam swimlaneTitleFontStyle bold
+skinparam defaultTextColor #222222
+
+|Staff/Owner|
+start
+:Login ke sistem;
+:Buka menu Log Chatbot;
+|Sistem|
+:Tampilkan daftar riwayat\npesan chatbot\nberdasarkan waktu;
+|Staff/Owner|
+:Lihat riwayat percakapan\npenghuni dengan chatbot;
+
+if (Ada log yang\nperlu dihapus?) then (Ya)
+  :Pilih satu atau lebih\nlog pesan yang dihapus;
+  :Konfirmasi hapus;
+
+  |Sistem|
+  :Hapus log pesan\ndari database;
+  :Catat audit:\n"Log chatbot dihapus\noleh Staff/Owner";
+  :Tampilkan konfirmasi\n"Log berhasil dihapus";
+else (Tidak)
+  :Selesai melihat log;
+endif
+stop
+@enduml

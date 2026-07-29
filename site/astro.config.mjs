@@ -9,12 +9,15 @@ export default defineConfig({
 	adapter: node({ mode: "standalone" }),
 	security: {
 		checkOrigin: false,
-		allowedDomains: [{ hostname: "cat.opah-barley.ts.net" }],
+		allowedDomains: [
+			{ hostname: "cat.opah-barley.ts.net" },
+			{ hostname: "indekos-ungu.my.id" },
+		],
 	},
 	vite: {
 		plugins: [tailwindcss()],
 		server: {
-			allowedHosts: ["cat.opah-barley.ts.net"],
+			allowedHosts: ["cat.opah-barley.ts.net", "indekos-ungu.my.id"],
 			hmr: false,
 		},
 	},

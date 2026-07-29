@@ -53,6 +53,7 @@ const totalUnpaid = unpaidInvoices.length;
 
 const pendingBills = unpaidInvoices
 	.slice(0, 5)
+	.filter(({ dueDate }) => dayjs(dueDate).diff(now, "days") <= 7)
 	.map(({ lease, dueDate, amount }) => {
 		const due = dayjs(dueDate);
 		const diffDays = due.diff(now, "days");
@@ -243,7 +244,14 @@ const getStatusBadge = (status: string) => {
 							</div>
 						) : (
 							recentComplaints.map(
-								({ description, imagePath, createdAt, tenant, room, status }) => (
+								({
+									description,
+									imagePath,
+									createdAt,
+									tenant,
+									room,
+									status,
+								}) => (
 									<div class="flex items-start justify-between rounded-lg px-2 py-3.5 transition-colors first:pt-0 last:pb-0 hover:bg-base-200/20">
 										<div class="flex gap-3">
 											{imagePath && (

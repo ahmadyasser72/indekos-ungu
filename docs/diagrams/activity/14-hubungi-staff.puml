@@ -1,0 +1,110 @@
+@startuml
+' Use Case 14 - Hubungi Staff via WhatsApp
+skinparam backgroundColor #FFFFFF
+skinparam activityBorderColor #333333
+skinparam activityBackgroundColor #F8F8F8
+skinparam activityBorderThickness 2
+skinparam arrowThickness 2
+skinparam swimlaneBorderColor #444444
+skinparam swimlaneTitleBackgroundColor #E0E0E0
+skinparam swimlaneTitleFontSize 14
+skinparam swimlaneTitleFontStyle bold
+skinparam defaultTextColor #222222
+
+|Penghuni|
+start
+:Kirim pesan "cs" atau\n"cs [pesan]" via WhatsApp;
+
+|WhatsAppBot|
+:Terima pesan dari Penghuni;
+:Mulai sesi
+membantu hubungi staff;
+
+if (Pesan langsung\nada di kiriman?) then (Tidak)
+  :Kirim pertanyaan:\n"Silakan ketik pesan\nyang ingin disampaikan\n(minimal 5 karakter)";
+
+  |Penghuni|
+  :Ketik pesan;
+
+  |WhatsAppBot|
+  :Terima jawaban;
+endif
+
+if (Pesan valid?) then (Ya)
+  |Sistem|
+  :Simpan permintaan\nchat baru;
+
+  |WhatsAppBot|
+  :Beri tahu semua Staff:\n"Permintaan chat dari\n[nama]";
+  :Kirim balasan ke Penghuni:\n"Pesan diteruskan\nke staff. Mohon\ntunggu respons.";
+
+  |Penghuni|
+  :Terima konfirmasi;
+  :Kirim pesan tambahan\n(sambil menunggu);
+
+  |WhatsAppBot|
+  :Simpan pesan tambahan\nke antrian;
+  note right: Pesan akan terlihat\nstaff nanti di dashboard
+
+  |Staff|
+  :Lihat daftar permintaan\nchat di web dashboard;
+  :Klik "Terima";
+
+  |Sistem|
+  :Ubah status\npermintaan chat
+  menjadi diterima;
+
+  |Staff|
+  :Ketik & kirim pesan\nvia web dashboard;
+
+  |Sistem|
+  :Simpan pesan\ndari Staff;
+
+  |WhatsAppBot|
+  :Cek pesan baru\nsetiap 5 detik;
+  :Cari pesan dari\nStaff yang\nbelum dikirim;
+  :Kirim pesan ke Penghuni\nvia WhatsApp;
+  :Tandai pesan sudah\ndikirim;
+  :Catat audit log;
+
+  |Penghuni|
+  :Terima balasan\ndari Staff;
+  :Balas pesan\n(otomatis masuk\nke dashboard Staff);
+
+  |Staff|
+  :Lihat balasan\nPenghuni di dashboard;
+
+  repeat
+    :Staff kirim pesan\nvia dashboard;
+    |Sistem|
+    :Simpan pesan\ndari Staff;
+    |WhatsAppBot|
+    :Cek & kirim\nke Penghuni;
+    |Penghuni|
+    :Balas;
+  repeat while (Percakapan berlanjut?) is (Ya)
+
+  |Staff|
+  :Klik "Tutup chat";
+
+  |Sistem|
+  :Ubah status\npermintaan chat
+  menjadi ditutup;
+
+  |WhatsAppBot|
+  :Kirim notifikasi\npenutupan chat\nke Penghuni;
+
+  |Penghuni|
+  :Terima notifikasi\nchat selesai;
+
+else (Tidak)
+  |WhatsAppBot|
+  :Kirim ulang pertanyaan\n"Pesan terlalu pendek\n(minimal 5 karakter)";
+  note right: Penghuni bisa\nulang atau ketik\n"batal" untuk batalkan
+  |Penghuni|
+  :Ulangi jawaban\natau batal;
+
+endif
+
+stop
+@enduml

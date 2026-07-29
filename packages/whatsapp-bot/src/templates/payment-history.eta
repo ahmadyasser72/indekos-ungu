@@ -1,7 +1,6 @@
-*📋 Riwayat Pembayaran (<%= it.paid.length %> terakhir)*
+*📋 Riwayat Pembayaran*
 
-<% for (const inv of it.paid) { %>• Invoice #<%= inv.id %>
-  Jumlah: <%= inv.amount %>
-  Lunas: <%= inv.dueDate %>
-
+<% for (const lease of it.leases) { %>▸ Kamar <%= lease.roomNumber %> — <%= lease.startDate %> s/d <%= lease.endDate %> (<%= lease.isActive ? "Aktif" : "Selesai" %>)
+<% for (const inv of lease.paid) { %>• #<%= inv.id %> | <%= inv.amount %> | Lunas: <%= inv.dueDate %>
+<% } %>
 <% } %>Untuk detail lebih lanjut, hubungi staf.

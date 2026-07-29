@@ -1,0 +1,51 @@
+@startuml Manajemen Tagihan
+title Manajemen Tagihan
+
+skinparam backgroundColor #FFFFFF
+skinparam activityBorderColor #333333
+skinparam activityBackgroundColor #F8F8F8
+skinparam activityBorderThickness 2
+skinparam arrowThickness 2
+skinparam swimlaneBorderColor #444444
+skinparam swimlaneTitleBackgroundColor #E0E0E0
+skinparam swimlaneTitleFontSize 14
+skinparam swimlaneTitleFontStyle bold
+skinparam defaultTextColor #222222
+
+|Staff|
+start
+:Buka menu Tagihan;
+:Pilih tagihan yang akan diproses;
+
+if (Aksi yang dipilih?) then (Buat link bayar)
+  :Klik tombol "Buat Link Bayar";
+
+  |Sistem|
+  :Minta link pembayaran ke PaymentGateway;
+
+  |PaymentGateway|
+  :Buat link pembayaran;
+  :Kirim link ke sistem;
+
+  |Sistem|
+  :Simpan link ke database;
+  :Tampilkan link pembayaran ke staff;
+
+else (Tandai lunas manual)
+  :Klik tombol "Tandai Lunas";
+
+  |Sistem|
+  :Validasi tagihan belum lunas;
+
+  if (Belum lunas?) then (ya)
+    :Ubah status tagihan menjadi "Lunas";
+    :Kirim notifikasi ke penghuni;
+    :Catat audit log;
+    :Tampilkan konfirmasi sukses;
+  else (tidak)
+    :Tampilkan pesan "tagihan sudah lunas";
+  endif
+endif
+
+stop
+@enduml

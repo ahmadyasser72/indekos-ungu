@@ -16,7 +16,9 @@ export const listComplaints: CommandHandlerFunction = async (
 	try {
 		const latest = await db.query.complaints.findMany({
 			where: { tenantId: tenant.id },
+			with: { room: true },
 			limit: 3,
+			orderBy: { id: "desc" },
 		});
 
 		if (latest.length === 0) {
@@ -30,11 +32,12 @@ export const listComplaints: CommandHandlerFunction = async (
 		);
 
 		return render("list-complaints", {
-			items: latest.map(({ id, description, createdAt, status }) => ({
+			items: latest.map(({ id, description, createdAt, status, room }) => ({
 				id,
 				description,
 				createdAt: formatDate(createdAt),
 				status: STATUS_LABEL[status],
+				roomNumber: room.roomNumber,
 			})),
 		});
 	} catch (error) {

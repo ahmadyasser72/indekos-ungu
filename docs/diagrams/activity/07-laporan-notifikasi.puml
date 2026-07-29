@@ -1,0 +1,41 @@
+@startuml
+' Use Case 07 - Laporan Notifikasi (Staff/Owner)
+skinparam backgroundColor #FFFFFF
+skinparam activityBorderColor #333333
+skinparam activityBackgroundColor #F8F8F8
+skinparam activityBorderThickness 2
+skinparam arrowThickness 2
+skinparam swimlaneBorderColor #444444
+skinparam swimlaneTitleBackgroundColor #E0E0E0
+skinparam swimlaneTitleFontSize 14
+skinparam swimlaneTitleFontStyle bold
+skinparam defaultTextColor #222222
+
+|Staff/Owner|
+start
+:Login ke sistem;
+:Buka menu Notifikasi;
+:Lihat history notifikasi\nyang sudah dikirim;
+
+if (Ingin trigger ulang\nworker notifikasi?) then (Ya)
+  :Pilih jenis worker:\n- Pengingat bayar\n- Notifikasi terlambat\n- Buat tagihan\n- Laporan bulanan;
+  :Kirim perintah\nke sistem;
+
+  |Sistem|
+  :Jalankan worker\nnotifikasi sesuai jenis;
+  if (Worker berhasil\ndijalankan?) then (Ya)
+    :Catat audit:\n"Worker dijalankan\noleh Staff/Owner";
+    :Tampilkan notifikasi\n"Worker berhasil\ndijalankan";
+  else (Tidak)
+    :Catat audit:\n"Gagal jalankan worker";
+    :Tampilkan notifikasi error;
+  endif
+
+else (Tidak)
+  |Sistem|
+  :Tampilkan history\nnotifikasi;
+endif
+|Staff/Owner|
+:Selesai;
+stop
+@enduml

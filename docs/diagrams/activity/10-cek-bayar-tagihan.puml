@@ -1,0 +1,68 @@
+@startuml
+' Use Case 10 - Cek dan Bayar Tagihan via WhatsApp
+skinparam backgroundColor #FFFFFF
+skinparam activityBorderColor #333333
+skinparam activityBackgroundColor #F8F8F8
+skinparam activityBorderThickness 2
+skinparam arrowThickness 2
+skinparam swimlaneBorderColor #444444
+skinparam swimlaneTitleBackgroundColor #E0E0E0
+skinparam swimlaneTitleFontSize 14
+skinparam swimlaneTitleFontStyle bold
+skinparam defaultTextColor #222222
+
+|Penghuni|
+start
+:Kirim pesan "tagihan"\nvia WhatsApp;
+
+|WhatsAppBot|
+:Terima pesan dari Penghuni;
+:Cari penghuni berdasarkan\nnomor telepon;
+
+|Sistem|
+:Cari kontrak sewa aktif dan\ntagihan yang belum dibayar\nmilik penghuni;
+
+if (Ada tagihan yang\nbelum dibayar?) then (Ya)
+  :Buat daftar tagihan:\n- Nomor invoice\n- Jumlah\n- Jatuh tempo\n- Link bayar (Duitku);
+
+  |WhatsAppBot|
+  :Kirim balasan berisi\ndaftar tagihan + link bayar\nvia WhatsApp;
+
+  |Penghuni|
+  :Klik link bayar;
+  :Lakukan pembayaran\nvia halaman Duitku;
+
+  |PaymentGateway|
+  :Proses pembayaran\ndari penghuni;
+  :Kirim notifikasi\nke sistem\n(status sukses/gagal);
+
+  |Sistem|
+  :Terima notifikasi\npembayaran dari Duitku;
+  :Ubah status tagihan\nmenjadi "Lunas";
+  :Siapkan notifikasi\nkonfirmasi bayar;
+  :Catat audit log\npembayaran sukses;
+
+  |WhatsAppBot|
+  :Cek notifikasi baru\nsetiap 5 detik;
+  :Temukan notifikasi\nkonfirmasi bayar\nyang belum dikirim;
+
+  |Sistem|
+  :Ambil data penghuni\n+ invoice terkait;
+  if (Penghuni belum terverifikasi?) then (Ya)
+    :Ubah status penghuni\njadi terverifikasi;
+  endif
+  :Kirim pesan konfirmasi\npembayaran sukses\nvia WhatsApp;
+  :Catat audit log;
+
+  |Penghuni|
+  :Terima notifikasi\npembayaran berhasil;
+
+else (Tidak)
+  |WhatsAppBot|
+  :Kirim balasan\ntidak ada tagihan\naktif;
+  |Penghuni|
+  :Tidak ada tagihan\nperlu dibayar;
+endif
+
+stop
+@enduml

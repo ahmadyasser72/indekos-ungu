@@ -1,0 +1,38 @@
+@startuml Manajemen Komplain
+title Manajemen Komplain
+
+skinparam backgroundColor #FFFFFF
+skinparam activityBorderColor #333333
+skinparam activityBackgroundColor #F8F8F8
+skinparam activityBorderThickness 2
+skinparam arrowThickness 2
+skinparam swimlaneBorderColor #444444
+skinparam swimlaneTitleBackgroundColor #E0E0E0
+skinparam swimlaneTitleFontSize 14
+skinparam swimlaneTitleFontStyle bold
+skinparam defaultTextColor #222222
+
+|Staff|
+start
+:Login ke sistem;
+:Buka daftar komplain;
+:Pilih komplain yang masuk;
+:Lihat detail komplain;
+
+:Sunting status komplain menjadi "diproses";
+
+|Sistem|
+:Catat perubahan status dan waktu;
+
+|Staff|
+:Proses komplain / selesaikan masalah;
+:Masukkan catatan penyelesaian;
+
+:Ubah status komplain menjadi "selesai";
+
+|Sistem|
+:Catat audit log;
+:Tampilkan konfirmasi sukses;
+
+stop
+@enduml

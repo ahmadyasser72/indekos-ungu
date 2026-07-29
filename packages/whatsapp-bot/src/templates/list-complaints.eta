@@ -1,7 +1,7 @@
 *📋 Daftar Komplain (<%= it.items.length %> terbaru)*
 
 <% for (const item of it.items) { %>━━━━━━━━━━━━━━━━━━━
-🆔 #<%= item.id %>
+🆔 #<%= item.id %> · 🏠 Kamar <%= item.roomNumber %>
 📝 <%= item.description %>
 📅 <%= item.createdAt %>
 <%= item.status %>

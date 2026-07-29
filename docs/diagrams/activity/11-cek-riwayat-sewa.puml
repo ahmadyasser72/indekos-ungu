@@ -1,0 +1,50 @@
+@startuml
+' Use Case 11 - Cek Riwayat Sewa via WhatsApp
+skinparam backgroundColor #FFFFFF
+skinparam activityBorderColor #333333
+skinparam activityBackgroundColor #F8F8F8
+skinparam activityBorderThickness 2
+skinparam arrowThickness 2
+skinparam swimlaneBorderColor #444444
+skinparam swimlaneTitleBackgroundColor #E0E0E0
+skinparam swimlaneTitleFontSize 14
+skinparam swimlaneTitleFontStyle bold
+skinparam defaultTextColor #222222
+
+|Penghuni|
+start
+:Kirim pesan "riwayat"\nvia WhatsApp;
+
+|WhatsAppBot|
+:Terima pesan dari Penghuni;
+:Cari penghuni berdasarkan\nnomor telepon;
+
+|Sistem|
+:Cari SEMUA kontrak milik\npenghuni (aktif & sebelumnya)\nurutan terbaru;
+
+:Cari invoice berstatus\nlunas di tiap kontrak\nurutan tanggal jatuh tempo;
+
+if (Ada kontrak dengan\nriwayat lunas?) then (Ya)
+  :Kelompokkan invoice\nper kontrak:
+  - Nomor kamar
+  - Tanggal mulai – selesai
+  - Status kontrak
+  - Daftar invoice lunas
+    (nomor, jumlah, tanggal bayar);
+
+  |WhatsAppBot|
+  :Kirim balasan berisi\nda riwayat pembayaran\nper kontrak via WhatsApp;
+
+  |Penghuni|
+  :Lihat riwayat\npembayaran lunas;
+
+else (Tidak)
+  |WhatsAppBot|
+  :Kirim balasan\n"Belum ada riwayat\npembayaran lunas";
+  |Penghuni|
+  :Tidak ada riwayat;
+
+endif
+
+stop
+@enduml

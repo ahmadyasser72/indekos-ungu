@@ -1,0 +1,35 @@
+@startuml Manajemen Kamar
+title Manajemen Kamar
+
+skinparam backgroundColor #FFFFFF
+skinparam activityBorderColor #333333
+skinparam activityBackgroundColor #F8F8F8
+skinparam activityBorderThickness 2
+skinparam arrowThickness 2
+skinparam swimlaneBorderColor #444444
+skinparam swimlaneTitleBackgroundColor #E0E0E0
+skinparam swimlaneTitleFontSize 14
+skinparam swimlaneTitleFontStyle bold
+skinparam defaultTextColor #222222
+
+|Admin / Staff|
+start
+:Login ke sistem;
+:Buka menu Manajemen Kamar;
+:Tambah / ubah / hapus data kamar;
+:Submit form;
+
+|Sistem|
+:Validasi nomor kamar unik;
+
+if (Nomor kamar belum dipakai?) then (ya)
+  :Simpan perubahan ke database;
+  :Catat audit log;
+  :Tampilkan konfirmasi sukses;
+else (tidak)
+  :Tampilkan pesan error "nomor kamar sudah ada";
+  :Kembali ke form;
+endif
+
+stop
+@enduml

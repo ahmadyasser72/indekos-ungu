@@ -450,7 +450,7 @@ export const register = defineAction({
 			"attempting to re-register tenant with new lease",
 		);
 
-		db.transaction((tx) => {
+		const { insertedLease } = db.transaction((tx) => {
 			const roomTaken = tx.query.leases
 				.findFirst({
 					columns: { id: true },
@@ -466,7 +466,8 @@ export const register = defineAction({
 				});
 			}
 
-			tx.insert(leases)
+			const [lease] = tx
+				.insert(leases)
 				.values({
 					tenantId: input.id,
 					roomId: input.room_id,
@@ -474,7 +475,31 @@ export const register = defineAction({
 					endDate: input.end_date ? new Date(input.end_date) : null,
 					isActive: true,
 				})
-				.run();
+				.returning({ id: leases.id })
+				.all();
+
+			const room = tx.query.rooms
+				.findFirst({
+					where: { id: input.room_id },
+					columns: { monthlyPrice: true },
+				})
+				.sync();
+
+			if (room?.monthlyPrice && lease) {
+				const startDate = dayjs(input.start_date);
+				const dueDate = startDate.add(3, "days").toDate();
+
+				tx.insert(invoices)
+					.values({
+						leaseId: lease.id,
+						amount: room.monthlyPrice,
+						dueDate,
+						status: "unpaid",
+					})
+					.run();
+			}
+
+			return { insertedLease: lease };
 		});
 
 		await context.locals.logAudit(
@@ -486,6 +511,44 @@ export const register = defineAction({
 				toCamelCaseKeys(input),
 			),
 		);
+
+		// Query the invoice we just created
+		const createdInvoice = await db.query.invoices.findFirst({
+			where: { leaseId: insertedLease.id },
+			columns: { id: true },
+		});
+
+		if (!createdInvoice?.id) {
+			log.error("failed to find invoice for re-registered lease");
+			throw new ActionError({
+				code: "INTERNAL_SERVER_ERROR",
+				message: "Gagal membuat invoice untuk penghuni yang didaftarkan ulang.",
+			});
+		}
+
+		// Generate Duitku payment link
+		try {
+			await generatePaymentLink(createdInvoice.id, context.locals.user?.id, {
+				logger: log,
+			});
+		} catch (error) {
+			log.error(
+				{ error },
+				"failed to generate payment link for re-registered lease",
+			);
+			throw new ActionError({
+				code: "INTERNAL_SERVER_ERROR",
+				message: "Gagal membuat link pembayaran.",
+			});
+		}
+
+		await db.insert(notifications).values({
+			tenantId: input.id,
+			roomId: input.room_id,
+			invoiceId: createdInvoice.id,
+			type: "welcome",
+			status: "pending",
+		});
 
 		log.info({ tenantId: input.id }, "tenant re-registered successfully");
 		return { id: input.id };
@@ -542,8 +605,8 @@ export const move = defineAction({
 			"attempting to move tenant to new room",
 		);
 
-		const { newLeaseId, additionalInvoiceId, newRoomNumber, oldRoomNumber } = db.transaction(
-			(tx) => {
+		const { newLeaseId, additionalInvoiceId, newRoomNumber, oldRoomNumber } =
+			db.transaction((tx) => {
 				const roomTaken = tx.query.leases
 					.findFirst({
 						columns: { id: true },
@@ -664,16 +727,6 @@ export const move = defineAction({
 							additionalInvoiceId = additionalInvoice.id;
 							newRoomNumber = newRoom.roomNumber;
 
-							tx.insert(notifications)
-								.values({
-									tenantId: input.id,
-									roomId: input.room_id,
-									invoiceId: additionalInvoice.id,
-									type: "move_additional_payment",
-									status: "pending",
-								})
-								.run();
-
 							log.info(
 								{
 									tenantId: input.id,
@@ -694,15 +747,14 @@ export const move = defineAction({
 					newRoomNumber,
 					oldRoomNumber: oldRoom?.roomNumber ?? null,
 				};
-			},
-		);
+			});
 
 		// Generate payment link for additional invoice (outside transaction)
 		if (additionalInvoiceId) {
 			try {
 				const moveMonth = formatDate(input.start_date, "MMM YYYY");
 				const productDetails = oldRoomNumber
-					? `Pindah Kamar ${oldRoomNumber} → ${newRoomNumber} - ${moveMonth}`
+					? `Pindah Kamar ${oldRoomNumber} \u2192 ${newRoomNumber} - ${moveMonth}`
 					: `Pindah Kamar ${newRoomNumber} - ${moveMonth}`;
 				const itemName = oldRoomNumber
 					? `Selisih + Sewa ${newRoomNumber} (${moveMonth})`
@@ -713,6 +765,16 @@ export const move = defineAction({
 					context.locals.user?.id,
 					{ logger: log, productDetails, itemName },
 				);
+
+				// Insert notification AFTER payment link is ready,
+				// so poller always finds duitkuReference when it picks this up
+				await db.insert(notifications).values({
+					tenantId: input.id,
+					roomId: input.room_id,
+					invoiceId: additionalInvoiceId,
+					type: "move_additional_payment",
+					status: "pending",
+				});
 			} catch (error) {
 				log.error(
 					{ error, invoiceId: additionalInvoiceId },

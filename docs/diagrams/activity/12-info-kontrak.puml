@@ -1,0 +1,52 @@
+@startuml
+' Use Case 12 - Info Kontrak via WhatsApp
+skinparam backgroundColor #FFFFFF
+skinparam activityBorderColor #333333
+skinparam activityBackgroundColor #F8F8F8
+skinparam activityBorderThickness 2
+skinparam arrowThickness 2
+skinparam swimlaneBorderColor #444444
+skinparam swimlaneTitleBackgroundColor #E0E0E0
+skinparam swimlaneTitleFontSize 14
+skinparam swimlaneTitleFontStyle bold
+skinparam defaultTextColor #222222
+
+|Penghuni|
+start
+:Kirim pesan "info"\nvia WhatsApp;
+
+|WhatsAppBot|
+:Terima pesan dari Penghuni;
+:Cari penghuni berdasarkan\nnomor telepon;
+
+|Sistem|
+:Cari kontrak aktif + data\nkamar + invoice belum dibayar;
+
+if (Ada kontrak aktif?) then (Ya)
+  :Siapkan detail kontrak:
+  - Nama lengkap
+  - Nomor telepon
+  - Daerah asal
+  - Nomor kamar
+  - Tipe kamar
+  - Harga sewa per bulan
+  - Tanggal mulai sewa
+  - Tanggal selesai
+  - Status tunggakan\n(ada/tidak ada);
+
+  |WhatsAppBot|
+  :Kirim balasan berisi\ndetail kontrak via WhatsApp;
+
+  |Penghuni|
+  :Lihat info kontrak\nlengkap;
+
+else (Tidak)
+  |WhatsAppBot|
+  :Kirim balasan\n"Anda tidak memiliki\nkontrak sewa aktif";
+  |Penghuni|
+  :Tidak ada kontrak;
+
+endif
+
+stop
+@enduml

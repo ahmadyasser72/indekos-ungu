@@ -1,0 +1,34 @@
+@startuml
+' Use Case 06 - Laporan Transaksi (Staff/Owner)
+skinparam backgroundColor #FFFFFF
+skinparam activityBorderColor #333333
+skinparam activityBackgroundColor #F8F8F8
+skinparam activityBorderThickness 2
+skinparam arrowThickness 2
+skinparam swimlaneBorderColor #444444
+skinparam swimlaneTitleBackgroundColor #E0E0E0
+skinparam swimlaneTitleFontSize 14
+skinparam swimlaneTitleFontStyle bold
+skinparam defaultTextColor #222222
+
+|Staff/Owner|
+start
+:Login ke sistem;
+:Buka menu Laporan;
+:Pilih periode laporan\n(tanggal mulai & selesai);
+
+|Sistem|
+:Validasi periode yang dipilih;
+if (Periode valid?) then (Ya)
+  :Ambil data transaksi\ndari database\nberdasarkan periode;
+  :Hitung total pendapatan\ndan rekap status pembayaran;
+  :Tampilkan laporan\n(pendapatan & status bayar);
+  |Staff/Owner|
+  :Tinjau dan unduh\nlaporan jika perlu;
+else (Tidak)
+  |Sistem|
+  :Tampilkan pesan error:
+  "Periode tidak valid";
+endif
+stop
+@enduml

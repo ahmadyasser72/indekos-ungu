@@ -1,0 +1,85 @@
+@startuml
+' Use Case 13 - Komplain via WhatsApp + Penanganan Staff
+skinparam backgroundColor #FFFFFF
+skinparam activityBorderColor #333333
+skinparam activityBackgroundColor #F8F8F8
+skinparam activityBorderThickness 2
+skinparam arrowThickness 2
+skinparam swimlaneBorderColor #444444
+skinparam swimlaneTitleBackgroundColor #E0E0E0
+skinparam swimlaneTitleFontSize 14
+skinparam swimlaneTitleFontStyle bold
+skinparam defaultTextColor #222222
+
+|Penghuni|
+start
+:Kirim pesan "komplain"\nvia WhatsApp;
+
+|WhatsAppBot|
+:Terima pesan dari Penghuni;
+:Mulai sesi percakapan\nalur komplain;
+
+:Kirim pertanyaan:\n"Silakan tulis judul\ndan deskripsi komplain\n(minimal 5 karakter)";
+
+|Penghuni|
+:Jawab dengan deskripsi\nbisa disertakan foto;
+
+|WhatsAppBot|
+:Terima jawaban;
+
+if (Deskripsi valid?) then (Ya)
+  :Simpan gambar\n(foto komplain) jika ada;
+
+  |Sistem|
+  :Buat komplain baru:\n- penghuni\n- kamar\n- deskripsi\n- status terbuka;
+  :Simpan gambar\nke folder uploads;
+
+  |WhatsAppBot|
+  :Beri tahu Staff\ntentang komplain baru:\n"Komplain baru dari\n[nama] - [deskripsi]";
+  :Kirim konfirmasi\nke Penghuni bahwa\nkomplain berhasil dikirim;
+
+  |Penghuni|
+  :Terima konfirmasi\nkomplain terkirim;
+
+  |Staff|
+  :Lihat daftar komplain\ndi web dashboard;
+  :Klik tombol "Proses";
+
+  |Sistem|
+  :Ubah status komplain\nmenjadi diproses;
+  :Catat waktu proses;
+
+  |WhatsAppBot|
+  :Kirim pesan notifikasi\nke Penghuni via WhatsApp:\n"Komplain #Nomor sedang\ndiproses";
+  :Catat audit log;
+
+  |Penghuni|
+  :Terima notifikasi\n"Komplain sedang\ndiproses";
+
+  |Staff|
+  :Selesaikan komplain\n+ catatan penyelesaian\ndi web dashboard;
+
+  |Sistem|
+  :Ubah status komplain\nmenjadi selesai;
+  :Catat catatan penyelesaian;
+  :Catat staff penyelesai;
+  :Catat waktu selesai;
+
+  |WhatsAppBot|
+  :Kirim pesan notifikasi\nke Penghuni via WhatsApp:\n"Komplain #Nomor sudah\nselesai";
+  :Catat audit log;
+
+  |Penghuni|
+  :Terima notifikasi\nkomplain selesai;
+
+else (Tidak)
+  |WhatsAppBot|
+  :Kirim ulang pertanyaan\n"Deskripsi terlalu pendek\n(minimal 5 karakter)";
+  note right: Penghuni bisa\nulang atau ketik\n"batal" untuk batalkan
+  |Penghuni|
+  :Ulangi jawaban\natau batal;
+
+endif
+
+stop
+@enduml

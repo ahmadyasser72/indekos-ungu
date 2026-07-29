@@ -38,7 +38,8 @@ export const runInvoiceGeneration: SchedulerWorkerFunction = async (
 				const creationDate = cycleStart.subtract(7, "days");
 
 				// Stop if creation date is too far in the future
-				if (creationDate.isAfter(dayjs(referenceTime).add(2, "years"), "day")) break;
+				if (creationDate.isAfter(dayjs(referenceTime).add(2, "years"), "day"))
+					break;
 
 				// Only create if we're within the creation window (referenceTime >= creationDate)
 				// and before the cycle end
@@ -56,10 +57,6 @@ export const runInvoiceGeneration: SchedulerWorkerFunction = async (
 						});
 					}
 				}
-
-				cycleStart = cycleStart.add(1, "month");
-			}
-		}
 
 				cycleStart = cycleStart.add(1, "month");
 			}

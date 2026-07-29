@@ -43,6 +43,7 @@ interface TemplateParams {
 			description: string;
 			createdAt: string;
 			status: string;
+			roomNumber: string;
 		}>;
 	};
 	"submit-complaint": {
@@ -52,8 +53,15 @@ interface TemplateParams {
 	};
 	"submit-complaint-format": Record<string, never>;
 	"payment-history": {
-		paid: Array<{ id: string; amount: string; dueDate: string }>;
+		leases: Array<{
+			roomNumber: string;
+			startDate: string;
+			endDate: string;
+			isActive: boolean;
+			paid: Array<{ id: string; amount: string; dueDate: string }>;
+		}>;
 	};
+
 	"tenant-info": {
 		fullName: string;
 		phoneNumber: string;

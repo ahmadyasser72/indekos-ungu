@@ -1,0 +1,72 @@
+@startuml
+' Use Case 15 - Notifikasi Otomatis (Scheduler Workers + Bot Polling)
+skinparam backgroundColor #FFFFFF
+skinparam activityBorderColor #333333
+skinparam activityBackgroundColor #F8F8F8
+skinparam activityBorderThickness 2
+skinparam arrowThickness 2
+skinparam swimlaneBorderColor #444444
+skinparam swimlaneTitleBackgroundColor #E0E0E0
+skinparam swimlaneTitleFontSize 14
+skinparam swimlaneTitleFontStyle bold
+skinparam defaultTextColor #222222
+
+|SistemWorker (Cron)|
+start
+:Menunggu jadwal cron\nberikutnya;
+
+partition "Cron 1: Setiap hari" {
+  :Jalankan pembuatan\ntagihan baru dan\npengingat bayar\nsecara paralel;
+
+  :Hasil: Tagihan baru + link\npembayaran Duitku\ndibuat untuk kontrak aktif;
+
+  :Hasil: Notifikasi pengingat\nuntuk tagihan yang belum\ndibayar dengan jatuh\ntempo ≤ 3 hari;
+}
+
+partition "Cron 2: Setiap hari" {
+  :Jalankan pengecekan\ntagihan lewat jatuh\ntempo dan pengingat\nsecara berurutan;
+
+  :Hasil: Tagihan yang belum\ndibayar dan lewat jatuh\ntempo ditandai sebagai\n"terlambat";
+
+  :Hasil: Notifikasi pengingat\nuntuk tagihan yang\nsudah terlambat;
+}
+
+partition "Cron 3: Tanggal 1\nsetiap bulan" {
+  :Jalankan laporan bulanan;
+  :Hitung total tagihan\nbulan lalu (lunas\nvs belum bayar);
+  :Kirim notifikasi langsung\nke Staff/Owner\n(bukan via WhatsApp bot);
+
+  |StaffOwner|
+  :Terima laporan\nkeuangan bulanan\nvia browser;
+}
+
+|Sistem|
+:Sumber notifikasi tidak hanya cron;
+note right
+  - Selamat datang → setelah bayar pertama
+  - Bayar sukses → notifikasi Duitku
+  - Pindah kamar → saat pindah kamar
+  - Selisih pindah → bayar selisih pindah
+  - Verifikasi nomor → saat edit nomor telepon
+end note
+
+:Semua notifikasi siap dikirim ke WhatsApp Bot;
+
+|WhatsAppBot|
+:Cari notifikasi\nyang belum dikirim;
+
+if (Ada notifikasi\nbaru?) then (Ya)
+  :Ambil data penghuni\n+ nomor telepon;
+  if (Nomor telepon\nada?) then (Ya)
+    :Siapkan pesan sesuai\njenis notifikasi;
+    :Kirim via WhatsApp\nke Penghuni;
+    :Catat riwayat\npengiriman;
+  else (Tidak)
+    :Tandai notifikasi\nsebagai gagal;
+  endif
+else (Tidak)
+  :Tidak ada notifikasi\nbaru;
+endif
+
+stop
+@enduml
