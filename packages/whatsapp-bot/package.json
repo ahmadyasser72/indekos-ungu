@@ -14,14 +14,14 @@
 	"dependencies": {
 		"@indekos/database": "workspace:*",
 		"@indekos/utilities": "workspace:*",
-		"baileys": "7.0.0-rc13",
-		"es-toolkit": "1.49.0",
+		"baileys": "7.0.0-rc14",
+		"es-toolkit": "1.52.0",
 		"eta": "4.6.0",
 		"uqr": "0.1.3"
 	},
 	"devDependencies": {
-		"@types/bun": "1.3.14",
-		"@types/node": "26.1.1",
+		"@types/bun": "1.4.1",
+		"@types/node": "26.4.1",
 		"typescript": "6.0.3"
 	}
 }
